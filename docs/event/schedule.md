@@ -11,7 +11,7 @@ HackTheBurgh 2026 at the Nucleus Building, Edinburgh. Source: https://hackthebur
 | 12:00 | Team building & hacking begins |
 | 13:00 | Team deadline & lunch |
 | 14:00 | HRT workshop |
-| 15:00 | Metaview workshop |
+| 15:00 | Metaview workshop, Larch Lecture Theatre |
 | 16:00 | JetBrains workshop |
 | 17:00 | G-Research workshop |
 | 18:00 | MLH workshop |
@@ -28,5 +28,7 @@ HackTheBurgh 2026 at the Nucleus Building, Edinburgh. Source: https://hackthebur
 | 12:05 | Lunch |
 | 12:30 | Demo & judging |
 | 15:00 | Closing ceremony |
+
+The Metaview workshop's room comes from Metaview's slides, `reference/tracks/metaview/opening-slides.pdf`.
 
 The site doesn't say how projects are submitted. InstaLily's track has its own submission: `main` of the InstaLily team repository at 12:00 Sunday (see `tracks.md`).

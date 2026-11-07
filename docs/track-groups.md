@@ -2,7 +2,7 @@
 
 Which sponsor tracks one project can enter together, and which MLH challenges fit any project. This is analysis, not a decision: the chosen tracks and challenges are recorded in the root `AGENTS.md`. Track briefs and rules are summarised in `event/tracks.md` and `event/challenges.md`.
 
-The tracks fall into three groups that do not combine well with each other. Four challenges fit whichever group is chosen.
+The tracks fall into three groups that do not combine well with each other. Four challenges fit whichever group is chosen, and so does Metaview's overall prize.
 
 ## Group A: data, predictions and personal finance
 
@@ -31,6 +31,10 @@ Viridien wants a computer-vision pipeline that extracts lithological intervals f
 
 Viridien judges correctness, efficiency and simplicity, so adding technology for challenge prizes is likely to cost marks. It suits one teammate working in parallel as a separate module. Vultr GPUs are the only challenge that would help.
 
+## Metaview's overall prize fits any group
+
+Metaview's prize goes to the best project of the event, with no theme, so any project can compete for it. No judging criteria are given. A broadly impressive, polished demo is the safest bet, which favours Group A's consumer-facing product over Viridien's narrow pipeline. Metaview's own product is AI for hiring, but nothing suggests a hiring theme earns extra marks.
+
 ## Challenges that fit any group
 
 | Challenge | Why it fits any group | Caveat |
@@ -44,4 +48,4 @@ Tiger Data and ElevenLabs fit only Group A. Solana fits no group well.
 
 ## Reach of each group
 
-Group A with Wordsmith reaches four sponsor tracks plus Entire, Gemini, Vultr, Auth0 and Tiger Data, with no conflicting rules. Group B reaches two tracks, and InstaLily's contract alone is a large amount of work. Viridien reaches one track.
+Every group can also compete for Metaview's overall prize. Group A with Wordsmith reaches four sponsor tracks plus Entire, Gemini, Vultr, Auth0 and Tiger Data, with no conflicting rules. Group B reaches two tracks, and InstaLily's contract alone is a large amount of work. Viridien reaches one track.

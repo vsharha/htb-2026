@@ -1,6 +1,6 @@
 # Sponsor tracks
 
-The same project can be entered into any number of these tracks, and can win more than one. Track titles come from the sponsor table, `reference/tracks/sponsor-table.png`. Prizes come from the same table, with detail added where the sponsor's own material gives more. Each section has these fields:
+The same project can be entered into any number of these tracks, and can win more than one. Track titles come from the sponsor table, `reference/tracks/sponsor-table.png`, except Metaview's overall prize, which is only in Metaview's own slides. Prizes come from the same table, with detail added where the sponsor's own material gives more. Each section has these fields:
 
 - Source: the sponsor's own material in `reference/tracks/`, when there is any.
 - Brief: what the sponsor asks for.
@@ -108,3 +108,12 @@ The same project can be entered into any number of these tracks, and can win mor
   - Efficiency: processing time, memory, hardware and running costs.
   - Simplicity: complexity only where it improves results.
   - Automation.
+
+## Metaview: Best project overall
+
+- Prizes: US$500 for every member of the winning team. No other places listed.
+- Source: `reference/tracks/metaview/opening-slides.pdf` (opening-ceremony slides)
+- Brief: none. The slides present this as the overall prize for the best project of the event, not a themed track, and don't say whether teams must enter it separately.
+- Context: Metaview builds AI that helps companies hire people: it finds candidates and reviews applications, runs first interviews and writes notes, and brings the evidence together so the hiring team can decide. The slides say people make the hiring decisions, and that 7,000 companies use it.
+- Workshop: 15:00 Saturday in the Larch Lecture Theatre, 60 minutes, hands-on. Teams build an agent that finds someone who could refer them for a role. Bring a laptop and a coding agent; leave with a working agent.
+- Judging notes: none given.
