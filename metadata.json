@@ -3,7 +3,7 @@
   "checkpoint_id": "01M6W4JBHR7MGVR8HHB50W1PVW",
   "strategy": "manual-commit",
   "branch": "vultr",
-  "checkpoints_count": 7,
+  "checkpoints_count": 12,
   "files_touched": [
     "docs/ideas/audience-heatmap.md",
     "docs/product.md",
@@ -23,26 +23,33 @@
       "compact_transcript": "/0/transcript.jsonl",
       "content_hash": "/0/content_hash.txt",
       "prompt": "/0/prompt.txt"
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "compact_transcript": "/1/transcript.jsonl",
+      "content_hash": "/1/content_hash.txt",
+      "prompt": "/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 131559,
+    "input_tokens": 214431,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 2972672,
-    "output_tokens": 19546,
-    "api_call_count": 44
+    "cache_read_tokens": 6444928,
+    "output_tokens": 29004,
+    "api_call_count": 75
   },
   "redaction": {
-    "replacements": 130,
+    "replacements": 142,
     "layers": {
-      "betterleaks": 0,
+      "betterleaks": 6,
       "connection_string": 0,
       "credential_key": 0,
-      "credential_value": 2,
+      "credential_value": 10,
       "credentialed_uri": 0,
-      "entropy": 128,
+      "entropy": 132,
       "key_context": 0,
-      "provider_token": 0,
+      "provider_token": 4,
       "shell_stdin": 0
     }
   }
