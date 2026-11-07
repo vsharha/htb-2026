@@ -20,8 +20,9 @@ The same project can be entered into any number of these tracks, and can win mor
 ## G-Research: Make the invisible visible
 
 - Prizes: 1st Nintendo Switch 2s. No other places listed.
-- Brief: TODO, no material yet.
-- Judging notes: TODO
+- Source: `reference/tracks/g-research/brief.txt`
+- Brief: choose something that's hard to observe and show what data about it is hidden, how to find it, and what can be done with it. Teams can build tools to collect their own data or dig into public data. Examples given: your own sleep or study habits, how a music genre changes over time, a market's mood.
+- Judging notes: none given beyond the brief's three questions: what is hidden, how it is found, and what it enables.
 
 ## JetBrains: Help the Developer
 
