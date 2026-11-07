@@ -33,6 +33,11 @@ Read the relevant file before work aimed at a specific track or challenge.
 
 Stack, commands and layout: TODO once chosen.
 
+## Agent skills
+
+- Skills live in `.agents/skills/`, one folder each. `.claude/skills` is a symlink to `../.agents/skills`, so Claude Code and Codex read the same files. Edit skills only at the real path.
+- Load the `frontend-design` skill before UI work. It is vendored from Anthropic's `claude-plugins-official` marketplace, under the Apache 2.0 licence in its folder.
+
 ## Shared files that need approval
 
 Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md`, `CLAUDE.md`, `docs/tracks.md`, `docs/challenges.md`, `docs/schedule.md`, `reference/`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
