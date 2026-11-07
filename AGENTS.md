@@ -58,13 +58,20 @@ How to write anything under `docs/` is in `docs/AGENTS.md`. Read it before creat
 
 Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md` and `CLAUDE.md` at any level, `docs/event/`, `reference/`, `.agents/skills/`, `.mcp.json`, `.codex/config.toml`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
 
+## Changes you didn't make
+
+A teammate may run several agent sessions in parallel in one checkout, so a change this session didn't make is not necessarily another teammate's.
+
+- Call an uncommitted change you didn't make "from another session", unless something shows who made it. Teammates work in their own clones, so their uncommitted work never appears in yours.
+- Attribute a commit by its author. A commit authored under the user's Git identity is the user's own, made from another of their sessions. Call a change a teammate's only when a different person authored it.
+
 ## Committing
 
 - Start every task with `git pull --rebase --autostash`, so you work on teammates' latest pushes.
 - Commit after each working change, without asking, under the user's Git identity. Commits carry no agent attribution.
 - Messages are a single short subject line describing what was done, such as "Add pledge form validation", matching earlier commits.
 - Before each commit, run the repository's checks once they exist (listed under Project) and fix any failure.
-- Stage only the files you changed, by path. Never use `git add -A` or `git add .`, because other teammates' uncommitted files may be in the same tree.
+- Stage only the files you changed, by path. Never use `git add -A` or `git add .`, because the user's other sessions may have uncommitted files in the same tree.
 
 ## Pushing
 
