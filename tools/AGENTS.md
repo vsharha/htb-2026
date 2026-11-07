@@ -15,8 +15,8 @@ Run commands from `tools/`. Use uv for everything Python: no pip or poetry, and 
 ## How the code is laid out
 
 - `tools/src/tools/sources/<source>.py`: one module per data source, named after it. Each exposes `load(refresh: bool = False)`, which returns the source's data and downloads it first only if its output doesn't exist yet or `refresh` is true. Source modules are imported, not run.
-- `tools/src/tools/analyze.py`: the entry point. It imports the sources, combines them for one startup and writes the result for the web app.
-- Agents that call a language model, such as the competitor-campaign agent, use Pydantic AI.
+- `tools/src/tools/analyze.py`: the entry point. It imports the sources, joins them per census tract and writes the city dataset the web app reads.
+- These scripts call no language model. Everything that depends on one startup's form, including the Jev scoring and the competitor-campaign agent, runs in the web app.
 
 ## Where data is written
 
