@@ -32,6 +32,8 @@ The web app is a Next.js 16 project in `web/` (App Router, TypeScript, Tailwind 
 - `pnpm dev`: dev server on http://localhost:3000
 - `pnpm lint`, `pnpm typecheck` and `pnpm build`: the checks to run before each commit
 
+UI components come from shadcn/ui (`base-nova` style, on Base UI). Add one with `pnpm dlx shadcn@latest add <component>` from `web/`; it lands in `web/src/components/ui/`.
+
 `next dev` writes `web/AGENTS.md`, which points agents to the version-matched Next.js docs in `web/node_modules/next/dist/docs/`.
 
 ## Docs

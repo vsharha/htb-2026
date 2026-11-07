@@ -10,3 +10,4 @@ Every decision the user makes or confirms, including ones reported from teammate
 
 - Web app: Next.js 16 (App Router, TypeScript, Tailwind CSS 4, ESLint) managed with pnpm, in the `web/` folder rather than the repo root. The repo root stays for docs and agent config, and a second service such as a Python API can sit beside `web/` later. 2026-11-07.
 - Frontend UI: shadcn/ui components styled with Tailwind CSS v4. 2026-11-07.
+- LLM calls and AI agents: Vercel AI SDK. 2026-11-07.
