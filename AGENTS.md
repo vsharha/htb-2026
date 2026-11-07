@@ -24,7 +24,7 @@ Priority challenges, most important first: TODO, not decided yet.
 - `docs/event/tracks.md`: each sponsor track's prizes, brief and judging notes.
 - `docs/event/challenges.md`: each MLH challenge's technology, prize, what qualifies, and sign-up.
 - `docs/event/schedule.md`: the event schedule.
-- `docs/product.md`, `docs/status.md` and `docs/pitch/`: the product plan, what is built, and pitch material. See "Product docs" below.
+- `docs/product.md`, `docs/status.md`, `docs/pitch/` and `docs/ideas/`: the product plan, what is built, pitch material, and candidate ideas. See "Product docs" below.
 
 Read the relevant file before work aimed at a specific track or challenge.
 
@@ -42,6 +42,26 @@ Agents keep these current without being asked.
 - `docs/product.md` says what the product is, who it is for and what sets it apart. Its Decisions section records every decision the user makes or confirms, including ones reported from teammates. Each is one line with the decision, reason and date, and a changed decision is updated in place. Never record a suggestion the user has not accepted.
 - `docs/status.md` lists each feature as built, mocked, planned or cut, with the tracks it serves. A built feature records how it was verified: the flow, the result, the date and the commit. A cut feature keeps its line with the reason. A change to code or demo data means re-checking the claims it affects.
 - `docs/pitch/notes.md` holds internal pitch notes. `docs/pitch/judges/` holds only what judges will see, one file per track.
+
+### Ideas
+
+`docs/ideas/` holds candidate product ideas from brainstorming, one file per idea, named in kebab case after the idea (`ad-channel-mispricing.md`). An idea is not a decision. Anyone may add or edit one without approval.
+
+- Record an idea when the user or a teammate raises it while brainstorming. An idea an agent proposes is recorded only if the user asks, and its Origin says so.
+- When an idea is compared with another, give the other its own file and link to it rather than describing it inline.
+- When the user chooses an idea, set its status to chosen and record the decision in `docs/product.md`. When an idea is dropped or merged into another, set its status and reason; never delete the file, because the reasons stay useful.
+- Judge track fit against the judging notes in `docs/event/tracks.md`, not the track title alone.
+
+Each idea file uses these sections, in this order:
+
+1. Title, then a status line: `Status: proposed`, `chosen`, `dropped` or `merged into <file>`, with the date and, for dropped or merged, the reason.
+2. Idea: what it does and for whom, in a short paragraph.
+3. Origin: who proposed it and what prompted it.
+4. Tracks it could serve: each track with strong, moderate or weak, and why.
+5. Challenges it could use: each MLH challenge whose technology fits a part of the idea, and which part.
+6. Open problems: unverified assumptions, data availability, and risks.
+7. Scope: what a 24-hour demo would show, end to end.
+8. Alternatives: links to the idea files it was compared with, and how it differs.
 
 ## Agent skills and tools
 

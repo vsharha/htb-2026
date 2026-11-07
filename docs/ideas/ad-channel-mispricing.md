@@ -1,12 +1,14 @@
 # Ad channel mispricing finder
 
-Status: idea only. Not accepted, not in `product.md` Decisions. Brainstormed 7 November 2026.
+Status: proposed, 7 November 2026.
 
 ## Idea
 
 A startup describes its product and audience. An agent finds advertising channels where the price is low compared with the attention they deliver, such as airport screens, rail stations, student unions, niche newsletters and podcasts. It ranks them by effective cost per relevant impression and drafts or sends outreach to the vendors.
 
-Origin: Revolut recently started advertising in airports, which the team believes is very cheap. Airports may not realise the mispricing and could raise prices. The tool would find cases like this for any startup marketing a product.
+## Origin
+
+Brainstormed on 7 November 2026. Revolut recently started advertising in airports, which the team believes is very cheap. Airports may not realise the mispricing and could raise prices. The tool would find cases like this for any startup marketing a product.
 
 ## Tracks it could serve
 
@@ -27,11 +29,12 @@ Origin: Revolut recently started advertising in airports, which the team believe
 - "Cheap" needs a benchmark: price against audience size, dwell time and audience fit, for example cost per thousand relevant views.
 - Ad prices are mostly negotiated and not public. In 24 hours the dataset is likely small and partly hand-built, plus some live scraping of public rate cards, passenger statistics and newsletter subscriber counts.
 - The edge decays once many startups use it.
+- Does the demo agent contact vendors, or stop at the ranked list?
 
-## Scope suggestion
+## Scope
 
-One vertical, such as UK out-of-home or newsletters and podcasts, instead of all channels. Demo one startup end to end: product description, ranked channels, then a sent enquiry. Open question: does the demo agent contact vendors, or stop at the ranked list?
+One vertical, such as UK out-of-home or newsletters and podcasts, instead of all channels. Demo one startup end to end: product description, ranked channels, then a sent enquiry.
 
-## Alternative being compared
+## Alternatives
 
-Prediction-market mispricing (Polymarket and Kalshi): HRT and G-Research fit, backtestable on resolved markets, clean public APIs, but finance-flavoured and no Bank of Scotland fit.
+- [Prediction-market mispricing](prediction-market-mispricing.md): a better fit for HRT and G-Research and easier to backtest, but finance-flavoured with no Bank of Scotland fit. This idea fits Wordsmith strongly, but its data is weaker; the prediction-market idea's Wordsmith fit hasn't been assessed.
