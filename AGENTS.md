@@ -2,8 +2,8 @@
 
 ## Hackathon rules
 
-- Event: HackTheBurgh 2026 at the Nucleus Building, Edinburgh. Hacking starts Saturday 7 November at 12:00. Projects must be submitted by Sunday 8 November at 12:00, and demos and judging start at 12:30. Teams have up to 4 members. The full schedule, including sponsor workshops, is in `docs/schedule.md`.
-- Terms used in this repository: "track" means a sponsor track (`docs/tracks.md`); "challenge" means an MLH technology challenge (`docs/challenges.md`). The sponsors' own table calls its tracks "challenges", so map that wording to "track" here.
+- Event: HackTheBurgh 2026 at the Nucleus Building, Edinburgh. Hacking starts Saturday 7 November at 12:00. Projects must be submitted by Sunday 8 November at 12:00, and demos and judging start at 12:30. Teams have up to 4 members. The full schedule, including sponsor workshops, is in `docs/event/schedule.md`.
+- Terms used in this repository: "track" means a sponsor track (`docs/event/tracks.md`); "challenge" means an MLH technology challenge (`docs/event/challenges.md`). The sponsors' own table calls its tracks "challenges", so map that wording to "track" here.
 - We build one codebase and submit the same project to several sponsor tracks. There is no limit on how many tracks it can win.
 - MLH challenges are separate prizes for using specific technologies. They stack with sponsor tracks.
 - All participants must follow the MLH Code of Conduct.
@@ -21,14 +21,14 @@ Priority challenges, most important first: TODO, not decided yet.
 
 ## Reference
 
-- `docs/tracks.md`: each sponsor track's prizes, brief and judging notes.
-- `docs/challenges.md`: each MLH challenge's technology, prize, what qualifies, and sign-up.
-- `docs/schedule.md`: the event schedule.
+- `docs/event/tracks.md`: each sponsor track's prizes, brief and judging notes.
+- `docs/event/challenges.md`: each MLH challenge's technology, prize, what qualifies, and sign-up.
+- `docs/event/schedule.md`: the event schedule.
 - `docs/product.md`, `docs/status.md` and `docs/pitch/`: the product plan, what is built, and pitch material. See "Product docs" below.
 
 Read the relevant file before work aimed at a specific track or challenge.
 
-`reference/` holds the original source files these docs are summarised from: sponsor material in `reference/tracks/`, one folder per sponsor, and MLH material in `reference/mlh/`. Read a file there only when the user asks, for example to update `docs/tracks.md` from new material. Otherwise use the summaries in `docs/`.
+`reference/` holds the original source files these docs are summarised from: sponsor material in `reference/tracks/`, one folder per sponsor, and MLH material in `reference/mlh/`. Read a file there only when the user asks, for example to update `docs/event/tracks.md` from new material. Otherwise use the summaries in `docs/event/`.
 
 ## Project
 
@@ -56,7 +56,7 @@ Agents keep these current without being asked.
 
 ## Shared files that need approval
 
-Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md`, `CLAUDE.md`, `docs/tracks.md`, `docs/challenges.md`, `docs/schedule.md`, `reference/`, `.agents/skills/`, `.mcp.json`, `.codex/config.toml`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
+Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md`, `CLAUDE.md`, `docs/event/`, `reference/`, `.agents/skills/`, `.mcp.json`, `.codex/config.toml`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
 
 ## Committing
 
