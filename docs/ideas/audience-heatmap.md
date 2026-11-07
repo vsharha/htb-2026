@@ -26,32 +26,34 @@ An hourly view of the audience fit layer, using subway and taxi data by hour, is
 
 ## Evidence and data
 
-None of these sources has been opened or checked. They come from memory on 7 November 2026, so access, coverage, formats and terms are unconfirmed.
+Checked on 7 November 2026 by querying each source's API or download index. "Checked" means we fetched the column list, a sample row and the row count or file list; no full download has been run. The New York open data portals (data.cityofnewyork.us and data.ny.gov) list no licence on these datasets.
 
 Who lives where:
 
-- US Census Bureau American Community Survey: income, age, education and household type per census tract (an area of about 4,000 people), through a free API.
+- US Census Bureau American Community Survey: income, age, education and household type per census tract (an area of about 4,000 people). The API at api.census.gov now refuses requests without a key ("Missing Key"), so a free key is needed. Not otherwise checked.
 
 Who works where:
 
-- US Census Bureau LODES (job counts by home and work location): jobs per census block by earnings band and industry. It shows daytime audiences, such as finance workers in Midtown.
+- US Census Bureau [LODES](https://lehd.ces.census.gov/data/lodes/LODES8/ny/) (job counts by home and work location), version 8: files for New York State run to 2024. Workplace files count jobs per census block by earnings band and industry, and origin-destination files link home and work blocks. They show daytime audiences, such as finance workers in Midtown.
 
 Who passes through:
 
-- MTA subway ridership by station and hour, on the New York open data portal.
-- Taxi and ride-hail trip records from the city's Taxi and Limousine Commission: pickups and drop-offs by taxi zone, with fares and tips that could serve as a rough income signal.
-- Citi Bike trip data.
-- Pedestrian counts from the city's Department of Transportation.
+- [MTA Subway Hourly Ridership: Beginning 2025](https://data.ny.gov/d/5wq4-mkjj) (checked): 47.4 million rows, updated 4 November 2026. Each row is one station complex, one hour and one fare class, with ridership, transfers, latitude and longitude. The fare class category, such as full fare or student, gives a rough audience signal. Earlier years are in separate datasets (2017 to 2019, and 2020 to 2024).
+- [Pickups and Drop-offs by Taxi Zone and Industry](https://data.cityofnewyork.us/d/c5iv-bn4s) (checked): monthly counts per taxi zone for yellow taxis, green taxis and high-volume ride-hail companies, with data to September 2026. [Taxi zone shapes](https://data.cityofnewyork.us/d/8meu-9t5y) are a separate dataset.
+- TLC [trip record files](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) (file list checked): monthly Parquet files to September 2026 for yellow taxis and high-volume ride-hail. Fares and tips per trip could serve as a rough income signal; the columns were not checked.
+- [Citi Bike trip data](https://s3.amazonaws.com/tripdata/index.html) (file list checked): monthly files to October 2026, under Citi Bike's [data sharing policy](https://www.citibikenyc.com/data-sharing-policy), which was not read.
+- [Bi-Annual Pedestrian Counts](https://data.cityofnewyork.us/d/cqsj-cfgu) (checked): only 114 locations, mostly retail corridors and bridges, counted in May and September or October for morning, midday and evening, from 2007 to May 2026. Too sparse for a citywide layer; useful to check the other layers at those points.
 
 Where ads can be bought:
 
-- Locations of LinkNYC kiosks and bus shelters, both of which carry advertising, on the New York open data portal.
-- Billboard locations, possibly in the Department of Buildings' sign permits.
+- [LinkNYC Kiosk Locations](https://data.cityofnewyork.us/d/s4kf-3yrf) (checked): 2,255 sites with address, coordinates and census tract. By kiosk type: 2,032 live Link1.0 kiosks, 151 live Link5G kiosks marked "Ad", 57 live Link5G kiosks marked "NonAd", and a few removed or payphones. Only the Link5G types say whether they carry ads; whether Link1.0 kiosks do is unchecked.
+- [Bus Stop Shelters](https://data.cityofnewyork.us/d/t4f2-8md7) (checked): 3,312 shelters with coordinates and neighbourhood, updated 1 October 2026. The data has no field saying whether a shelter carries advertising.
+- [DOB Sign Application Filings](https://data.cityofnewyork.us/d/nyis-y4yr) (checked): 15,288 filings, but only from April 2013 to October 2017. It covers all signs, not only advertising, and gives an address and tax lot rather than coordinates. Not usable as a current billboard map.
 
 Competitors:
 
 - Competitors' outdoor campaigns: no public list exists, so the agent in step 3 gathers them from press, trade sites and social media.
-- Competitors' stores and offices: OpenStreetMap or a places API.
+- Competitors' stores and offices: OpenStreetMap or a places API. Not checked.
 
 ## Existing products
 
@@ -73,7 +75,9 @@ No search has been run yet. From memory: foot-traffic and audience-mapping produ
 
 ## Open problems
 
-- Every dataset in Evidence and data is unchecked: access, size, licence and whether it covers what is claimed.
+- Licences: the New York open data portals list none on the datasets checked, and Citi Bike's data sharing policy has not been read.
+- Billboards have no current public map. The only sign dataset stops in 2017, so the placements step relies on LinkNYC kiosks and bus shelters, and on shelters only if we can find which ones carry advertising.
+- The Census API needs a free key, which nobody has requested yet.
 - The competitor-campaign agent may find few campaigns for small competitors, leaving the competition layer mostly made of stores and offices, which show where competitors are, not where they advertise.
 - Turning a one-sentence target customer into census and trip filters is untested, and some customers, such as "developers at Series A startups", have no direct census field.
 - Prices for LinkNYC kiosks and bus shelters are probably unpublished, so cost per audience member would be an estimate. How to estimate it is undecided.
