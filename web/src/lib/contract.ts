@@ -2,6 +2,9 @@
 // `stand-in/` and the real backend both produce exactly these, so the UI
 // does not change when one replaces the other.
 
+/** Cities with a prepared dataset. Boroughs below are New York's markets. */
+export const CITIES = [{ id: "new-york", name: "New York" }] as const;
+
 export const BOROUGHS = [
   "Manhattan",
   "Brooklyn",

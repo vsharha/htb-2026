@@ -18,7 +18,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Audience heatmap · New York",
+  title: "Placewise",
   description:
     "Find where your target customers live, work and pass through in New York, and where competitors aren't advertising to them.",
 };
