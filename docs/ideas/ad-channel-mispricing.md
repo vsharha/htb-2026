@@ -48,10 +48,41 @@ What the source says:
 - Revolut ties sign-ups to the channel with card vending machines next to the jet-bridge ads. It has said seven machines handed out more than 300,000 cards in a year.
 - Scale: Storonsky says close to half of Europe's airports. Public reports say roughly 14 to 18 airports and over 300 jet bridges.
 
-Data the product needs:
+Data the product needs, by market. Checked on 7 November 2026. "Opened" means we read the file; "from search" means only the search result was read, so access and terms are unconfirmed.
 
-- Prices: BER publishes its rate card, which makes it a usable worked example. Most airports don't publish prices.
-- Attention and audience benchmarks exist from Lumen Research, JCDecaux with Lumen and Tobii, and CAA passenger surveys. Access within 24 hours is unchecked.
+Airports:
+
+- Price: the source's claim that BER publishes a jet-bridge rate card is not supported. The BER 2027 media kit (opened, 103 pages, [web page](https://werbung.berlin-airport.de/en/advertising/specials0/fluggastbruecken.html)) lists 27 jet bridges with a 2-year minimum booking and "media: on request". It does publish prices for other formats.
+- Price: Hamburg Airport publishes one ([jet bridge sheet](https://hamburg-airport.de/resource/blob/83948/7d01824222a4048df7df072d35636f8c/jet-bridges-data.pdf), opened): €33,000 a month net for 16 jet bridges (32 double-sided XXL spaces), plus VAT, production and installation. The sheet is dated September 2024 with a term to 31 March 2025, so the price is probably out of date.
+- Audience: the same Hamburg sheet gives 13.6 million passengers in 2024, average age 42, 47.2% with a household income over €4,000 net, and an average stay of 116 minutes.
+- Audience: CAA UK airport data, [2025 annual tables](https://www.caa.co.uk/data-and-analysis/uk-aviation-market/airports/uk-airport-data/uk-airport-data-2025/annual-2025/) (CSV and PDF; the CAA asks to be credited). Table 09, passengers per UK airport for 2025 and 2024, is in the repo at `data/caa/annual-2025/`. It has volumes only, no income.
+- Rough price estimates: [AdQuick's jet bridge guide](https://adquick.com/answers/airport-jet-bridge-advertising) (from search) gives $3,500 to $7,000 a month per bridge at Bogotá. Not comparable with Hamburg or BER.
+
+Rail stations:
+
+- Price: none found.
+- Audience: ORR [estimates of station usage](https://dataportal.orr.gov.uk/station-usage) (from search): entries, exits and interchanges by station in Table 1410, and a time series from 1997 in Table 1415, in ODS format. The latest release covers April 2024 to March 2025; the next is due in November 2026.
+
+Student unions:
+
+- Price and audience: UK students' unions publish media packs with prices and audience sizes (from search): [Manchester Met 2026-27](https://www.theunionmmu.org/resources/media-pack-2026-27/download_attachment), [Reading 2025-26](https://issuu.com/rusudocs/docs/media_pack_2025-26), [Bucks 2025-26](https://www.bucksstudentsunion.org/pageassets/advertise/Bucks-Students-Union-media-pack-2025-26.pdf), [Cardiff](https://www.cardiffstudents.com/pageassets/about-cusu/advertising/Media-Pack-2023-2024(1).pdf), [Leeds](https://issuu.com/leedsuniunion/docs/general_media_pack), [Strathclyde](https://www.strathunion.com/pageassets/union/advertise/Strath_Union_Media_Pack_Native_2022_23.pdf) and [Derby](https://www.derbyunion.co.uk/pageassets/marketing/media-pack-2023.pdf). Examples: Leeds lists 32,000 students and a £2,000 newspaper wrap-around. Several packs are old, and VAT treatment varies. There is no single list.
+
+Newsletters:
+
+- Price and audience (all from search): the [Paved marketplace](https://www.paved.com/publishers/marketplace) and its [note on where prices show](https://help.paved.com/article/102-where-is-the-price-for-a-sponsorship-with-a-particular-newsletter), a [2026 directory of newsletters that accept sponsors](https://www.lilachbullock.com/newsletters-that-accept-sponsors-directory-2026/) and a [platform comparison](https://dupple.com/learn/best-newsletter-advertising-platforms). Sources report Paved with 3,000+ newsletters and primary sponsorships at $15 to $30 per thousand; direct placements run from about $50 to several thousand dollars a send. These are vendor and blog figures. Swapstack's status is unclear.
+
+Podcasts:
+
+- Price: [AdvertiseCast monthly rates](https://rainnews.com/advertisecast-podcast-ad-rates-february-2024/) (from search), averages from actual sales across 1,500+ shows, with history to 2020. Also [UK podcast CPMs for 2026](https://playpodcasts.com/blog/price-per-ear-british-podcast-advertising-cpm-2026) and [CPM by genre and size](https://www.millionpodcasts.com/blog/podcast-advertising-cost-cpm-rates-by-genre-size/); the second describes its ranges as directional estimates.
+- Audience: [Rephonic](https://rephonic.com/blog/podcast-ad-rates/amp/) estimates listeners per episode (vendor estimates, free trial). Listen Notes' free tier is unconfirmed.
+
+Meta baseline (all markets):
+
+- The source's UK median of £13.02 was not reproduced. Vendor blogs give a UK average of about $10.85 (roughly £8.55), or £6 to £12 for link ads and £8 to £16 for lead-gen or video ([Photonpay](https://www.photonpay.com/uk/blog/article/facebook-advertising-costs), [Influee](https://influee.co/gb/blog/good-cpm-facebook-ads)). They disagree, so the baseline should be an adjustable range.
+
+Attention (all markets):
+
+- No public jet-bridge attention data was found. Lumen Research and JCDecaux with Lumen and Tobii figures are only quoted in articles, so attention stays a slider.
 
 Other sources found in a web search on 7 November 2026:
 
@@ -87,7 +118,7 @@ A web search on 7 November 2026 found products covering each step separately, bu
 - The premise is sourced but not proven. The only evidence is one newsletter's model. The jet-bridge attention figure of four seconds is an assumption, since the author says no eye-tracking study exists for jet bridges. He anchored it to Heathrow out-of-home research. The result holds only above 1.44 seconds.
 - "Airports don't realise the mispricing and should hike prices" is not supported. Airports price per impression and the buyer prices per attention and customer value. The source doesn't show airports are underpriced, only that the channel is good value for a buyer who values attention. The seller-side pitch should be dropped or reworded.
 - Cheap impressions are not cheap customers. Ranking by cost per attentive second still needs an audience-value term, which needs the startup's own customer value and a way to estimate who passes through a channel.
-- Data availability: most airports don't publish prices, and access to the attention and audience benchmarks in 24 hours is unchecked.
+- Data availability: jet-bridge prices are mostly "on request", and no public price was found for rail stations. Most sources in Evidence and data were read only as search results, so access, scraping terms and licences are unchecked.
 - Revolut's scale is reported inconsistently (see Evidence and data).
 - Verification: an agent proposing non-obvious channels will invent plausible ones that don't exist or have no price. Each candidate needs a step that finds a real rate card or a real contact, or the product is only an idea generator.
 - Crowding: if many startups use the tool they all find the same hidden channel, and it stops being hidden. The tool needs a way to spread demand, or the edge decays and that is accepted.
@@ -97,7 +128,7 @@ A web search on 7 November 2026 found products covering each step separately, bu
 
 One vertical, such as UK and European out-of-home or newsletters and podcasts, instead of all channels. Demo one startup end to end: product description, ranked channels, then a sent enquiry.
 
-A natural first channel is a reproduction of the BER jet-bridge calculation from the source: rate card, production and installation, currency conversion and negotiated discount, down to cost per thousand attentive seconds against Meta. Showing the impression-versus-attention flip is the demo's strongest moment.
+A natural first channel is a reproduction of the source's jet-bridge calculation down to cost per thousand attentive seconds against Meta. BER's price is on request, so Hamburg's published price and audience figures (see Evidence and data) are the usable worked example. Showing the impression-versus-attention flip is the demo's strongest moment.
 
 ## Alternatives
 
