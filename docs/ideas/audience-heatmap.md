@@ -16,7 +16,7 @@ Raised by Viktor on 7 November 2026 as a pivot from the ad channel mispricing fi
 
 Decided on 7 November 2026; the decisions are in [product.md](../product.md).
 
-1. Input: the onboarding form above. The target customer sentence becomes weights on census and trip data, such as age, income, industry and household type. OpenAI's GPT-6 Luna Decisions, a decision model, scores how strongly the sentence implies each attribute and whether that attribute should count for or against an area.
+1. Input: the onboarding form above. The target customer sentence becomes weights on census and trip data, such as age, income, industry and household type. Jev, a decision model, scores how strongly the sentence implies each attribute.
 2. Audience fit layer: each area of the city is scored by how many target customers live there, work there or pass through it.
 3. Competition layer: a browser agent finds the startup's competitors, then searches press, trade sites and social media for their outdoor campaigns in the city, such as "<competitor> subway ad" or "<competitor> billboard NYC", and places each find on the map. Where it finds nothing, competitors' stores and offices stand in.
 4. Gap layer: areas with high audience fit and low competition. This is the default view; the other two layers are toggles that explain it.
@@ -80,7 +80,7 @@ No search has been run yet. From memory: foot-traffic and audience-mapping produ
 - Licences: the New York open data portals list none on the datasets checked, and Citi Bike's data sharing policy has not been read.
 - Billboards have no current public map. The only sign dataset stops in 2017, so the placements step relies on LinkNYC kiosks and bus shelters, and on shelters only if we can find which ones carry advertising.
 - The competitor-campaign agent may find few campaigns for small competitors, leaving the competition layer mostly made of stores and offices, which show where competitors are, not where they advertise.
-- Turning a one-sentence target customer into weights on the tract columns with a decision model is untested, and some customers, such as "developers at Series A startups", have no direct census field.
+- Turning a one-sentence target customer into weights on the tract columns with Jev is untested, and some customers, such as "developers at Series A startups", have no direct census field.
 - Prices for LinkNYC kiosks and bus shelters are probably unpublished, so cost per audience member would be an estimate. How to estimate it is undecided.
 - Judges in Edinburgh may ask why New York. The answer is that New York publishes the most data and the method works elsewhere, which the pitch should say up front.
 - The mispricing claim of the earlier idea, and the Revolut evidence behind it, no longer support the product directly. The pitch needs its own evidence that competitors leave gaps in a city.

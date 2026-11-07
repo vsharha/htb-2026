@@ -49,7 +49,7 @@ export type ColumnWeight = {
   column: string;
   description: string;
   measures: Measure;
-  /** -1 to 1. Positive pushes a tract up, negative pushes it down. */
+  /** 0 to 1. */
   weight: number;
 };
 

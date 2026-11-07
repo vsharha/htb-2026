@@ -145,9 +145,7 @@ function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | n
 }
 
 function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | null }) {
-  const weights = run.fit?.weights
-    .filter((w) => w.weight !== 0)
-    .sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
+  const weights = run.fit?.weights.filter((w) => w.weight > 0).sort((a, b) => b.weight - a.weight);
   return (
     <>
       <Section title="Most customers">
@@ -158,7 +156,7 @@ function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | nu
         )}
       </Section>
 
-      <Section title="Who we looked for" aside="← against · for →">
+      <Section title="Who we looked for">
         {!weights ? (
           <Pending>Reading your target customer…</Pending>
         ) : (
@@ -167,16 +165,10 @@ function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | nu
               <li key={w.column} className="flex flex-col gap-1">
                 <div className="flex items-baseline justify-between gap-3 text-sm">
                   <span>{w.description}</span>
-                  <span className="shrink-0 font-mono text-xs text-muted-foreground">
-                    {MEASURE_LABEL[w.measures]} · {w.weight > 0 ? "+" : ""}
-                    {w.weight.toFixed(2)}
-                  </span>
+                  <span className="shrink-0 font-mono text-xs text-muted-foreground">{MEASURE_LABEL[w.measures]}</span>
                 </div>
-                <div className="relative h-1.5 rounded-full bg-foreground/10">
-                  <div
-                    className={`absolute inset-y-0 rounded-full ${w.weight > 0 ? "left-1/2 bg-foreground" : "right-1/2 bg-heat-cool"}`}
-                    style={{ width: `${Math.abs(w.weight) * 50}%` }}
-                  />
+                <div className="h-1.5 rounded-full bg-foreground/10">
+                  <div className="h-full rounded-full bg-foreground" style={{ width: `${w.weight * 100}%` }} />
                 </div>
               </li>
             ))}
