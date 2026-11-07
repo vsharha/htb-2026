@@ -101,9 +101,9 @@ export function BriefForm({
       </ul>
 
       <div className="flex flex-wrap items-center gap-4">
-        <Button type="submit" disabled={busy} className="h-12 gap-2 rounded-full px-6 text-base">
+        <Button type="submit" disabled={busy} className="h-12 gap-2.5 rounded-full pr-5 pl-6 text-base">
           {busy ? "Mapping your audience…" : "Map my audience"}
-          <ArrowRight data-icon="inline-end" />
+          <ArrowRight />
         </Button>
       </div>
     </form>
