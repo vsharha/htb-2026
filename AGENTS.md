@@ -24,6 +24,7 @@ Priority challenges, most important first: TODO, not decided yet.
 - `docs/tracks.md`: each sponsor track's prizes, brief and judging notes.
 - `docs/challenges.md`: each MLH challenge's technology, prize, what qualifies, and sign-up.
 - `docs/schedule.md`: the event schedule.
+- `docs/product.md`, `docs/status.md` and `docs/pitch/`: the product plan, what is built, and pitch material. See "Product docs" below.
 
 Read the relevant file before work aimed at a specific track or challenge.
 
@@ -33,14 +34,29 @@ Read the relevant file before work aimed at a specific track or challenge.
 
 Stack, commands and layout: TODO once chosen.
 
-## Agent skills
+## Product docs
+
+Agents keep these current without being asked.
+
+- Product direction is brainstormed and recorded with the user before features are built.
+- `docs/product.md` says what the product is, who it is for and what sets it apart. Its Decisions section records every decision the user makes or confirms, including ones reported from teammates. Each is one line with the decision, reason and date, and a changed decision is updated in place. Never record a suggestion the user has not accepted.
+- `docs/status.md` lists each feature as built, mocked, planned or cut, with the tracks it serves. A built feature records how it was verified: the flow, the result, the date and the commit. A cut feature keeps its line with the reason. A change to code or demo data means re-checking the claims it affects.
+- `docs/pitch/notes.md` holds internal pitch notes. `docs/pitch/judges/` holds only what judges will see, one file per track.
+
+## Agent skills and tools
 
 - Skills live in `.agents/skills/`, one folder each. `.claude/skills` is a symlink to `../.agents/skills`, so Claude Code and Codex read the same files. Edit skills only at the real path.
 - Load the `frontend-design` skill before UI work. It is vendored from Anthropic's `claude-plugins-official` marketplace, under the Apache 2.0 licence in its folder.
+- Both agents get the same Playwright MCP server, configured in `.mcp.json` for Claude Code and `.codex/config.toml` for Codex. It runs with `--isolated`, so each session gets its own in-memory browser profile and several agents on one machine don't share one.
+
+## Frontend work
+
+- Check a frontend change on the running dev server with Playwright or a browser before reporting it done: look at the page, use the changed flow, and read the console for errors.
+- Before starting a dev server, check whether one is already running, by its process or by probing its port, and reuse it. A change to config, dependencies or env means stopping it and starting a fresh one. Never leave several instances running.
 
 ## Shared files that need approval
 
-Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md`, `CLAUDE.md`, `docs/tracks.md`, `docs/challenges.md`, `docs/schedule.md`, `reference/`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
+Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md`, `CLAUDE.md`, `docs/tracks.md`, `docs/challenges.md`, `docs/schedule.md`, `reference/`, `.agents/skills/`, `.mcp.json`, `.codex/config.toml`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
 
 ## Committing
 
