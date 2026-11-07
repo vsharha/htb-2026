@@ -49,7 +49,7 @@ export type ColumnWeight = {
   column: string;
   description: string;
   measures: Measure;
-  /** 0 to 1. */
+  /** -1 to 1: positive when the target customers are more likely to have the trait, negative when less. */
   weight: number;
 };
 
@@ -58,6 +58,8 @@ export type AudienceFit = {
   weights: ColumnWeight[];
   /** Census tract GEOID to a score from 0 to 1. Tracts outside the brief's markets are absent. */
   scores: Record<string, number>;
+  /** Whether Jev weighted the columns, or the keyword fallback did because Jev couldn't be reached. */
+  source: "jev" | "keywords";
 };
 
 export type Station = {

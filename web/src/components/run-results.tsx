@@ -145,7 +145,9 @@ function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | n
 }
 
 function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | null }) {
-  const weights = run.fit?.weights.filter((w) => w.weight > 0).sort((a, b) => b.weight - a.weight);
+  // Traits that count for or against the customer, strongest either way first.
+  const weights = run.fit?.weights.filter((w) => w.weight !== 0).sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
+  const aside = run.fit && (run.fit.source === "jev" ? "weighted by Jev" : "weighted by keywords");
   return (
     <>
       <Section title="Most customers">
@@ -156,7 +158,12 @@ function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | nu
         )}
       </Section>
 
-      <Section title="Who we looked for">
+      <Section title="Who we looked for" aside={aside}>
+        {run.fit?.source === "keywords" && (
+          <p className="text-xs text-muted-foreground">
+            Jev couldn&rsquo;t be reached, so these weights come from keywords in your target customer.
+          </p>
+        )}
         {!weights ? (
           <Pending>Reading your target customer…</Pending>
         ) : (
@@ -164,11 +171,17 @@ function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | nu
             {weights.map((w) => (
               <li key={w.column} className="flex flex-col gap-1">
                 <div className="flex items-baseline justify-between gap-3 text-sm">
-                  <span>{w.description}</span>
+                  <span>
+                    {w.weight < 0 && <span className="text-muted-foreground">Less likely: </span>}
+                    {w.description}
+                  </span>
                   <span className="shrink-0 font-mono text-xs text-muted-foreground">{MEASURE_LABEL[w.measures]}</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-foreground/10">
-                  <div className="h-full rounded-full bg-foreground" style={{ width: `${w.weight * 100}%` }} />
+                  <div
+                    className={"h-full rounded-full " + (w.weight < 0 ? "bg-heat-cool" : "bg-foreground")}
+                    style={{ width: `${Math.abs(w.weight) * 100}%` }}
+                  />
                 </div>
               </li>
             ))}
