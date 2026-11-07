@@ -4,7 +4,9 @@ Status: proposed, 7 November 2026.
 
 ## Idea
 
-A startup describes its product and audience. An agent finds advertising channels where the price is low compared with the attention and audience value they deliver, such as airport jet bridges, rail stations, student unions, niche newsletters and podcasts. It ranks them by effective cost per attentive second, weighted by how valuable the audience is, and drafts or sends outreach to the vendors.
+Mispricings like Revolut's airport ads hide in plain sight. Many startups compete for the same few ad channels, which keeps those prices high, while other places where the same audience pays attention go unconsidered. The product is discovery, not ranking a fixed list of known channels.
+
+A startup describes its product and audience. An agent asks where that audience's attention sits that nobody in the category is buying, such as airport jet bridges, rail stations, student unions, niche newsletters and podcasts. It finds a real price and contact for each candidate, compares it with the crowded channels by effective cost per attentive second weighted by how valuable the audience is, and drafts or sends outreach to the vendors.
 
 The metric matters. The source below shows that airport ads are not cheap per impression, so a ranking by cost per thousand impressions would miss the gap. The gap appears only when price is measured per second of attention and per type of customer reached.
 
@@ -26,8 +28,8 @@ What the source says:
 
 ## Tracks it could serve
 
-- Wordsmith: strong. Finding vendors, reading rate cards, filling quote forms and sending enquiries is a long browser workflow. Judged on workflow complexity, so a long end-to-end flow helps.
-- G-Research: strong. The hidden thing is now concrete: a channel's price per attentive second and the value of the audience it reaches, neither of which its rate card shows. The project shows how it is found and what to do with it, which matches the track's three questions.
+- Wordsmith: strong. Finding vendors, reading rate cards, filling quote forms and sending enquiries is a long browser workflow. Judged on workflow complexity, so a long end-to-end flow helps; the verification step (find the real rate card, contact the vendor) adds depth.
+- G-Research: strong. The hidden thing is the channel itself, plus its price per attentive second and the value of the audience it reaches, neither of which its rate card shows. The project shows how it is found and what to do with it, which matches the track's three questions.
 - HRT: moderate, if framed as predicting a fair price from attention and audience data. Weaker than the prediction-market idea.
 - Bank of Scotland: weak.
 
@@ -44,7 +46,8 @@ What the source says:
 - Cheap impressions are not cheap customers. Ranking by cost per attentive second still needs an audience-value term, which needs the startup's own customer value and a way to estimate who passes through a channel.
 - Data availability: most airports don't publish prices. BER does, which makes it a usable worked example. Attention and audience benchmarks exist from Lumen Research, JCDecaux with Lumen and Tobii, and CAA passenger surveys, but access in 24 hours is unchecked.
 - Revolut's scale is reported inconsistently (see above).
-- The edge decays once many startups use it.
+- Verification: an agent proposing non-obvious channels will invent plausible ones that don't exist or have no price. Each candidate needs a step that finds a real rate card or a real contact, or the product is only an idea generator.
+- Crowding: if many startups use the tool they all find the same hidden channel, and it stops being hidden. The tool needs a way to spread demand, or the edge decays and that is accepted.
 - Does the demo agent contact vendors, or stop at the ranked list?
 
 ## Scope
