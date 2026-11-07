@@ -2,7 +2,7 @@
 
 ## Hackathon rules
 
-- Event: HackTheBurgh, weekend of 7 November 2026. Submission deadline: TODO.
+- Event: HackTheBurgh 2026 at the Nucleus Building, Edinburgh. Hacking starts Saturday 7 November at 12:00. Projects must be submitted by Sunday 8 November at 12:00, and demos and judging start at 12:30. Teams have up to 4 members. The full schedule, including sponsor workshops, is in `docs/schedule.md`.
 - Terms used in this repository: "track" means a sponsor track (`docs/tracks.md`); "challenge" means an MLH technology challenge (`docs/challenges.md`). The sponsors' own table calls its tracks "challenges", so map that wording to "track" here.
 - We build one codebase and submit the same project to several sponsor tracks. There is no limit on how many tracks it can win.
 - MLH challenges are separate prizes for using specific technologies. They stack with sponsor tracks.
@@ -23,6 +23,7 @@ Priority challenges, most important first: TODO, not decided yet.
 
 - `docs/tracks.md`: each sponsor track's prizes, brief and judging notes.
 - `docs/challenges.md`: each MLH challenge's technology, prize, what qualifies, and sign-up.
+- `docs/schedule.md`: the event schedule.
 
 Read the relevant file before work aimed at a specific track or challenge.
 
@@ -34,7 +35,7 @@ Stack, commands and layout: TODO once chosen.
 
 ## Shared files that need approval
 
-Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md`, `CLAUDE.md`, `docs/tracks.md`, `docs/challenges.md`, `reference/`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
+Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md`, `CLAUDE.md`, `docs/tracks.md`, `docs/challenges.md`, `docs/schedule.md`, `reference/`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
 
 ## Committing
 
