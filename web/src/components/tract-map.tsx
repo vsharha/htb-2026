@@ -2,7 +2,7 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { setWorkerUrl } from "maplibre-gl";
+import { setWorkerUrl, type ExpressionSpecification } from "maplibre-gl";
 import { useEffect, useMemo, useRef } from "react";
 import Map, { Layer, Marker, NavigationControl, Source, type MapRef } from "react-map-gl/maplibre";
 
@@ -16,9 +16,21 @@ import type { LayerId, TractLayers, TractShapes } from "@/lib/gap";
 setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
 
 // MapLibre paints with plain colour values, not CSS variables, so these
-// repeat --heat-cool, --heat-mid and --heat-hot from globals.css.
-const HEAT = { cool: "#2b59c3", mid: "#f2b134", hot: "#e0334f" };
+// repeat --heat-cool, --heat-mid and --heat-hot from globals.css, with the
+// alpha rising from 0.15 to 0.75 so weak tracts let the basemap show through.
+function heatRamp(id: LayerId): ExpressionSpecification {
+  return [
+    "interpolate", ["linear"], ["get", id],
+    0, "rgba(43, 89, 195, 0.15)",
+    0.5, "rgba(242, 177, 52, 0.45)",
+    1, "rgba(224, 51, 79, 0.75)",
+  ];
+}
 const INK = "#15171c";
+
+const LAYER_IDS: LayerId[] = ["fit", "competition", "gap"];
+/** How long the map takes to fade from one tab's colours to the next. */
+const FADE_MS = 300;
 
 /** CARTO's light basemap: streets and water in greys, so the tract colours carry the map. */
 const BASEMAP = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
@@ -87,14 +99,23 @@ export function TractMap({
     >
       <NavigationControl position="top-right" showCompass={false} />
       <Source id="tracts" type="geojson" data={tracts}>
-        <Layer
-          id="tract-fill"
-          type="fill"
-          paint={{
-            "fill-color": ["interpolate", ["linear"], ["get", layer], 0, HEAT.cool, 0.5, HEAT.mid, 1, HEAT.hot],
-            "fill-opacity": ["interpolate", ["linear"], ["get", layer], 0, 0.15, 1, 0.75],
-          }}
-        />
+        {/*
+          One fill per tab, each coloured by its own value. Switching tabs only
+          changes which fill is opaque, a plain value MapLibre can animate, so
+          the map cross-fades instead of jumping.
+        */}
+        {LAYER_IDS.map((id) => (
+          <Layer
+            key={id}
+            id={`tract-fill-${id}`}
+            type="fill"
+            paint={{
+              "fill-color": heatRamp(id),
+              "fill-opacity": layer === id ? 1 : 0,
+              "fill-opacity-transition": { duration: FADE_MS, delay: 0 },
+            }}
+          />
+        ))}
         <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.3, "line-opacity": 0.6 }} />
       </Source>
       <Source id="stations" type="geojson" data={stations}>
