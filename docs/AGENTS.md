@@ -18,6 +18,10 @@ Agents keep these current without being asked.
 - `status.md` lists each feature as built, mocked, planned or cut, with the tracks it serves. A built feature records how it was verified: the flow, the result, the date and the commit. A mocked feature says what is faked. A cut feature keeps its line with the reason. A change to code or demo data means re-checking the claims it affects.
 - `pitch/notes.md` holds internal pitch notes. `pitch/judges/` holds only what judges will see, one file per track named after the sponsor, such as `judges/jetbrains.md`.
 
+## Track groups
+
+`track-groups.md` records which sponsor tracks one project can enter together and which MLH challenges fit any project. Idea files can link to its groups instead of repeating the reasoning. It is analysis, not a decision; update it when `event/tracks.md` or `event/challenges.md` changes.
+
 ## Ideas
 
 `ideas/` holds candidate product ideas from brainstorming, one file per idea, named in kebab case after the idea (`ad-channel-mispricing.md`). An idea is not a decision. Anyone may add or edit one without approval.
