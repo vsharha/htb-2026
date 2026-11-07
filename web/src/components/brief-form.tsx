@@ -16,6 +16,10 @@ import { cn } from "@/lib/utils";
 const blank =
   "max-w-full rounded-none border-0 [field-sizing:content] border-b-2 border-foreground/25 bg-transparent px-1 text-foreground outline-none transition-colors placeholder:text-foreground/30 hover:border-foreground/50 focus-visible:border-heat-cool focus-visible:bg-heat-cool/5";
 
+// Text inputs rather than type="number": they size to their content and have
+// no spinner arrows. `pattern` keeps the browser's validation.
+const money = { type: "text", inputMode: "decimal", required: true, autoComplete: "off" } as const;
+
 export function BriefForm({
   onSubmit,
   busy,
@@ -64,22 +68,33 @@ export function BriefForm({
         </select>{" "}
         startup building{" "}
         <label className="sr-only" htmlFor="description">What the startup builds, in one sentence</label>
-        <input id="description" name="description" required placeholder="a budgeting app for shared flats" className={cn(blank, "min-w-[12ch]")} />
-        . Our customer is{" "}
+        <span className="whitespace-nowrap">
+          <input id="description" name="description" required placeholder="a budgeting app for shared flats" className={cn(blank, "min-w-[12ch] max-w-[calc(100%-1ch)]")} />.
+        </span>{" "}
+        Our customer is{" "}
         <label className="sr-only" htmlFor="targetCustomer">Target customer, in one sentence</label>
-        <input id="targetCustomer" name="targetCustomer" required placeholder="young professionals who rent with roommates" className={cn(blank, "min-w-[16ch]")} />
-        . They pay ${" "}
+        <span className="whitespace-nowrap">
+          <input id="targetCustomer" name="targetCustomer" required placeholder="young professionals who rent with roommates" className={cn(blank, "min-w-[16ch] max-w-[calc(100%-1ch)]")} />.
+        </span>{" "}
+        They pay{" "}
         <label className="sr-only" htmlFor="pays">What a customer pays, in US dollars</label>
-        <input id="pays" name="pays" type="number" min={0} step="any" required placeholder="12" className={cn(blank, "min-w-[3ch] tabular-nums")} />{" "}
+        <span className="whitespace-nowrap">
+          $<input id="pays" name="pays" {...money} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="12" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
+        </span>{" "}
         per{" "}
         <label className="sr-only" htmlFor="per">Paid per</label>
-        <select id="per" name="per" defaultValue="month" className={cn(blank, "cursor-pointer")}>
-          <option value="month">month</option>
-          <option value="purchase">purchase</option>
-        </select>
-        , and we can spend ${" "}
+        <span className="whitespace-nowrap">
+          <select id="per" name="per" defaultValue="month" className={cn(blank, "cursor-pointer")}>
+            <option value="month">month</option>
+            <option value="purchase">purchase</option>
+          </select>
+          ,
+        </span>{" "}
+        and we can spend{" "}
         <label className="sr-only" htmlFor="budget">Monthly advertising budget, in US dollars</label>
-        <input id="budget" name="budget" type="number" min={0} step={100} required placeholder="3000" className={cn(blank, "min-w-[4ch] tabular-nums")} />{" "}
+        <span className="whitespace-nowrap">
+          $<input id="budget" name="budget" {...money} pattern="[0-9]+" placeholder="3000" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
+        </span>{" "}
         a month on ads in:
       </p>
 
