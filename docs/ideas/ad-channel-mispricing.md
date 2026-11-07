@@ -54,6 +54,15 @@ What the source says:
 
 One vertical, such as UK and European out-of-home or newsletters and podcasts, instead of all channels. Demo one startup end to end: product description, ranked channels, then a sent enquiry.
 
+A "why does the gap exist?" filter could screen each candidate channel, adapted from "What Is A Mispricing?", Mispriced #006, 26 October 2026 (an investing article; the mapping to ads is ours, not the author's). The author names four reasons a gap survives, shown here with the channel version:
+
+- Information: rate cards and attention data are scattered or unpublished.
+- Constraints: minimum spends, agency-only buying, or inventory too small for big buyers.
+- Behaviour: marketers anchor to Meta and Google because they are measurable.
+- Transformation: the buyer changes the channel's worth, for example a QR code or promo code that makes it measurable.
+
+A candidate with no reason is probably fairly priced and gets rejected, with the reason shown. Rejecting quickly is the point: the author says most candidates turn out fairly priced. The cause could also be tagged to guess how long a gap lasts, since an information gap closes as more people use the tool (our inference).
+
 A natural first channel is a reproduction of the BER jet-bridge calculation from the source: rate card, production and installation, currency conversion and negotiated discount, down to cost per thousand attentive seconds against Meta. Showing the impression-versus-attention flip is the demo's strongest moment.
 
 ## Alternatives
