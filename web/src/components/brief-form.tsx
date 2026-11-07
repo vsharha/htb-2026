@@ -14,6 +14,16 @@ const blank =
 // no spinner arrows. `pattern` keeps the browser's validation.
 const money = { type: "text", inputMode: "decimal", required: true, autoComplete: "off" } as const;
 
+const SAMPLE_BRIEF: Brief = {
+  industry: "Fintech",
+  description: "a budgeting app for shared flats",
+  targetCustomer: "young professionals in tech who rent with roommates",
+  customerPays: { amount: 12, per: "month" },
+  monthlyBudget: 3000,
+  city: CITIES[0].id,
+  markets: [...CITIES[0].areas],
+};
+
 export function BriefForm({
   onSubmit,
   busy,
@@ -24,6 +34,14 @@ export function BriefForm({
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
+    const empty = ["industry", "description", "targetCustomer", "pays", "budget"]
+      .every((name) => !data.get(name));
+    if (empty && data.get("per") === "month" && data.get("city") === CITIES[0].id) {
+      onSubmit(SAMPLE_BRIEF);
+      return;
+    }
+    if (!e.currentTarget.reportValidity()) return;
+
     const city = CITIES.find((c) => c.id === data.get("city")) ?? CITIES[0];
     onSubmit({
       industry: data.get("industry") as Industry,
@@ -40,7 +58,7 @@ export function BriefForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-10">
+    <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-10">
       <p className="font-heading text-[clamp(1.6rem,3.6vw,2.75rem)] leading-[1.55] font-medium tracking-tight text-balance">
         We&rsquo;re a{" "}
         <label className="sr-only" htmlFor="industry">Industry</label>
