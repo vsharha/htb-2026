@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "chatcmpl-tool-92d082330188c7f8",
+  "agent_id": "ses_e485b1e8cffeYkA6reo3wrOvTp",
+  "subagent_type": "general",
+  "task_description": "Goldfish structural on tracks",
+  "token_usage": {
+    "input_tokens": 37260,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 91101,
+    "output_tokens": 3237,
+    "api_call_count": 5
+  },
+  "started_at": "2026-11-07T20:13:18.568Z",
+  "completed_at": "2026-11-07T20:17:20.858548677Z"
+}

@@ -3,10 +3,12 @@
   "checkpoint_id": "01M6VZ2DR45X2KS2E2DMQCGTAJ",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 8,
+  "checkpoints_count": 23,
   "files_touched": [
     "docs/ideas/audience-heatmap.md",
-    "docs/product.md"
+    "docs/product.md",
+    "web/package.json",
+    "web/pnpm-lock.yaml"
   ],
   "sessions": [
     {
@@ -15,24 +17,38 @@
       "compact_transcript": "/0/transcript.jsonl",
       "content_hash": "/0/content_hash.txt",
       "prompt": "/0/prompt.txt"
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "compact_transcript": "/1/transcript.jsonl",
+      "content_hash": "/1/content_hash.txt",
+      "prompt": "/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 147056,
+    "input_tokens": 323345,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 5793024,
-    "output_tokens": 14373,
-    "api_call_count": 65
+    "cache_read_tokens": 6510543,
+    "output_tokens": 20721,
+    "api_call_count": 70,
+    "subagent_tokens": {
+      "input_tokens": 253468,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 1118657,
+      "output_tokens": 28966,
+      "api_call_count": 63
+    }
   },
   "redaction": {
-    "replacements": 10,
+    "replacements": 28,
     "layers": {
       "betterleaks": 6,
       "connection_string": 0,
       "credential_key": 0,
       "credential_value": 6,
       "credentialed_uri": 0,
-      "entropy": 4,
+      "entropy": 24,
       "key_context": 0,
       "provider_token": 4,
       "shell_stdin": 0

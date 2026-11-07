@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "chatcmpl-tool-8c2a35ad90447d63",
+  "agent_id": "ses_e4872243cffe8c2GRIhuOdaQu1",
+  "subagent_type": "general",
+  "task_description": "Goldfish overlap audit",
+  "token_usage": {
+    "input_tokens": 35033,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 141751,
+    "output_tokens": 4004,
+    "api_call_count": 9
+  },
+  "started_at": "2026-11-07T19:48:09.791Z",
+  "completed_at": "2026-11-07T19:50:49.924698628Z"
+}

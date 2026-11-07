@@ -1,0 +1,93 @@
+@egm-brainstorm instead of finding niche data, could we look at estimating traffic to find the most effective data evaluate both intra city e..g where in a city, vs inter city, e..g what cities are most effectice. the idea would still have the input form of what target customer you want form the current idea, but we generate heatmaps of the most efffective places. evaluate the idea
+
+---
+
+yeah it doesnt have to be uk it can be any city. the which city or where to place in a city doesnt particularly matter either works, easiest / best choice wins.
+
+---
+
+ok can you summarise this
+
+---
+
+does this data cost anything
+
+---
+
+this is a hackathon project so theres no commercial use. so what would the project look lie
+
+---
+
+no do a goldfish review
+
+---
+
+can you look at main what is going on there, what has been pushed what can be re used
+
+---
+
+yeah its fine to pivot the city to new york.
+
+---
+
+so what needs doing
+
+---
+
+add a nix flake with a dev shell of all deps needed
+
+---
+
+can you add a basic flake to manage system packages, and then let tools e..g uv manage indiviual lang packages
+
+---
+
+ok we're back on main, be mindful of what you push as this will be used by others. always ask to push before doing it. tooling can be managed with nix shell or nix develop if needed. based on the work going on now, what can be done in parallel without conflicts
+
+---
+
+what can be done without overlapping
+
+---
+
+email has been sent for ensus we're waiting what work naturally carries on from what people are doing, that should be avoided. what can be done that has no overlap now or in someones future work
+
+---
+
+email has been sent for ensus we're waiting what work naturally carries on from what people are doing, that should be avoided. what can be done that has no overlap now or in someones future work
+
+---
+
+email has been sent for ensus we're waiting what work naturally carries on from what people are doing, that should be avoided. what can be done that has no overlap now or in someones future work please still use the elephant goldfish model
+
+---
+
+why dont they change the demon story
+
+---
+
+what about passing all of this data into a decision model e..g jev. and we need this to uncover the hidden pattersn in the data
+
+---
+
+what about passing all of this data into a decision model e..g jev. and we need this to uncover the hidden pattersn in the data. google what jev / decision models are
+
+---
+
+so how do we relate it back to the tracks
+
+---
+
+so lets do a gold fish
+
+---
+
+sorry continue
+
+---
+
+sorry continue
+
+---
+
+sorry continue

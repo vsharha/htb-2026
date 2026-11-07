@@ -1,0 +1,15 @@
+{
+  "tool_use_id": "chatcmpl-tool-8a342d59e42e8acf",
+  "agent_id": "ses_e485b1e8effeVjPVGiMocJodPA",
+  "subagent_type": "general",
+  "task_description": "Goldfish readiness on tracks",
+  "token_usage": {
+    "input_tokens": 37080,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 278977,
+    "output_tokens": 4781,
+    "api_call_count": 14
+  },
+  "started_at": "2026-11-07T20:13:18.567Z",
+  "completed_at": "2026-11-07T20:16:47.780701499Z"
+}
