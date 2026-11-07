@@ -1,6 +1,6 @@
 # Idea ranking
 
-Seven project ideas, ranked. This is a recommendation, not a decision. The team decides what we build.
+Ten project ideas, ranked. Each has its own file in `ideas/`. This is a recommendation, not a decision. The team decides what we build.
 
 ## How it was ranked
 
@@ -22,12 +22,23 @@ Facts below come from the agents' web checks on 7 November 2026. Nobody has re-c
 
 | # | Idea | Sponsor tracks it fits | In one line |
 |---|---|---|---|
-| 1 | Flat Truth | Wordsmith, G-Research, Bank of Scotland (all strong); HRT (weak) | Check an Edinburgh rental against public records before you sign |
-| 2 | Fine Print | HRT, G-Research (strong); Wordsmith (moderate) | Two betting contracts that look the same often aren't, and an agent finds out why |
-| 3 | Room Radar | Wordsmith (strong); G-Research, Bank of Scotland (moderate) | Find the real cheapest room for a society's event |
-| 4 | Ad channel finder | G-Research (strong); Wordsmith, HRT (moderate) | Find cheap, overlooked places to advertise |
-| – | Overpaid | Bank of Scotland (strong); others moderate or weak | Not recommended: a weaker, wider version of #1 |
-| – | Glassbox | InstaLily (strong, if it passes); JetBrains (moderate) | Not recommended: fewest tracks, and one missed bug means unranked |
+| 1 | [Flat Truth](ideas/flat-truth.md) | Wordsmith, G-Research, Bank of Scotland (all strong); HRT (weak) | Check an Edinburgh rental against public records before you sign |
+| 2 | [Fine Print](ideas/fine-print.md) | HRT, G-Research (strong); Wordsmith (moderate) | Two betting contracts that look the same often aren't, and an agent finds out why |
+| 3 | [Room Radar](ideas/room-radar.md) | Wordsmith (strong); G-Research, Bank of Scotland (moderate) | Find the real cheapest room for a society's event |
+| 4 | [Ad channel finder](ideas/ad-channel-mispricing.md) | G-Research (strong); Wordsmith, HRT (moderate) | Find cheap, overlooked places to advertise |
+| 5 | [Overpaid](ideas/overpaid.md) | Bank of Scotland (strong); others moderate or weak | Not recommended: a weaker, wider version of #1 |
+| 6 | [Glassbox](ideas/glassbox.md) | InstaLily (strong, if it passes); JetBrains (moderate) | Not recommended: fewest tracks, and one missed bug means unranked |
+| 7 | [Terms Time Machine](ideas/terms-time-machine.md) | G-Research, Wordsmith (strong); Bank of Scotland (moderate) | See how a service's terms changed and how hard it is to cancel |
+| 8 | [Small Print Tax](ideas/small-print-tax.md) | Bank of Scotland, G-Research (strong); HRT, Wordsmith (moderate) | The real 24-month cost of a broadband or mobile contract |
+| 9 | [Cheap Hours](ideas/cheap-hours.md) | HRT, Bank of Scotland (strong); G-Research (moderate) | When electricity is cheapest and greenest, and what to run then |
+| 10 | [Shelf Truth](ideas/shelf-truth.md) | Wordsmith, G-Research, Bank of Scotland (strong); HRT (moderate) | Catch shrinkflation and fake "was" prices in supermarkets |
+
+Ideas 1 to 6 went through the debate and the judge. Ideas 7 to 10 came up in the first round but were not debated, so their ranking rests on the first-round notes and their facts are mostly unchecked. They rank below the debated ideas for these reasons:
+
+- **7, Terms Time Machine:** its data is unchecked, it needs test accounts and its HRT fit is weak.
+- **8, Small Print Tax:** comparison sites block bots, the overpayment is small and bill-saving apps are common.
+- **9, Cheap Hours:** Octopus already publishes the next day's prices, energy apps are common and its Wordsmith fit is weak.
+- **10, Shelf Truth:** it depends on supermarket sites that block bots.
 
 No pair of ideas combines into one coherent project. Each pair turned out to be two products bolted together.
 
