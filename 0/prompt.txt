@@ -1,0 +1,65 @@
+what is left to do in the project
+
+---
+
+is there anything not to do with estimating the cost
+
+---
+
+im not in charge of this data oof cost, im trying to see if there's work in paralle
+
+---
+
+what are low cost easy contriubtions
+
+---
+
+what does deploy tracing involve
+
+---
+
+is this needed for a demo? this project wont be deployed but only for a hackathon project
+
+---
+
+so what else can be done
+
+---
+
+how does the competitor campaign agent work
+
+---
+
+what does this do, does this need a llm
+
+---
+
+how would this llm be integrated
+
+---
+
+we have an openai key REDACTED  can we use this
+
+---
+
+yeah you can put it into .env.local
+
+---
+
+ok its done, lets build with it
+
+---
+
+so what is the end goal of this, say a very high level pipeline of what happens
+
+---
+
+how does it find competitiors? and can we do this feature without editing existing code
+
+---
+
+surely we can just add a new layer ? i mean that we dont have to edit the existing logic, its fine if some code changes
+
+---
+
+ah, add a nix flake shell for dependencies
