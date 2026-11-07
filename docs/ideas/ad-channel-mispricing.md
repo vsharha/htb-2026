@@ -12,7 +12,7 @@ The metric matters. The source in Evidence and data shows that airport ads are n
 
 ## Origin
 
-Raised by the user on 7 November 2026, prompted by Revolut's airport advertising. The user first took it to mean airports charge too little and should raise prices. A newsletter found later that day, described in Evidence and data, gives a different reading, and the rest of this file follows it.
+One of Daniel's three ideas, raised on 7 November 2026 and prompted by Revolut's airport advertising. It was first taken to mean airports charge too little and should raise prices. A newsletter found later that day, described in Evidence and data, gives a different reading, and the rest of this file follows it.
 
 ## How it works
 
