@@ -5,6 +5,7 @@ The same project can be entered into any number of these tracks, and can win mor
 ## HRT: Best Use of Data for Predictions & Decision Making
 
 - Prizes: 1st PlayStation 5s; 2nd keyboards.
+- Source: `reference/tracks/hrt/challenge-track.png`
 - Brief: TODO
 - Judging notes: TODO
 
@@ -17,29 +18,34 @@ The same project can be entered into any number of these tracks, and can win mor
 ## JetBrains: Help the Developer
 
 - Prizes: 1st €350 each; 2nd €150 each.
+- Source: `reference/tracks/jetbrains/` (case description, judging criteria, OpenAI access, resources slides)
 - Brief: TODO
 - Judging notes: TODO
 
 ## Bank of Scotland: Smart Cost of Living
 
 - Prizes: 1st £150 Amazon gift card each; 2nd £75 Amazon gift card each.
+- Source: `reference/tracks/bank-of-scotland/` (challenge and prizes slides)
 - Brief: TODO
 - Judging notes: TODO
 
 ## Wordsmith: Make the most complicated end-to-end agentic AI browser-use workflow
 
 - Prizes: 1st AirPods Max; 2nd and 3rd goodie bags.
+- Source: `reference/tracks/wordsmith/slides.pdf`
 - Brief: TODO
 - Judging notes: TODO
 
 ## InstaLily: Build a coding agent that adapts to whoever's using it
 
 - Prizes: 1st fast-tracked interview and Sony headphones; 2nd Logitech MX Master 3S mice.
+- Source: `reference/tracks/instalily/challenge-brief.pdf` and `agent-contract.pdf`
 - Brief: TODO
 - Judging notes: TODO
 
 ## Viridien: Automate lithological interval detection, depth mapping, pattern clustering, and legend classification
 
 - Prizes: 1st AirPods 5 and £100 of fossils. No other places listed.
+- Source: `reference/tracks/viridien/presentation.pptx`
 - Brief: TODO
 - Judging notes: TODO
