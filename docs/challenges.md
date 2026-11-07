@@ -1,6 +1,6 @@
 # MLH challenges
 
-MLH awards these prizes for using specific technologies. They are separate from the sponsor tracks in `tracks.md`, and a project can win both. Source: the MLH email for HackTheBurgh, 6 November 2026.
+MLH awards these prizes for using specific technologies. They are separate from the sponsor tracks in `tracks.md`, and a project can win both. Source: the MLH email for HackTheBurgh, 6 November 2026, stored as `reference/mlh/mlh-email-2026-11-06.pdf`.
 
 Some technologies have promo codes, claimed through links in the MLH email. Do not store the codes in this repository.
 

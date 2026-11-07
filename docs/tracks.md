@@ -1,6 +1,6 @@
 # Sponsor tracks
 
-The same project can be entered into any number of these tracks, and can win more than one. Each section gives the prizes as announced. "Brief" holds the fuller description from the sponsor talk or submission page, and "Judging notes" holds what the sponsor says it judges on.
+The same project can be entered into any number of these tracks, and can win more than one. Track titles and prizes come from the sponsor table, `reference/tracks/sponsor-table.png`. When a section draws on a sponsor's own material, its "Source" line names the file in `reference/tracks/`. Each section gives the prizes as announced. "Brief" holds the fuller description from the sponsor talk or submission page, and "Judging notes" holds what the sponsor says it judges on.
 
 ## HRT: Best Use of Data for Predictions & Decision Making
 

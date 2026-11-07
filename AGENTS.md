@@ -26,13 +26,15 @@ Priority challenges, most important first: TODO, not decided yet.
 
 Read the relevant file before work aimed at a specific track or challenge.
 
+`reference/` holds the original source files these docs are summarised from: sponsor material in `reference/tracks/`, one folder per sponsor, and MLH material in `reference/mlh/`. Read a file there only when the user asks, for example to update `docs/tracks.md` from new material. Otherwise use the summaries in `docs/`.
+
 ## Project
 
 Stack, commands and layout: TODO once chosen.
 
 ## Shared files that need approval
 
-Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md`, `CLAUDE.md`, `docs/tracks.md`, `docs/challenges.md`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
+Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md`, `CLAUDE.md`, `docs/tracks.md`, `docs/challenges.md`, `reference/`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
 
 ## Committing
 
@@ -56,7 +58,7 @@ Several teammates, each with their own coding agent, push to one shared `main` b
 - Resolve pull conflicts by keeping the intent of both sides. Never take one side wholesale (`--ours` or `--theirs`) on files you didn't write. If the right resolution is unclear, stop and ask.
 - `git reset --hard`, `git checkout -- <path>`, `git restore`, `git clean` and `git stash drop` need the user's approval.
 - Resolve a lockfile conflict by re-running the package manager's lock or install and committing the result, never by deleting the lockfile.
-- Keep build output, screenshots and downloaded data over a few MB out of Git. Commit data only when the demo needs it offline.
+- Keep build output, screenshots and downloaded data over a few MB out of Git. Commit data only when the demo needs it offline. Source files in `reference/` are the exception, except very large ones such as videos, which are kept as a link.
 - Never bypass checks: no `--no-verify`, no disabled lint rules, no deleting failing code.
 
 ## Secrets and code quality
