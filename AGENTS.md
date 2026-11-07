@@ -27,7 +27,12 @@ Read `docs/event/tracks.md` or `docs/event/challenges.md` before work aimed at a
 
 ## Project
 
-Stack, commands and layout: TODO once chosen.
+The web app is a Next.js 16 project in `web/` (App Router, TypeScript, Tailwind CSS 4, ESLint), managed with pnpm. Run commands from `web/`:
+
+- `pnpm dev`: dev server on http://localhost:3000
+- `pnpm lint`, `pnpm typecheck` and `pnpm build`: the checks to run before each commit
+
+`next dev` writes `web/AGENTS.md`, which points agents to the version-matched Next.js docs in `web/node_modules/next/dist/docs/`.
 
 ## Docs
 
