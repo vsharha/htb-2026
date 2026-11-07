@@ -1,0 +1,29 @@
+look at the current setup. what mlh hacking przies can be won
+
+---
+
+how would vultr be added
+
+---
+
+how do i get the free credit
+
+---
+
+ok done, can we adapt this to use a local decision model on cloud gpu and
+
+---
+
+ok done, can we adapt this to use a local decision model
+
+---
+
+ok done, can we adapt this to use a local decision model but running on the deployed cloud
+
+---
+
+yeah its fine to use cleph or some qwen model instead of jev
+
+---
+
+clef the cloudflare i like that.
