@@ -3,7 +3,7 @@
 Run from tools/ with `uv run python -m tools.analyze`. Writes
 data/analysis/nyc_tracts.geojson: one feature per tract with its Census
 demographics, the subway riders passing nearby, and its advertising placements.
-Startup-specific scoring and competitor data are not joined yet.
+Startup-specific scoring and competitor campaigns are added by the web app.
 """
 
 import geopandas as gpd

@@ -16,7 +16,7 @@ Raised by Viktor on 7 November 2026 as a pivot from the ad channel mispricing fi
 
 Decided on 7 November 2026; the decisions are in [product.md](../product.md).
 
-1. Input: the onboarding form above. The target customer sentence becomes filters on census and trip data, such as age, income, industry and household type.
+1. Input: the onboarding form above. The target customer sentence becomes weights on census and trip data, such as age, income, industry and household type. Jev, a decision model, scores how strongly the sentence implies each attribute.
 2. Audience fit layer: each area of the city is scored by how many target customers live there, work there or pass through it.
 3. Competition layer: a browser agent finds the startup's competitors, then searches press, trade sites and social media for their outdoor campaigns in the city, such as "<competitor> subway ad" or "<competitor> billboard NYC", and places each find on the map. Where it finds nothing, competitors' stores and offices stand in.
 4. Gap layer: areas with high audience fit and low competition. This is the default view; the other two layers are toggles that explain it.
@@ -49,7 +49,7 @@ Where ads can be bought:
 
 - [LinkNYC Kiosk Locations](https://data.cityofnewyork.us/d/s4kf-3yrf) (checked): 2,255 sites with address, coordinates and census tract. By kiosk type: 2,032 live Link1.0 kiosks, 151 live Link5G kiosks marked "Ad", 57 live Link5G kiosks marked "NonAd", and a few removed or payphones. Only the Link5G types say whether they carry ads; whether Link1.0 kiosks do is unchecked. Fetched with the bus shelters by the `placements` source, which keeps live kiosks only.
 - [Bus Stop Shelters](https://data.cityofnewyork.us/d/t4f2-8md7) (checked): 3,312 shelters with coordinates and neighbourhood, updated 1 October 2026. The data has no field saying whether a shelter carries advertising. The `placements` source writes kiosks and shelters to `data/placements/nyc_placements.csv` (5,556 rows), with carries_ads set to yes, no or unknown.
-- Joined per tract (fetched): `tools.analyze` writes `data/analysis/nyc_tracts.geojson`, each tract's shape with its Census columns, the subway station complexes within 1,300 feet (about a five-minute walk) and their weekly riders, and its counts of LinkNYC kiosks, kiosks marked as carrying ads, and bus shelters. 1,373 tracts have a station nearby and 125 contain a kiosk marked as carrying ads. Startup-specific scoring and competitor data aren't joined yet.
+- Joined per tract (fetched): `tools.analyze` writes `data/analysis/nyc_tracts.geojson`, each tract's shape with its Census columns, the subway station complexes within 1,300 feet (about a five-minute walk) and their weekly riders, and its counts of LinkNYC kiosks, kiosks marked as carrying ads, and bus shelters. 1,373 tracts have a station nearby and 125 contain a kiosk marked as carrying ads. Startup-specific scoring and the competitor campaigns are added in the web app, not in this file.
 - [DOB Sign Application Filings](https://data.cityofnewyork.us/d/nyis-y4yr) (checked): 15,288 filings, but only from April 2013 to October 2017. It covers all signs, not only advertising, and gives an address and tax lot rather than coordinates. Not usable as a current billboard map.
 
 Competitors:
@@ -71,7 +71,7 @@ No search has been run yet. From memory: foot-traffic and audience-mapping produ
 
 ## Challenges it could use
 
-- Gemini API: the competitor-campaign agent and turning the target customer sentence into data filters.
+- Gemini API: the competitor-campaign agent, if it runs on a Gemini model.
 - Tiger Data: hourly ridership and trip data are time series, which fits the hourly view if it is built.
 - Vultr: hosting the data processing or the demo.
 
@@ -80,7 +80,7 @@ No search has been run yet. From memory: foot-traffic and audience-mapping produ
 - Licences: the New York open data portals list none on the datasets checked, and Citi Bike's data sharing policy has not been read.
 - Billboards have no current public map. The only sign dataset stops in 2017, so the placements step relies on LinkNYC kiosks and bus shelters, and on shelters only if we can find which ones carry advertising.
 - The competitor-campaign agent may find few campaigns for small competitors, leaving the competition layer mostly made of stores and offices, which show where competitors are, not where they advertise.
-- Turning a one-sentence target customer into census and trip filters is untested, and some customers, such as "developers at Series A startups", have no direct census field.
+- Turning a one-sentence target customer into weights on the tract columns with Jev is untested, and some customers, such as "developers at Series A startups", have no direct census field.
 - Prices for LinkNYC kiosks and bus shelters are probably unpublished, so cost per audience member would be an estimate. How to estimate it is undecided.
 - Judges in Edinburgh may ask why New York. The answer is that New York publishes the most data and the method works elsewhere, which the pitch should say up front.
 - The mispricing claim of the earlier idea, and the Revolut evidence behind it, no longer support the product directly. The pitch needs its own evidence that competitors leave gaps in a city.
