@@ -42,7 +42,7 @@ LLM calls and AI agents go through the Vercel AI SDK (`ai` plus a provider packa
 
 `next dev` writes `web/AGENTS.md`, which points agents to the version-matched Next.js docs in `web/node_modules/next/dist/docs/`.
 
-The data-gathering scripts are a Python project in `tools/`. Read `tools/AGENTS.md` before working on them or on the data they write to `data/`.
+The data-gathering scripts are a Python project in `tools/`. Gather data through a script there, not by hand, in `web/`, or with a one-off command, so anyone can re-run it. Read `tools/AGENTS.md` before working on them or on the data they write to `data/`.
 
 ## Docs
 
