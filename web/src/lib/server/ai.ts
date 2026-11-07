@@ -1,15 +1,15 @@
 import "server-only";
 
 import { openai } from "@ai-sdk/openai";
-import { APICallError, createProviderRegistry, gateway } from "ai";
+import { APICallError, createProviderRegistry } from "ai";
 
-const providers = createProviderRegistry({ openai, gateway });
-type ModelId = `openai:${string}` | `gateway:${string}`;
+const providers = createProviderRegistry({ openai });
+type ModelId = `openai:${string}`;
 
 export const AI_MODELS = {
   competitor: "openai:gpt-5-mini",
-  audience: "gateway:typesafe-ai/jev",
-} as const satisfies { competitor: ModelId; audience: `gateway:${string}` };
+  audience: "clef-flash",
+} as const satisfies { competitor: ModelId; audience: string };
 
 type ResearchEvent = {
   type: string;
@@ -73,10 +73,13 @@ export function getCompetitorAI(modelId: ModelId = AI_MODELS.competitor) {
   };
 }
 
-export function getAudienceModel() {
-  return providers.decisionModel(AI_MODELS.audience);
-}
+const DEFAULT_CLEF_URL = "http://127.0.0.1:30000";
 
-export function hasAudienceCredentials() {
-  return Boolean(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN);
+export function getClefConfig() {
+  const base = (process.env.CLEF_BASE_URL ?? DEFAULT_CLEF_URL).replace(/\/+$/, "");
+  return {
+    url: base.endsWith("/v1/systemone") ? base : `${base}/v1/systemone`,
+    model: process.env.CLEF_MODEL ?? AI_MODELS.audience,
+    token: process.env.CLEF_API_TOKEN,
+  };
 }

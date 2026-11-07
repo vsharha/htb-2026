@@ -150,7 +150,7 @@ function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | n
 function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | null }) {
   // Traits that count for or against the customer, strongest either way first.
   const weights = run.fit?.weights.filter((w) => w.weight !== 0).sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
-  const aside = run.fit && (run.fit.source === "jev" ? "weighted by Jev" : "weighted by keywords");
+  const aside = run.fit && (run.fit.source === "clef" ? "weighted by Clef" : "weighted by keywords");
   return (
     <>
       <Section title="Most customers">
@@ -164,7 +164,7 @@ function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | nu
       <Section title="Who we looked for" aside={aside}>
         {run.fit?.source === "keywords" && (
           <p className="text-xs text-muted-foreground">
-            Jev couldn&rsquo;t be reached, so these weights come from keywords in your target customer.
+            Clef couldn&rsquo;t be reached, so these weights come from keywords in your target customer.
           </p>
         )}
         {!weights ? (

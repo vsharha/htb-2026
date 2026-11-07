@@ -1,14 +1,13 @@
 "use server";
 
-// Scores the target customer against the tract columns with Jev, TypeSafe
-// AI's decision model, through Vercel AI Gateway, then combines the real tract
-// numbers in code. Jev sees the brief and the 21 column descriptions, never a
-// tract: one request asks one score question per column.
-
-import { experimental_decide as decide } from "ai";
+// Scores the target customer against the tract columns with a local Clef
+// decision model (Cloudflare, Jev/SystemOne-compatible) over its
+// /v1/systemone endpoint, then combines the real tract numbers in code. Clef
+// sees the brief and the 21 column descriptions, never a tract: one request
+// asks one score question per column.
 
 import type { AudienceFit, Brief, ColumnWeight } from "@/lib/contract";
-import { getAudienceModel, hasAudienceCredentials } from "@/lib/server/ai";
+import { getClefConfig } from "@/lib/server/ai";
 import { keywordWeights } from "@/lib/stand-in/keyword-weights";
 import { readAnalysisCsv, readAnalysisJson } from "@/lib/stand-in/data-files";
 import type { TractColumn } from "@/lib/tract-columns";
@@ -30,48 +29,80 @@ const LEVELS = [
   "Strongly for: the target customers are much more likely to have this trait.",
 ];
 
-/**
- * The answer as a weight from -1 to 1. With per-level probabilities this is
- * the expected level, so a split between "for" and "strongly for" lands
- * between them; otherwise it is the single level Jev chose.
- */
-function toWeight(answer: { score: number; probabilities?: Record<string, number> }) {
-  const top = LEVELS.length - 1;
-  let level = answer.score;
-  const entries = Object.entries(answer.probabilities ?? {})
-    .map(([key, p]) => [Number(key), p] as const)
+function probabilityWeight(probabilities: unknown, top: number): number | null {
+  if (!probabilities || typeof probabilities !== "object") return null;
+  const entries = Object.entries(probabilities as Record<string, unknown>)
+    .map(([key, p]) => [Number(key), typeof p === "number" ? p : Number.NaN] as const)
     .filter(([i, p]) => Number.isInteger(i) && i >= 0 && i <= top && Number.isFinite(p));
   const total = entries.reduce((sum, [, p]) => sum + p, 0);
-  if (total > 0) level = entries.reduce((sum, [i, p]) => sum + i * p, 0) / total;
+  if (total <= 0) return null;
+  const level = entries.reduce((sum, [i, p]) => sum + i * p, 0) / total;
   return Number(Math.max(-1, Math.min(1, (level / top) * 2 - 1)).toFixed(2));
 }
 
-async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnWeight[]> {
-  const result = await decide({
-    model: getAudienceModel(),
-    state: {
-      "target customer": brief.targetCustomer,
-      startup: brief.description,
-      industry: brief.industry,
-    },
-    questions: Object.fromEntries(
-      columns.map((c) => [
-        c.name,
-        {
-          type: "score" as const,
-          instructions: `How does this trait of an area's ${c.measures === "lives" ? "residents" : c.measures === "works" ? "workers" : "passers-by"} relate to the startup's target customers? Trait: ${c.description}.`,
-          criteria: LEVELS,
-        },
-      ]),
-    ),
-    abortSignal: AbortSignal.timeout(TIMEOUT_MS),
+/** Maps a Clef score answer to a weight from -1 to 1. */
+function toWeight(answer: unknown, top: number): number {
+  if (!answer || typeof answer !== "object") throw new Error("missing answer");
+  const a = answer as { score?: unknown; probabilities?: unknown };
+  const fromProbabilities = probabilityWeight(a.probabilities, top);
+  if (fromProbabilities !== null) return fromProbabilities;
+  if (typeof a.score === "number" && Number.isFinite(a.score)) {
+    const level = Math.max(0, Math.min(top, a.score));
+    return Number((((level / top) * 2 - 1)).toFixed(2));
+  }
+  throw new Error("score answer has no score or probabilities");
+}
+
+function unwrap(body: unknown): { answers: Record<string, unknown> } {
+  if (!body || typeof body !== "object") throw new Error("Clef returned no body");
+  const b = body as { answers?: unknown; result?: { answers?: unknown } };
+  const answers = b.answers ?? b.result?.answers;
+  if (!answers || typeof answers !== "object") throw new Error("Clef returned no answers");
+  return { answers: answers as Record<string, unknown> };
+}
+
+async function clefWeights(columns: TractColumn[], brief: Brief): Promise<ColumnWeight[]> {
+  const { url, model, token } = getClefConfig();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      model,
+      state: {
+        "target customer": brief.targetCustomer,
+        startup: brief.description,
+        industry: brief.industry,
+      },
+      questions: Object.fromEntries(
+        columns.map((c) => [
+          c.name,
+          {
+            type: "score",
+            instructions: `How does this trait of an area's ${c.measures === "lives" ? "residents" : c.measures === "works" ? "workers" : "passers-by"} relate to the startup's target customers? Trait: ${c.description}.`,
+            criteria: LEVELS,
+          },
+        ]),
+      ),
+    }),
+    signal: AbortSignal.timeout(TIMEOUT_MS),
   });
 
-  return columns.map((c) => {
-    const answer = result.answers[c.name];
-    if (answer?.type !== "score") throw new Error(`Jev returned no score for "${c.name}".`);
-    return { column: c.name, description: c.description, measures: c.measures, weight: toWeight(answer) };
-  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`Clef ${response.status}${text ? `: ${text.slice(0, 200)}` : ""}`);
+  }
+
+  const { answers } = unwrap(await response.json());
+  const top = LEVELS.length - 1;
+  return columns.map((c) => ({
+    column: c.name,
+    description: c.description,
+    measures: c.measures,
+    weight: toWeight(answers[c.name], top),
+  }));
 }
 
 export async function scoreAudience(brief: Brief): Promise<AudienceFit> {
@@ -80,24 +111,17 @@ export async function scoreAudience(brief: Brief): Promise<AudienceFit> {
     readAnalysisCsv("nyc_tracts.csv"),
   ]);
 
-  // Without gateway credentials, or if Jev fails, the keyword stand-in keeps
-  // the page working, and `source` tells the page which one it got. Locally the
-  // credential is AI_GATEWAY_API_KEY; on a Vercel deployment the AI SDK uses
-  // the project's OIDC token when no key is set.
+  // The local Clef model weights the columns; if it can't be reached, the
+  // keyword stand-in keeps the page working and `source` tells the page which
+  // one it got.
   let weights: ColumnWeight[];
-  let source: AudienceFit["source"] = "jev";
-  if (!hasAudienceCredentials()) {
-    console.warn("No AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN; weighting the audience by keywords instead of Jev.");
+  let source: AudienceFit["source"] = "clef";
+  try {
+    weights = await clefWeights(columns, brief);
+  } catch (error) {
+    console.error("Clef failed; weighting the audience by keywords instead.", error);
     weights = keywordWeights(columns, brief.targetCustomer);
     source = "keywords";
-  } else {
-    try {
-      weights = await jevWeights(columns, brief);
-    } catch (error) {
-      console.error("Jev failed; weighting the audience by keywords instead.", error);
-      weights = keywordWeights(columns, brief.targetCustomer);
-      source = "keywords";
-    }
   }
 
   const markets = new Set<string>(brief.markets);

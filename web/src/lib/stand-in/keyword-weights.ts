@@ -1,5 +1,5 @@
 // Weights the tract columns by matching keywords in the target customer
-// sentence. Audience scoring falls back to this when Jev can't be reached.
+// sentence. Audience scoring falls back to this when Clef can't be reached.
 
 import type { ColumnWeight } from "@/lib/contract";
 import type { TractColumn } from "@/lib/tract-columns";
