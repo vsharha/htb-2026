@@ -1,0 +1,33 @@
+what is the status on integrating jev into this
+
+---
+
+@egm-brainstorm can we look at using the openai api key for a decision model intead
+
+---
+
+yes that decisions api we have a open ai key for the hackaton
+
+---
+
+surely the decisions model is a drop in replacement for jev?
+
+---
+
+lets only focus on the jev aspect for now and using decsions api isntead
+
+---
+
+what is the current jev meant to do now
+
+---
+
+whats teh diff
+
+---
+
+i think option A then but include the design choice for context for agents if needed
+
+---
+
+we should err for now, make the failure obvious as that can be corrected later. is there anything else to decide before implementation
