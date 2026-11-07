@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { Campaign, Placement } from "@/lib/contract";
 import type { LayerId, TractLayers, TractShapes } from "@/lib/gap";
+import { cn } from "@/lib/utils";
 
 // MapLibre needs the browser's WebGL, so the map is never rendered on the server.
 const TractMap = dynamic(() => import("@/components/tract-map").then((m) => m.TractMap), {
@@ -32,17 +33,20 @@ export function MapPanel({
   layers,
   campaigns,
   placements,
+  className,
 }: {
   shapes: TractShapes | null;
   layers: TractLayers | null;
   campaigns: Campaign[];
   placements: Placement[] | null;
+  /** Sizes the map; the panel fills whatever box this gives it. */
+  className?: string;
 }) {
   const [layer, setLayer] = useState<LayerId>("gap");
   const current = LAYERS.find((l) => l.id === layer)!;
 
   return (
-    <section className="relative h-[70vh] min-h-[28rem] overflow-hidden rounded-2xl border-2 border-foreground">
+    <section className={cn("relative overflow-hidden", className)}>
       {shapes ? (
         <TractMap shapes={shapes} layers={layers} layer={layer} campaigns={campaigns} placements={placements} />
       ) : (
@@ -72,7 +76,7 @@ export function MapPanel({
         </ToggleGroup>
       </div>
 
-      <div className="pointer-events-none absolute bottom-3 left-3 w-56 rounded-xl bg-background/95 p-3 shadow-sm sm:bottom-4 sm:left-4">
+      <div className="pointer-events-none absolute bottom-9 left-3 w-52 rounded-xl bg-background/95 p-3 shadow-sm sm:bottom-4 sm:left-4 sm:w-56">
         <div
           className="h-2 rounded-full"
           style={{ background: "linear-gradient(to right, var(--heat-cool), var(--heat-mid), var(--heat-hot))" }}
