@@ -32,13 +32,16 @@ Agents keep these current without being asked.
 - When the user chooses an idea, set its status to chosen and record the decision in `product.md`. When an idea is dropped or merged into another, set its status and reason; never delete the file, because the reasons stay useful.
 - Judge track fit against the judging notes in `event/tracks.md`, not the track title alone.
 
-Each idea file uses these sections, in this order:
+Each idea file uses these sections, in this order. Sections marked optional appear only once there is something to put in them.
 
 1. Title, then a status line: `Status: proposed`, `chosen`, `dropped` or `merged into <file>`, with the date and, for dropped or merged, the reason.
 2. Idea: what it does and for whom, in a short paragraph.
-3. Origin: who proposed it and what prompted it.
-4. Tracks it could serve: each track with strong, moderate or weak, and why.
-5. Challenges it could use: each MLH challenge whose technology fits a part of the idea, and which part.
-6. Open problems: unverified assumptions, data availability, and risks.
-7. Scope: what a 24-hour demo would show, end to end.
-8. Alternatives: links to the idea files it was compared with, and how it differs.
+3. Origin: who proposed it and what prompted it. Source material goes in Evidence and data.
+4. How it works (optional): the inputs, the steps the product takes, what it outputs, and any calculation or model it relies on. This is the product design; what the demo shows goes in Scope.
+5. Evidence and data (optional): sources that support the premise, with their dates and how reliable they are, and the data the product needs, with whether access has been checked.
+6. Existing products (optional): outside products and research that already cover part of the idea, how this idea differs, the date of the search, and what the search did not cover.
+7. Tracks it could serve: each track with strong, moderate or weak, and why.
+8. Challenges it could use: each MLH challenge whose technology fits a part of the idea, and which part.
+9. Open problems: unverified assumptions, unchecked data access, and risks. Facts already found go in Evidence and data or Existing products, not here.
+10. Scope: what a 24-hour demo would show, end to end.
+11. Alternatives: links to the idea files it was compared with, and how it differs. Outside products go in Existing products.
