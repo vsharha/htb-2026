@@ -24,7 +24,7 @@ Priority challenges, most important first: TODO, not decided yet.
 - `docs/event/tracks.md`: each sponsor track's prizes, brief and judging notes.
 - `docs/event/challenges.md`: each MLH challenge's technology, prize, what qualifies, and sign-up.
 - `docs/event/schedule.md`: the event schedule.
-- `docs/product.md`, `docs/status.md`, `docs/pitch/` and `docs/ideas/`: the product plan, what is built, pitch material, and candidate ideas. See "Product docs" below.
+- `docs/product.md`, `docs/status.md`, `docs/pitch/` and `docs/ideas/`: the product plan, what is built, pitch material, and candidate ideas. See "Docs" below.
 
 Read the relevant file before work aimed at a specific track or challenge.
 
@@ -34,34 +34,14 @@ Read the relevant file before work aimed at a specific track or challenge.
 
 Stack, commands and layout: TODO once chosen.
 
-## Product docs
+## Docs
 
-Agents keep these current without being asked.
+How to write anything under `docs/` is in `docs/AGENTS.md`. Read it before creating or editing a file there. Keep the product docs current without being asked:
 
-- Product direction is brainstormed and recorded with the user before features are built.
-- `docs/product.md` says what the product is, who it is for and what sets it apart. Its Decisions section records every decision the user makes or confirms, including ones reported from teammates. Each is one line with the decision, reason and date, and a changed decision is updated in place. Never record a suggestion the user has not accepted.
-- `docs/status.md` lists each feature as built, mocked, planned or cut, with the tracks it serves. A built feature records how it was verified: the flow, the result, the date and the commit. A cut feature keeps its line with the reason. A change to code or demo data means re-checking the claims it affects.
-- `docs/pitch/notes.md` holds internal pitch notes. `docs/pitch/judges/` holds only what judges will see, one file per track.
-
-### Ideas
-
-`docs/ideas/` holds candidate product ideas from brainstorming, one file per idea, named in kebab case after the idea (`ad-channel-mispricing.md`). An idea is not a decision. Anyone may add or edit one without approval.
-
-- Record an idea when the user or a teammate raises it while brainstorming. An idea an agent proposes is recorded only if the user asks, and its Origin says so.
-- When an idea is compared with another, give the other its own file and link to it rather than describing it inline.
-- When the user chooses an idea, set its status to chosen and record the decision in `docs/product.md`. When an idea is dropped or merged into another, set its status and reason; never delete the file, because the reasons stay useful.
-- Judge track fit against the judging notes in `docs/event/tracks.md`, not the track title alone.
-
-Each idea file uses these sections, in this order:
-
-1. Title, then a status line: `Status: proposed`, `chosen`, `dropped` or `merged into <file>`, with the date and, for dropped or merged, the reason.
-2. Idea: what it does and for whom, in a short paragraph.
-3. Origin: who proposed it and what prompted it.
-4. Tracks it could serve: each track with strong, moderate or weak, and why.
-5. Challenges it could use: each MLH challenge whose technology fits a part of the idea, and which part.
-6. Open problems: unverified assumptions, data availability, and risks.
-7. Scope: what a 24-hour demo would show, end to end.
-8. Alternatives: links to the idea files it was compared with, and how it differs.
+- Brainstorm product direction with the user and record it before building features.
+- Record each idea raised while brainstorming in `docs/ideas/`.
+- Record each decision the user makes or confirms in `docs/product.md`.
+- Update `docs/status.md` when a feature is built, mocked or cut, and when a change affects what it claims.
 
 ## Agent skills and tools
 
@@ -76,7 +56,7 @@ Each idea file uses these sections, in this order:
 
 ## Shared files that need approval
 
-Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md`, `CLAUDE.md`, `docs/event/`, `reference/`, `.agents/skills/`, `.mcp.json`, `.codex/config.toml`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
+Several teammates, each with their own coding agent, push to one shared `main` branch. Some files affect everyone, so an agent changes them only with the user's approval: `AGENTS.md` and `CLAUDE.md` at any level, `docs/event/`, `reference/`, `.agents/skills/`, `.mcp.json`, `.codex/config.toml`, `.gitignore`, and root package, workspace, lint, format and type-check config once they exist. Lockfiles are the exception, because they change whenever someone adds a dependency. Major version upgrades also need approval, and any version pin is recorded with its reason.
 
 ## Committing
 
