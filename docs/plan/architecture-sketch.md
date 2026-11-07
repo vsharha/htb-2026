@@ -1,36 +1,39 @@
 # Architecture sketch
 
-Status: proposal, 7 November 2026. Nothing here is decided. It sketches the pipeline in [the idea file](../ideas/ad-channel-mispricing.md) and fills in step 1 from research on existing AI media planners.
+Status: decided, 7 November 2026, except the open questions at the end. The decisions are recorded in [product.md](../product.md). This file describes the pipeline for [the ad channel mispricing finder](../ideas/ad-channel-mispricing.md), with research on existing AI media planners behind the form.
 
 ## Pipeline
 
 ```
-1. Brief ──> 2. Candidates ──> 3. Gap filter ──> 4. Verification ──> 5. Pricing ──> 6. Outreach
- (input)     (LLM proposes)    (reject/keep)     (rate card?)        (CPM vs        (draft/send)
-                                                                      attention)
+1. Form ──> 2. Crowded ──> 3. Candidates ──> 4. Gap filter ──> 5. Verification ──> 6. Pricing ──> 7. Report and
+ (input)     channels       (orchestrator     (reject/keep)     (per-medium         (CPM vs         outreach
+             (competitors   proposes                            agents find         attention)      (draft/send)
+             + our own      placements)                         rate card)
+             history)
 ```
 
-Each step takes the previous step's output as typed data, so steps can be built and demoed one at a time.
+Step 1 is the startup's input; steps 2 to 7 are the six steps the orchestrator agent runs. Each step takes the previous step's output as typed data, so steps can be built and demoed one at a time.
 
-## Step 1: Brief (input)
+The unit throughout is a placement, such as "Hamburg Airport jet bridges, €33,000 a month for 16 bridges", not a medium such as "airports". Per impression, airports as a medium are no cheaper than Meta, so any underpricing is in individual placements.
 
-Existing AI media planners ask for a short brief, so ours should too. Common inputs:
+## Step 1: Form (input)
+
+Existing AI media planners ask for a short brief, so ours does too. Common inputs:
 
 - Ant10 (The Media Ant): brand and category, objective, budget, target geography, target audience, duration, preferences or constraints.
 - Basis Compass: uploaded documents and plain-language instructions; no fixed fields found.
 - Akkio: budget, what to optimise, goals, uploaded reach curves. Needs measurement data a startup won't have, so we skip it.
 
-Proposed brief for us:
+Our form is short, with two free-text fields:
 
 | Field | Why we need it |
 |---|---|
-| Product description | Proposes candidate channels |
-| Target customer | Decides whose attention to find |
-| Customer value (rough lifetime value) | Weights audience value in step 5. Planners don't ask for this |
-| Geography | Narrows to one market, e.g. UK and EU |
-| Budget and duration | Filters out channels with minimum spends or long terms (BER's jet bridges have a 2-year minimum) |
-| Channels already used (optional) | Marks the crowded channels, so we look elsewhere |
-| Vertical (optional) | Out-of-home, or newsletters and podcasts |
+| Industry (multiple choice) | Finds competitors for the crowded-channel check |
+| Startup in one sentence (free text) | Proposes candidate placements |
+| Target customer in one sentence (free text) | Decides whose attention to find |
+| What a customer pays, per month or per purchase | Weights audience value in step 6. Easier to answer than lifetime value; planners don't ask for either |
+| Monthly advertising budget | Filters out placements with minimum spends or long terms (BER's jet bridges have a 2-year minimum; Hamburg's cost €33,000 a month) |
+| Markets | Narrows to the places the startup wants customers, such as the UK |
 
 Output of step 1: a structured brief object passed to step 2.
 
@@ -40,37 +43,45 @@ Surveyed 7 November 2026 from vendors' own pages; no product was tried. Basis, A
 
 | | Existing planners | Ours |
 |---|---|---|
-| Channel set | Fixed catalogue | Discovered per brief |
+| Channel set | Fixed catalogue | Specific placements discovered per brief, excluding crowded ones |
 | Price | Estimates inside the platform | Real rate card or marked unverified |
 | Metric | Reach, impressions, efficiency | Cost per thousand attentive seconds, weighted by audience value |
-| Output | Budget split with rationale | Ranked channels, each with a reason its gap survives and a contact |
+| Output | Budget split with rationale | Ranked placements, each with a reason its gap survives, a contact and a way to measure it |
 | Action | Activates inside own platform | Drafts or sends vendor outreach |
 
 Nearest rivals for the pitch: Ant10 (plans offline channels, but India-focused and from its own inventory), Stroby (newsletter matching), AdQuick (out-of-home marketplace). Detail in the idea file under Existing products.
 
-## Steps 2 to 6
+## Steps 2 to 7
 
-Summarised from the idea file's candidate design. Full reasoning and sources are there.
+Full reasoning and sources are in the idea file.
 
-- Step 2, candidates: an LLM proposes places where the audience's attention sits, within one vertical.
-- Step 3, gap filter: each candidate must name a reason its gap survives (information, constraints, behaviour or transformation), or it is rejected with the reason shown.
-- Step 4, verification: a browser agent looks for a real rate card, media kit or contact. No result means unverified.
-- Step 5, pricing: CPM beside cost per thousand attentive seconds, weighted by audience value, against a Meta baseline. Attention seconds and the Meta baseline are adjustable, with breakeven marked.
-- Step 6, outreach: draft the enquiry, or fill the vendor's quote form.
+- Step 2, crowded channels: an agent finds the startup's competitors from its industry and description, and checks where they advertise in Meta's Ad Library and Google's Ads Transparency Center. Placements we have already recommended to other clients in the same category also count as crowded. Access terms for both libraries are unchecked.
+- Step 3, candidates: the orchestrator proposes specific placements where the target customer's attention sits, leaving out crowded channels and anything over budget.
+- Step 4, gap filter: each candidate must name a reason its low price lasts (information, constraints, behaviour or transformation), or it is rejected with the reason shown. It runs before verification so that browser time goes only to survivors.
+- Step 5, verification: the orchestrator sends each survivor to the agent for its medium, such as the airport agent or the student union agent. Each agent knows how its medium is sold. Airports often sell through their own media team or a large contractor, students' unions publish media packs, and newsletters sell through marketplaces such as Paved or directly. The agent finds a real rate card, media kit or contact; no result means unverified.
+- Step 6, pricing: cost per thousand impressions beside cost per thousand attentive seconds, weighted by audience value, both against a Meta baseline. Attention seconds and the Meta baseline are sliders, with the breakeven point marked.
+- Step 7, report and outreach: the orchestrator ranks the placements, adds a way to measure each one (a QR code, promo code or landing page), and drafts the enquiry or fills the vendor's quote form.
+
+## Where the data comes from
+
+Data for one group of channels is gathered ahead of time with scripts in `tools/`, and the live agents add to it. Hamburg Airport's published jet-bridge sheet is the worked example for the pricing step. A recorded run of the full pipeline is kept as a fallback for the demo, because live browser agents fail on cookie banners, PDFs and slow sites.
 
 ## Data passed between steps
 
 Proposed shapes, to be refined when building:
 
-- `Brief`: the fields above.
-- `Candidate`: channel name, type, why the audience is there, gap reason.
-- `VerifiedChannel`: candidate plus price, price source link, contact, audience size, status (verified or unverified).
-- `PricedChannel`: verified channel plus CPM, weighted cost per attentive second, breakeven seconds.
-- `Outreach`: channel, draft message, status (drafted or sent).
+- `Brief`: the form fields above.
+- `CrowdedChannel`: channel, why it counts as crowded (a named competitor advertises there, or we recommended it to another client in the category), and the evidence link.
+- `Candidate`: placement name, medium, why the audience is there, gap reason.
+- `VerifiedPlacement`: candidate plus price, price source link, contact, audience size, status (verified or unverified).
+- `PricedPlacement`: verified placement plus CPM, weighted cost per attentive second, breakeven seconds.
+- `Recommendation`: priced placement plus measurement method.
+- `Outreach`: placement, draft message, status (drafted or sent).
+
+A stored list of past recommendations, by client category, feeds step 2.
 
 ## Open questions for this sketch
 
-- Does step 1 take free text only, or a form? A form is simpler to build; free text is closer to what Basis and Ant10 do.
-- Is customer value required? Step 5 needs it, but asking for it adds friction.
-- One vertical or two for the demo? The idea file suggests one.
-- Does the demo send real vendor emails, or stop at a draft? Also open in the idea file.
+- Which group of channels does the demo use? Students' unions and newsletters publish prices; airports tell the Revolut story but mostly price "on request".
+- Does the demo send real vendor enquiries, or stop at a draft? Also open in the idea file.
+- Does the demo run two clients in the same category, to show the second getting different placements?

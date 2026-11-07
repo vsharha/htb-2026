@@ -16,14 +16,15 @@ One of Daniel's three ideas, raised on 7 November 2026 and prompted by Revolut's
 
 ## How it works
 
-A candidate design, proposed by an agent on 7 November 2026 and not yet decided:
+Decided on 7 November 2026; the decisions are in [product.md](../product.md) and the step-by-step design in [the architecture sketch](../plan/architecture-sketch.md). The product recommends specific placements, such as Hamburg Airport's jet bridges, not mediums such as "airports", because per impression airports as a medium are no cheaper than Meta.
 
-1. Input: the startup's product, target customer and roughly what a customer is worth to it. The audience weighting needs the last of these.
-2. Candidates: an LLM proposes places where that audience's attention sits, within one vertical, such as UK and European out-of-home, or newsletters and podcasts.
-3. Gap filter: each candidate must name a reason its gap survives, or it is rejected with the reason shown (see below).
-4. Verification: a browser agent looks for a real rate card, media kit or contact for each survivor. A candidate without one is marked unverified.
-5. Pricing: each verified channel shows cost per thousand impressions beside cost per thousand attentive seconds weighted by audience value, both against a Meta baseline. The attention seconds are assumptions, so they appear as sliders with the breakeven point marked.
-6. Outreach: the agent drafts the enquiry or fills the vendor's quote form.
+1. Input: a short form with industry, the startup in one sentence, the target customer in one sentence, what a customer pays, monthly advertising budget, and markets. The audience weighting uses what a customer pays; the budget filters out placements with minimum spends.
+2. Crowded channels: an agent finds the startup's competitors and checks where they advertise in Meta's Ad Library and Google's Ads Transparency Center. Placements already recommended to other clients in the same category also count as crowded.
+3. Candidates: an orchestrator agent proposes specific placements where the target customer's attention sits, leaving out crowded channels and anything over budget.
+4. Gap filter: each candidate must name a reason its gap survives, or it is rejected with the reason shown (see below).
+5. Verification: the orchestrator sends each survivor to an agent for its medium, such as an airport agent or a student union agent, which knows how that medium is sold. The agent finds a real rate card, media kit or contact. A candidate without one is marked unverified.
+6. Pricing: each verified placement shows cost per thousand impressions beside cost per thousand attentive seconds weighted by audience value, both against a Meta baseline. The attention seconds are assumptions, so they appear as sliders with the breakeven point marked.
+7. Report and outreach: the orchestrator ranks the placements, adds a way to measure each one (a QR code, promo code or landing page), and drafts the enquiry or fills the vendor's quote form.
 
 The gap filter is adapted from "What Is A Mispricing?", Mispriced #006, 26 October 2026 (an investing article; the mapping to ads is ours, not the author's). The author names four reasons a gap survives, shown here with the channel version:
 
@@ -117,16 +118,16 @@ A web search on 7 November 2026 found products covering each step separately, bu
 
 - The premise is sourced but not proven. The only evidence is one newsletter's model. The jet-bridge attention figure of four seconds is an assumption, since the author says no eye-tracking study exists for jet bridges. He anchored it to Heathrow out-of-home research. The result holds only above 1.44 seconds.
 - "Airports don't realise the mispricing and should hike prices" is not supported. Airports price per impression and the buyer prices per attention and customer value. The source doesn't show airports are underpriced, only that the channel is good value for a buyer who values attention. The seller-side pitch should be dropped or reworded.
-- Cheap impressions are not cheap customers. Ranking by cost per attentive second still needs an audience-value term, which needs the startup's own customer value and a way to estimate who passes through a channel.
+- Cheap impressions are not cheap customers. Ranking by cost per attentive second still needs an audience-value term. The form's "what a customer pays" gives the startup's side; how to estimate who passes through a placement is still open.
 - Data availability: jet-bridge prices are mostly "on request", and no public price was found for rail stations. Most sources in Evidence and data were read only as search results, so access, scraping terms and licences are unchecked.
 - Revolut's scale is reported inconsistently (see Evidence and data).
-- Verification: an agent proposing non-obvious channels will invent plausible ones that don't exist or have no price. Each candidate needs a step that finds a real rate card or a real contact, or the product is only an idea generator.
-- Crowding: if many startups use the tool they all find the same hidden channel, and it stops being hidden. The tool needs a way to spread demand, or the edge decays and that is accepted.
+- Verification: an agent proposing non-obvious placements will invent plausible ones that don't exist or have no price. The per-medium agents check each candidate for a real rate card or contact, but since most prices are unpublished, many candidates may end unverified.
+- Crowding: if many startups in one category use the tool, they all find the same placements. Out-of-home inventory is fixed (Hamburg has 16 jet bridges), so the first buyer can lock it up for the term, and sellers raise rate cards when terms end. The tool counts its own past recommendations in a category as crowded, so later clients see different placements. Whether that spreads demand enough is untested, and gaps from unpublished prices close anyway once the tool publishes them.
 - Does the demo agent contact vendors, or stop at the ranked list?
 
 ## Scope
 
-One vertical, such as UK and European out-of-home or newsletters and podcasts, instead of all channels. Demo one startup end to end: product description, ranked channels, then a sent enquiry.
+One group of channels, such as UK and European out-of-home or newsletters and podcasts, instead of all channels, with its data gathered ahead of time by scripts in `tools/`. Demo one startup end to end: product description, ranked placements, then a sent enquiry. A recorded run is kept as a fallback in case the live agents fail.
 
 A natural first channel is a reproduction of the source's jet-bridge calculation down to cost per thousand attentive seconds against Meta. BER's price is on request, so Hamburg's published price and audience figures (see Evidence and data) are the usable worked example. Showing the impression-versus-attention flip is the demo's strongest moment.
 
