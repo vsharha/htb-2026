@@ -28,10 +28,6 @@ function heatRamp(id: LayerId): ExpressionSpecification {
 }
 const INK = "#15171c";
 
-const LAYER_IDS: LayerId[] = ["fit", "competition", "gap"];
-/** How long the map takes to fade from one tab's colours to the next. */
-const FADE_MS = 300;
-
 /** CARTO's light basemap: streets and water in greys, so the tract colours carry the map. */
 const BASEMAP = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
@@ -99,23 +95,7 @@ export function TractMap({
     >
       <NavigationControl position="top-right" showCompass={false} />
       <Source id="tracts" type="geojson" data={tracts}>
-        {/*
-          One fill per tab, each coloured by its own value. Switching tabs only
-          changes which fill is opaque, a plain value MapLibre can animate, so
-          the map cross-fades instead of jumping.
-        */}
-        {LAYER_IDS.map((id) => (
-          <Layer
-            key={id}
-            id={`tract-fill-${id}`}
-            type="fill"
-            paint={{
-              "fill-color": heatRamp(id),
-              "fill-opacity": layer === id ? 1 : 0,
-              "fill-opacity-transition": { duration: FADE_MS, delay: 0 },
-            }}
-          />
-        ))}
+        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer) }} />
         <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.3, "line-opacity": 0.6 }} />
       </Source>
       <Source id="stations" type="geojson" data={stations}>
