@@ -1,7 +1,8 @@
-"""Fetch American Community Survey data for every census tract in New York City.
+"""American Community Survey data for every census tract in New York City.
 
-Reads CENSUS_API_KEY from tools/.env or the environment. Writes the raw API
-responses to data/raw/census/ and one row per tract to data/census/nyc_tracts.csv.
+load() returns one row per tract from data/census/nyc_tracts.csv, fetching it
+first if the file doesn't exist. Fetching reads CENSUS_API_KEY from tools/.env
+or the environment and keeps the raw API responses in data/raw/census/.
 """
 
 import csv
@@ -47,9 +48,10 @@ VARIABLES = [
     *COLLEGE,
 ]
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[4]
 RAW_DIR = ROOT / "data" / "raw" / "census"
 OUT_DIR = ROOT / "data" / "census"
+OUTPUT = OUT_DIR / "nyc_tracts.csv"
 ENV_FILE = ROOT / "tools" / ".env"
 
 ATTEMPTS = 8
@@ -114,7 +116,7 @@ def share(row: dict[str, str], parts: list[str], total: str) -> float | None:
     return round(sum(values) / denominator, 4)
 
 
-def main() -> None:
+def _fetch() -> None:
     key = load_key()
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -143,8 +145,7 @@ def main() -> None:
         "share_income_150k",
         "share_college_students",
     ]
-    output = OUT_DIR / "nyc_tracts.csv"
-    with output.open("w", newline="") as file:
+    with OUTPUT.open("w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=fields)
         writer.writeheader()
         for row in tracts:
@@ -164,8 +165,16 @@ def main() -> None:
                     "share_college_students": share(row, COLLEGE, "B01003_001E"),
                 }
             )
-    print(f"Wrote {len(tracts)} tracts to {output.relative_to(ROOT)}")
+    print(f"Wrote {len(tracts)} tracts to {OUTPUT.relative_to(ROOT)}")
 
 
-if __name__ == "__main__":
-    main()
+def load(refresh: bool = False) -> list[dict[str, str]]:
+    """Return one row per tract, keyed by the column names of nyc_tracts.csv.
+
+    Values are strings as read from the CSV; an empty string means the Census
+    Bureau published no estimate for that tract.
+    """
+    if refresh or not OUTPUT.exists():
+        _fetch()
+    with OUTPUT.open(newline="") as file:
+        return list(csv.DictReader(file))
