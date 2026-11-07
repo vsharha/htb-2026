@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 
 import { LAYERS } from "@/components/layer-tabs";
+import type { PlacementFocus } from "@/components/use-placement-focus";
 import type { Campaign, Placement } from "@/lib/contract";
 import type { LayerId, TractLayers, TractShapes } from "@/lib/gap";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ export function MapPanel({
   campaigns,
   placements,
   layer,
+  focus,
   className,
 }: {
   shapes: TractShapes | null;
@@ -34,6 +36,7 @@ export function MapPanel({
   campaigns: Campaign[];
   placements: Placement[] | null;
   layer: LayerId;
+  focus: PlacementFocus;
   /** Sizes the map; the panel fills whatever box this gives it. */
   className?: string;
 }) {
@@ -42,7 +45,7 @@ export function MapPanel({
   return (
     <section className={cn("relative overflow-hidden", className)}>
       {shapes ? (
-        <TractMap shapes={shapes} layers={layers} layer={layer} campaigns={campaigns} placements={placements} />
+        <TractMap shapes={shapes} layers={layers} layer={layer} campaigns={campaigns} placements={placements} focus={focus} />
       ) : (
         <MapPlaceholder>Loading New York&rsquo;s census tracts…</MapPlaceholder>
       )}
@@ -56,16 +59,19 @@ export function MapPanel({
           <span>{current.low}</span>
           <span className="text-right">{current.high}</span>
         </div>
-        <ul className="mt-3 flex flex-col gap-1 text-xs">
-          {layer !== "fit" && (
+        {layer !== "fit" && (
+          <ul className="mt-3 flex flex-col gap-1.5 text-xs">
             <li className="flex items-center gap-2">
               <span className="size-3 rounded-full border-2 border-foreground" /> Station with a competitor&rsquo;s ad
             </li>
-          )}
-          <li className="flex items-center gap-2">
-            <span className="size-2.5 rounded-full border border-background bg-foreground ring-1 ring-foreground/20" /> Placement to buy
-          </li>
-        </ul>
+            <li className="flex items-center gap-2">
+              <span className="flex size-4 items-center justify-center rounded-full border-2 border-foreground bg-background font-mono text-[9px] font-semibold">
+                1
+              </span>
+              Placement to buy, numbered as in the list
+            </li>
+          </ul>
+        )}
       </div>
     </section>
   );

@@ -25,7 +25,7 @@ const SAMPLE_BRIEF: Brief = {
  * page scrolls as a whole.
  */
 function SplitResults({ run }: { run: RunState }) {
-  const { layer, setLayer, campaigns, layers } = useRunView(run);
+  const { layer, setLayer, campaigns, layers, focus } = useRunView(run);
   return (
     <div className="flex flex-col bg-card text-card-foreground lg:grid lg:h-dvh lg:grid-cols-[2fr_1fr] lg:grid-rows-[auto_1fr] lg:overflow-hidden">
       <div className="flex flex-col gap-5 px-5 py-4 sm:px-8 lg:col-start-2 lg:pt-8 lg:pb-2">
@@ -38,6 +38,7 @@ function SplitResults({ run }: { run: RunState }) {
         campaigns={campaigns}
         placements={run.placements}
         layer={layer}
+        focus={focus}
         className="h-[55dvh] lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:h-full"
       />
       <aside className="flex flex-col gap-6 px-5 py-6 sm:px-8 sm:py-8 lg:col-start-2 lg:min-h-0 lg:overflow-y-auto lg:pt-6">
@@ -45,7 +46,7 @@ function SplitResults({ run }: { run: RunState }) {
           A {SAMPLE_BRIEF.industry.toLowerCase()} startup building {SAMPLE_BRIEF.description}, for{" "}
           {SAMPLE_BRIEF.targetCustomer}. ${SAMPLE_BRIEF.monthlyBudget.toLocaleString("en-US")} a month in New York.
         </p>
-        <ResultsList run={run} layers={layers} campaigns={campaigns} layer={layer} />
+        <ResultsList run={run} layers={layers} campaigns={campaigns} layer={layer} focus={focus} />
       </aside>
     </div>
   );

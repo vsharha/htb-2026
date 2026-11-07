@@ -3,8 +3,10 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { setWorkerUrl } from "maplibre-gl";
-import { useMemo } from "react";
-import Map, { Layer, NavigationControl, Source } from "react-map-gl/maplibre";
+import { useEffect, useMemo, useRef } from "react";
+import Map, { Layer, Marker, NavigationControl, Source, type MapRef } from "react-map-gl/maplibre";
+
+import type { PlacementFocus } from "@/components/use-placement-focus";
 
 import type { Campaign, Placement } from "@/lib/contract";
 import type { LayerId, TractLayers, TractShapes } from "@/lib/gap";
@@ -27,13 +29,25 @@ export function TractMap({
   layer,
   campaigns,
   placements,
+  focus,
 }: {
   shapes: TractShapes;
   layers: TractLayers | null;
   layer: LayerId;
   campaigns: Campaign[];
   placements: Placement[] | null;
+  focus: PlacementFocus;
 }) {
+  const map = useRef<MapRef>(null);
+
+  // A click on a placement row brings its marker into view.
+  const selected = focus.selected;
+  useEffect(() => {
+    if (selected?.from !== "list") return;
+    const p = placements?.find((x) => x.id === selected.id);
+    if (p) map.current?.flyTo({ center: [p.longitude, p.latitude], zoom: Math.max(map.current.getZoom(), 14) });
+  }, [selected, placements]);
+
   const tracts = useMemo(
     () => ({
       ...shapes,
@@ -61,20 +75,9 @@ export function TractMap({
     [campaigns],
   );
 
-  const pins = useMemo(
-    () => ({
-      type: "FeatureCollection" as const,
-      features: (placements ?? []).map((p) => ({
-        type: "Feature" as const,
-        properties: { id: p.id },
-        geometry: { type: "Point" as const, coordinates: [p.longitude, p.latitude] },
-      })),
-    }),
-    [placements],
-  );
-
   return (
     <Map
+      ref={map}
       initialViewState={{ longitude: -73.94, latitude: 40.71, zoom: 10.2 }}
       minZoom={9}
       maxBounds={[-74.6, 40.35, -73.4, 41.1]}
@@ -102,13 +105,30 @@ export function TractMap({
           paint={{ "circle-radius": 7, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": INK, "circle-stroke-width": 2 }}
         />
       </Source>
-      <Source id="placements" type="geojson" data={pins}>
-        <Layer
-          id="placement-dot"
-          type="circle"
-          paint={{ "circle-radius": 4, "circle-color": INK, "circle-stroke-color": "#ffffff", "circle-stroke-width": 1.5 }}
-        />
-      </Source>
+      {/* Placements come from the gap, so the customers view leaves them out. */}
+      {layer !== "fit" &&
+        placements?.map((p, i) => {
+          const active = focus.hovered === p.id || focus.selected?.id === p.id;
+          return (
+            <Marker key={p.id} longitude={p.longitude} latitude={p.latitude} anchor="center" style={{ zIndex: active ? 2 : 1 }}>
+              <button
+                type="button"
+                aria-label={`Placement ${i + 1}: ${p.address}`}
+                onMouseEnter={() => focus.hover(p.id)}
+                onMouseLeave={() => focus.hover(null)}
+                onFocus={() => focus.hover(p.id)}
+                onBlur={() => focus.hover(null)}
+                onClick={() => focus.select(p.id, "map")}
+                className={
+                  "flex size-6 cursor-pointer items-center justify-center rounded-full border-2 border-foreground font-mono text-[11px] font-semibold tabular-nums shadow-sm transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
+                  (active ? "scale-125 bg-foreground text-background" : "bg-background text-foreground")
+                }
+              >
+                {i + 1}
+              </button>
+            </Marker>
+          );
+        })}
     </Map>
   );
 }

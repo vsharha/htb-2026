@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { LayerTabs } from "@/components/layer-tabs";
 import { MapPanel } from "@/components/map-panel";
 import { campaignsOf, type RunState } from "@/components/use-audience-run";
-import type { Campaign } from "@/lib/contract";
+import { usePlacementFocus, type PlacementFocus } from "@/components/use-placement-focus";
+import type { Campaign, Placement } from "@/lib/contract";
 import { computeLayers, strongest, type LayerId, type TractLayers } from "@/lib/gap";
 import { tractLabel } from "@/lib/tracts";
 
@@ -21,7 +22,7 @@ const MEASURE_LABEL = { lives: "lives", works: "works", passes: "passes through"
 /** How many tracts each tab ranks. */
 const TOP_TRACTS = 5;
 
-/** The selected layer, the campaigns found so far and the map layers they produce. */
+/** The selected layer, the campaigns found so far, the map layers they produce and the focused placement. */
 export function useRunView(run: RunState) {
   const [layer, setLayer] = useState<LayerId>("gap");
   const campaigns = useMemo(() => campaignsOf(run.events), [run.events]);
@@ -29,7 +30,8 @@ export function useRunView(run: RunState) {
     () => (run.shapes && run.fit ? computeLayers(run.shapes, run.fit, campaigns) : null),
     [run.shapes, run.fit, campaigns],
   );
-  return { layer, setLayer, campaigns, layers };
+  const focus = usePlacementFocus();
+  return { layer, setLayer, campaigns, layers, focus };
 }
 
 function Section({ title, aside, children }: { title: string; aside?: React.ReactNode; children: React.ReactNode }) {
@@ -62,7 +64,58 @@ function TractRanking({ layers, layer, value }: { layers: TractLayers; layer: La
   );
 }
 
-function GapTab({ run, layers }: { run: RunState; layers: TractLayers | null }) {
+function PlacementRow({ placement: p, number, focus }: { placement: Placement; number: number; focus: PlacementFocus }) {
+  const row = useRef<HTMLButtonElement>(null);
+  const active = focus.hovered === p.id || focus.selected?.id === p.id;
+
+  // A click on the marker scrolls its row into view.
+  const selected = focus.selected;
+  useEffect(() => {
+    if (selected?.id === p.id && selected.from === "map") row.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [selected, p.id]);
+
+  return (
+    <li className="border-b border-border last:border-0">
+      <button
+        ref={row}
+        type="button"
+        onMouseEnter={() => focus.hover(p.id)}
+        onMouseLeave={() => focus.hover(null)}
+        onFocus={() => focus.hover(p.id)}
+        onBlur={() => focus.hover(null)}
+        onClick={() => focus.select(p.id, "list")}
+        className={
+          "-mx-2 flex w-[calc(100%+1rem)] cursor-pointer gap-3 rounded-lg px-2 py-2.5 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
+          (active ? "bg-foreground/5" : "")
+        }
+      >
+        <span
+          className={
+            "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-foreground font-mono text-[10px] font-semibold tabular-nums " +
+            (active ? "bg-foreground text-background" : "bg-background")
+          }
+        >
+          {number}
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span className="flex items-baseline justify-between gap-3 text-sm">
+            <span className="font-medium">{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
+            <span className="font-mono tabular-nums">
+              ${p.costPerAudienceMember.toFixed(3)}
+              <span className="text-xs text-muted-foreground"> / customer</span>
+            </span>
+          </span>
+          <span className="flex items-baseline justify-between gap-3 text-xs text-muted-foreground">
+            <span>{p.address} · {tractLabel(p.geoid)}</span>
+            <span className="shrink-0">{p.measurement}</span>
+          </span>
+        </span>
+      </button>
+    </li>
+  );
+}
+
+function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | null; focus: PlacementFocus }) {
   return (
     <>
       <Section title="Biggest gaps">
@@ -82,23 +135,11 @@ function GapTab({ run, layers }: { run: RunState; layers: TractLayers | null }) 
             No kiosks or bus shelters in these areas fit your budget. Raise the budget to include bus shelters.
           </p>
         ) : (
-          <ul className="flex flex-col">
-            {run.placements.map((p) => (
-              <li key={p.id} className="flex flex-col gap-0.5 border-b border-border py-2.5 last:border-0">
-                <div className="flex items-baseline justify-between gap-3 text-sm">
-                  <span className="font-medium">{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
-                  <span className="font-mono tabular-nums">
-                    ${p.costPerAudienceMember.toFixed(3)}
-                    <span className="text-xs text-muted-foreground"> / customer</span>
-                  </span>
-                </div>
-                <div className="flex items-baseline justify-between gap-3 text-xs text-muted-foreground">
-                  <span>{p.address} · {tractLabel(p.geoid)}</span>
-                  <span className="shrink-0">{p.measurement}</span>
-                </div>
-              </li>
+          <ol className="flex flex-col">
+            {run.placements.map((p, i) => (
+              <PlacementRow key={p.id} placement={p} number={i + 1} focus={focus} />
             ))}
-          </ul>
+          </ol>
         )}
       </Section>
     </>
@@ -144,6 +185,7 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
   const competitors = run.events.flatMap((e) => (e.type === "competitor" ? [e.competitor] : []));
   const steps = run.events.flatMap((e) => (e.type === "step" ? [e.message] : []));
   const errors = run.events.flatMap((e) => (e.type === "error" ? [e.message] : []));
+  const unplaced = campaigns.filter((c) => !c.station).length;
 
   return (
     <>
@@ -175,6 +217,11 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
             </li>
           ))}
         </ul>
+        {unplaced > 0 && (
+          <p className="text-xs text-muted-foreground">
+            {unplaced === 1 ? "1 ad isn’t on the map" : `${unplaced} ads aren’t on the map`}: no station matched.
+          </p>
+        )}
         {!run.agentDone && !run.error && <Pending>{steps.at(-1) ?? "Searching…"}</Pending>}
         {errors.map((m) => (
           <p key={m} className="text-sm text-heat-hot">{m}</p>
@@ -190,12 +237,14 @@ export function ResultsList({
   layers,
   campaigns,
   layer,
+  focus,
   onLayerChange,
 }: {
   run: RunState;
   layers: TractLayers | null;
   campaigns: Campaign[];
   layer: LayerId;
+  focus: PlacementFocus;
   /** Shows the layer tabs at the top; omit when the page places them itself. */
   onLayerChange?: (layer: LayerId) => void;
 }) {
@@ -207,7 +256,7 @@ export function ResultsList({
           The run stopped: {run.error}
         </p>
       )}
-      {layer === "gap" && <GapTab run={run} layers={layers} />}
+      {layer === "gap" && <GapTab run={run} layers={layers} focus={focus} />}
       {layer === "fit" && <CustomersTab run={run} layers={layers} />}
       {layer === "competition" && <CompetitorsTab run={run} campaigns={campaigns} />}
     </div>
@@ -216,7 +265,7 @@ export function ResultsList({
 
 /** Map above the results, for pages that scroll as a whole. */
 export function RunResults({ run }: { run: RunState }) {
-  const { layer, setLayer, campaigns, layers } = useRunView(run);
+  const { layer, setLayer, campaigns, layers, focus } = useRunView(run);
   return (
     <div className="flex flex-col gap-10">
       <MapPanel
@@ -225,9 +274,10 @@ export function RunResults({ run }: { run: RunState }) {
         campaigns={campaigns}
         placements={run.placements}
         layer={layer}
+        focus={focus}
         className="h-[70vh] min-h-[28rem] rounded-2xl"
       />
-      <ResultsList run={run} layers={layers} campaigns={campaigns} layer={layer} onLayerChange={setLayer} />
+      <ResultsList run={run} layers={layers} campaigns={campaigns} layer={layer} focus={focus} onLayerChange={setLayer} />
     </div>
   );
 }
