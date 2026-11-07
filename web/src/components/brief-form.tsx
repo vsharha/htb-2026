@@ -44,7 +44,7 @@ export function BriefForm({
       <p className="font-heading text-[clamp(1.6rem,3.6vw,2.75rem)] leading-[1.55] font-medium tracking-tight text-balance">
         We&rsquo;re a{" "}
         <label className="sr-only" htmlFor="industry">Industry</label>
-        <select id="industry" name="industry" required defaultValue="" className={cn(blank, "cursor-pointer pr-2")}>
+        <select id="industry" name="industry" required defaultValue="" className={cn(blank, "cursor-pointer pr-2 invalid:text-foreground/30 [&>option]:text-foreground")}>
           <option value="" disabled>pick an industry</option>
           {INDUSTRIES.map((i) => (
             <option key={i} value={i}>{i.toLowerCase()}</option>
