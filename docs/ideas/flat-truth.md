@@ -12,6 +12,12 @@ It returns three things. First, problems: illegal fees, since an "admin fee" is 
 
 Raised by AI agents in a brainstorm on 7 November 2026, at macmac's request. Three of four agents generating ideas independently proposed a version of it. An advocate agent fact-checked it on the web, and a judge agent ranked it first of all the ideas in `docs/ideas/` (see [idea-ranking.md](../idea-ranking.md)).
 
+## Evidence and data
+
+This comes from agents' web checks on 7 November 2026 and has not been re-checked by a person.
+
+- Confirmed: premiums are an offence under the Rent (Scotland) Act 1984, section 82. Section 90(1) has covered admin fees since 2012, and section 88 lets tenants recover them.
+
 ## Tracks it could serve
 
 - Wordsmith: strong. It is legal by nature, which Wordsmith prefers, and the workflow is long, with each step feeding the next: read the listing, check fees against statute, search several government sites with different forms, match tribunal decisions, write the report. Tokens, model and time should be shown, since Wordsmith also judges those.
@@ -35,7 +41,6 @@ These come from agents' web checks on 7 November 2026 and have not been re-check
 - Awards are often small; one recent award was £50 for a slightly late deposit. Show a range from similar cases, never "up to 3× your deposit".
 - Rent data is coarse. Scottish Government rent statistics cover 18 areas, and all of Edinburgh falls in Lothian.
 - Other teams in Edinburgh will likely build renting apps, mostly rent calculators. Cross-checking registers and tribunal decisions is what sets this apart.
-- Confirmed: premiums are an offence under the Rent (Scotland) Act 1984, section 82. Section 90(1) has covered admin fees since 2012, and section 88 lets tenants recover them.
 
 ## Scope
 

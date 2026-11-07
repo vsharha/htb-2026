@@ -10,6 +10,13 @@ A student society or community group describes its event, such as "60 people, Th
 
 A rework of Daniel's [off-peak venue hire](off-peak-venue-hire.md) idea, made by its advocate agent in a brainstorm on 7 November 2026 at macmac's request. It changes who the idea serves, from startups booking launch venues to societies and community groups. It also changes the focus, from off-peak prices to real cost and hidden free rooms. A judge agent ranked it third (see [idea-ranking.md](../idea-ranking.md)).
 
+## Evidence and data
+
+These come from agents' web checks on 7 November 2026.
+
+- Tagvenue lists 431 Edinburgh rooms, most with public "from" prices, and loaded without a bot wall. The council publishes library room rates of £17–30 an hour for community groups and £50–83 for commercial hire. The University publishes charitable room rates.
+- The University's "Community Access to Rooms" scheme gives local groups rooms free on weekday evenings. It also offers the Nucleus Building and Old College free on weekends from 10 to 4. Only about 9,000 hours have been booked, by about 200 groups.
+
 ## Tracks it could serve
 
 - Wordsmith: strong. One task runs across many sites, then reviews booking terms, which is everyday in-house legal work, and checks licensing.
@@ -25,8 +32,6 @@ A rework of Daniel's [off-peak venue hire](off-peak-venue-hire.md) idea, made by
 
 These come from agents' web checks on 7 November 2026.
 
-- Tagvenue lists 431 Edinburgh rooms, most with public "from" prices, and loaded without a bot wall. The council publishes library room rates of £17–30 an hour for community groups and £50–83 for commercial hire. The University publishes charitable room rates.
-- The University's "Community Access to Rooms" scheme gives local groups rooms free on weekday evenings. It also offers the Nucleus Building and Old College free on weekends from 10 to 4. Only about 9,000 hours have been booked, by about 200 groups.
 - Hire Space and many venues show no prices, and community centres have no central price list.
 - There is no price or availability history.
 - Sending real enquiries to many venues is spam, so the agent stops at submit.

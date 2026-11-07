@@ -10,6 +10,10 @@ The advertised monthly price is not what you pay. The agent reads your contract 
 
 Raised by an AI agent whose angle was the most impressive demo, in a brainstorm on 7 November 2026, at macmac's request. It was not carried into the debate round, but its broadband and comparison-site facts were checked under [Overpaid](overpaid.md). Ranked eighth in [idea-ranking.md](../idea-ranking.md), from the first-round assessment only.
 
+## Evidence and data
+
+- Confirmed: Ofcom's rule that price rises must be stated in pounds and pence applies from 17 January 2025, but not retrospectively. Older contracts can still carry inflation-linked rises.
+
 ## Tracks it could serve
 
 - Bank of Scotland: strong. Cost, time, convenience and sustainability, exactly as the brief puts it.
@@ -28,7 +32,6 @@ Raised by an AI agent whose angle was the most impressive demo, in a brainstorm 
 - Ofcom puts the broadband loyalty penalty at only about £108 a year.
 - A wrong prediction live is embarrassing, so rehearse with addresses already checked.
 - Bill-saving apps are common at hackathons.
-- Confirmed: Ofcom's rule that price rises must be stated in pounds and pence applies from 17 January 2025, but not retrospectively. Older contracts can still carry inflation-linked rises.
 
 ## Scope
 

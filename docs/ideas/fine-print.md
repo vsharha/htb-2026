@@ -12,6 +12,18 @@ The output is a "true spread": the price gap minus fees, minus the risk that the
 
 A rework of Daniel's [prediction-market mispricing](prediction-market-mispricing.md) idea. It was made by the advocate agent for that idea in a brainstorm on 7 November 2026, at macmac's request. The angle of reading the rules first came from another agent in the same brainstorm. A judge agent ranked it second (see [idea-ranking.md](../idea-ranking.md)).
 
+## Evidence and data
+
+These come from agents' web checks on 7 November 2026.
+
+- Confirmed with live calls from the UK: both platforms' data can be read without a key. That covers Polymarket's resolution text and price history, and Kalshi's settled markets, rules, price candles, contract-terms PDFs and settlement sources.
+- kalshi.com rejected a script with HTTP 429 (too many requests). The APIs and PDFs worked.
+- Research papers (arXiv 2601.01706 and 2604.24147) report price gaps between the platforms that persist and blame different resolution rules. Known cases: the 2024 US government shutdown market, where Polymarket settled Yes and Kalshi No; the US Bitcoin reserve; and Fed rate markets.
+
+## Existing products
+
+- Bots that trade on price gaps between the platforms already exist, so the novelty has to come from reading the rules (agents' web checks, 7 November 2026).
+
 ## Tracks it could serve
 
 - HRT: strong. Real market data, meaning order books, bid and ask, and price history, plus alternative data (contract text and settlement sources), drive a tested decision. It is the best HRT fit of any idea.
@@ -28,12 +40,8 @@ A rework of Daniel's [prediction-market mispricing](prediction-market-mispricing
 
 These come from agents' web checks on 7 November 2026.
 
-- Confirmed with live calls from the UK: both platforms' data can be read without a key. That covers Polymarket's resolution text and price history, and Kalshi's settled markets, rules, price candles, contract-terms PDFs and settlement sources.
-- Research papers (arXiv 2601.01706 and 2604.24147) report price gaps between the platforms that persist and blame different resolution rules. Known cases: the 2024 US government shutdown market, where Polymarket settled Yes and Kalshi No; the US Bitcoin reserve; and Fed rate markets.
 - Only tens of past cases settled differently, so the accuracy test is small.
 - Matching the same question across platforms is fiddly.
-- Bots that trade on price gaps already exist, so the novelty has to come from reading the rules.
-- kalshi.com rejected a script with HTTP 429 (too many requests). The APIs and PDFs worked.
 - Both platforms restrict UK users, and the Gambling Commission treats UK-facing prediction markets as betting. The demo must be read-only, with no trading.
 
 ## Scope

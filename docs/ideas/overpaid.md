@@ -10,6 +10,10 @@ A household uploads its bills. The app finds each recurring charge where it pays
 
 Raised by an AI agent as "Loyalty Tax" in a brainstorm on 7 November 2026, at macmac's request. The agent was extending the team's mispricing ideas to the household side. In the debate round its advocate merged it with the renting idea that became [Flat Truth](flat-truth.md). A judge agent ranked it fifth and found it weaker than Flat Truth on every track they share (see [idea-ranking.md](../idea-ranking.md)).
 
+## Evidence and data
+
+- Confirmed in agents' web checks on 7 November 2026: the Octopus and carbon intensity APIs are open and need no key.
+
 ## Tracks it could serve
 
 - Bank of Scotland: strong. It covers cost, time, convenience and sustainability.
@@ -31,7 +35,6 @@ These come from agents' web checks on 7 November 2026.
 - Comparison sites block bots and ban scraping. Getting round that is a bad look for a legal sponsor.
 - Uploading bank statements raises privacy and parsing problems, so a demo would need fake data.
 - Bill-saving apps are common at hackathons.
-- Confirmed: the Octopus and carbon intensity APIs are open and need no key.
 
 ## Scope
 
