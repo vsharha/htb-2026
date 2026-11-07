@@ -31,16 +31,7 @@ The idea is locked in: the ad channel mispricing finder, chosen by the user on 7
 
 Python tools are managed with uv, and Node.js tools with pnpm. Do not use pip, poetry, npm or yarn.
 
-The web app is a Next.js 16 project in `web/` (App Router, TypeScript, Tailwind CSS 4, ESLint), managed with pnpm. Run commands from `web/`:
-
-- `pnpm dev`: dev server on http://localhost:3000
-- `pnpm lint`, `pnpm typecheck` and `pnpm build`: the checks to run before each commit
-
-UI components come from shadcn/ui (`base-nova` style, on Base UI). Add one with `pnpm dlx shadcn@latest add <component>` from `web/`; it lands in `web/src/components/ui/`.
-
-LLM calls and AI agents go through the Vercel AI SDK (`ai` plus a provider package), not a provider's own SDK.
-
-`next dev` writes `web/AGENTS.md`, which points agents to the version-matched Next.js docs in `web/node_modules/next/dist/docs/`.
+The web app is a Next.js 16 project in `web/`. Read `web/AGENTS.md` before working on it; it holds the web app's commands, checks, libraries and frontend rules.
 
 The data-gathering scripts are a Python project in `tools/`. Gather data through a script there, not by hand, in `web/`, or with a one-off command, so anyone can re-run it. Read `tools/AGENTS.md` before working on them or on the data they write to `data/`.
 
@@ -60,15 +51,6 @@ Keep the other product docs current without being asked:
 
 - Record each decision the user makes or confirms in `docs/product.md`.
 - Update `docs/status.md` when a feature is built, mocked or cut, and when a change affects what it claims.
-
-## Agent skills
-
-Load the `frontend-design` skill before UI work. It is vendored from Anthropic's `claude-plugins-official` marketplace, under the Apache 2.0 licence in its folder.
-
-## Frontend work
-
-- Check a frontend change on the running dev server with Playwright or a browser before reporting it done: look at the page, use the changed flow, and read the console for errors.
-- Before starting a dev server, check whether one is already running, by its process or by probing its port, and reuse it. A change to config, dependencies or env means stopping it and starting a fresh one. Never leave several instances running.
 
 ## Shared files that need approval
 
@@ -96,7 +78,7 @@ A teammate may run several agent sessions in parallel in one checkout, so a chan
 - Start every task with `git pull --rebase --autostash`, so you work on teammates' latest pushes.
 - Commit after each working change, without asking, under the user's Git identity. Commits carry no agent attribution.
 - Messages are a single short subject line describing what was done, such as "Add pledge form validation", matching earlier commits.
-- Before each commit, run the repository's checks once they exist (listed under Project) and fix any failure.
+- Before each commit, run the checks for the parts you changed, listed in `web/AGENTS.md` and `tools/AGENTS.md`, and fix any failure.
 - Stage only the files you changed, by path. Never use `git add -A` or `git add .`, because the user's other sessions may have uncommitted files in the same tree.
 
 ## Pushing
