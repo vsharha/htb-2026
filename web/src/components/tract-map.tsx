@@ -71,7 +71,7 @@ export function TractMap({
     () => ({
       type: "FeatureCollection" as const,
       features: campaigns.flatMap((c) =>
-        c.station
+        c.station && c.coverage === "current"
           ? [{
               type: "Feature" as const,
               properties: { name: c.station.name },

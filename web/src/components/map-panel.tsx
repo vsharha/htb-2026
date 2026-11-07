@@ -63,7 +63,7 @@ export function MapPanel({
           <ul className="mt-3 flex flex-col gap-1.5 text-xs">
             <li className="flex items-center gap-2">
               <span className="size-4 shrink-0 rounded-full border-2 border-foreground" />
-              Station with a competitor&rsquo;s ad
+              Confirmed current subway ad
             </li>
             <li className="flex items-center gap-2">
               <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground bg-background font-mono text-[9px] font-semibold">

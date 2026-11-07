@@ -49,7 +49,7 @@ export function computeLayers(
   campaigns: Campaign[],
 ): TractLayers {
   const stations: Position[] = campaigns.flatMap((c) =>
-    c.station ? [[c.station.longitude, c.station.latitude] as Position] : [],
+    c.station && c.coverage === "current" ? [[c.station.longitude, c.station.latitude] as Position] : [],
   );
   const layers: TractLayers = {};
   for (const feature of shapes.features) {

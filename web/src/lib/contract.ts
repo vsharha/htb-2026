@@ -2,6 +2,8 @@
 // `stand-in/` and the real backend both produce exactly these, so the UI
 // does not change when one replaces the other.
 
+import type { UIMessage } from "ai";
+
 export const BOROUGHS = [
   "Manhattan",
   "Brooklyn",
@@ -71,13 +73,18 @@ export type Station = {
   weeklyRiders: number;
 };
 
-export type Competitor = { name: string; reason: string };
+export type Competitor = { name: string; reason: string; sourceUrl: string };
 
 export type Campaign = {
   competitor: string;
   title: string;
   kind: "subway" | "billboard" | "bus shelter" | "linknyc" | "other";
   sourceUrl: string;
+  evidence: string;
+  location: string | null;
+  startsOn: string | null;
+  endsOn: string | null;
+  coverage: "current" | "historical" | "unknown";
   /** The subway station the server matched the campaign to, or null when it could not place it. */
   station: Station | null;
 };
@@ -87,8 +94,11 @@ export type AgentEvent =
   | { type: "step"; message: string }
   | { type: "competitor"; competitor: Competitor }
   | { type: "campaign"; campaign: Campaign }
+  | { type: "recording"; recordedAt: string }
   | { type: "done" }
   | { type: "error"; message: string };
+
+export type AgentMessage = UIMessage<never, { agent: AgentEvent }>;
 
 export type Placement = {
   id: string;

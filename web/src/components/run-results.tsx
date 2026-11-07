@@ -123,6 +123,9 @@ function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | n
           <TractRanking layers={layers} layer="gap" value={(s) => s.toFixed(2)} />
         )}
         {layers && !run.agentDone && <Pending>Updating as competitors&rsquo; ads are found…</Pending>}
+        <p className="text-xs text-muted-foreground">
+          Only campaigns with confirmed current dates and station locations affect the map. Unsearched areas and missing evidence mean unknown coverage.
+        </p>
       </Section>
 
       <Section title="Placements to buy" aside={run.placements && `${run.placements.length} found`}>
@@ -207,7 +210,7 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
           <ul className="flex flex-col gap-1.5 text-sm">
             {competitors.map((c) => (
               <li key={c.name}>
-                <span className="font-semibold">{c.name}</span>{" "}
+                {c.sourceUrl ? <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="font-semibold underline underline-offset-2">{c.name}</a> : <span className="font-semibold">{c.name}</span>}{" "}
                 <span className="text-muted-foreground">— {c.reason}</span>
               </li>
             ))}
@@ -218,13 +221,19 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
       <Section title="Their ads" aside={`${campaigns.length} found`}>
         <ul className="flex flex-col gap-2.5 text-sm" aria-live="polite">
           {campaigns.map((c) => (
-            <li key={c.sourceUrl} className="border-l-4 border-heat-hot pl-3">
+            <li key={`${c.sourceUrl}|${c.title}|${c.station?.id}`} className="border-l-4 border-heat-hot pl-3">
               <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
                 {c.competitor}: {c.title}
               </a>
               <div className="font-mono text-xs text-muted-foreground">
                 {c.station ? c.station.name : "No station matched"} · {c.kind}
               </div>
+              <p className="text-xs text-muted-foreground">
+                {c.coverage === "current" ? "Confirmed current dates" : c.coverage === "historical" ? "Historical campaign" : "Current coverage unknown"}
+                {(c.startsOn || c.endsOn) && `: ${c.startsOn ?? "unknown start"} to ${c.endsOn ?? "unknown end"}`}
+              </p>
+              {c.location && <p className="text-xs text-muted-foreground">{c.location}</p>}
+              {c.evidence && <p className="mt-1 text-xs text-muted-foreground">{c.evidence}</p>}
             </li>
           ))}
         </ul>
@@ -234,6 +243,7 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
           </p>
         )}
         {!run.agentDone && !run.error && <Pending>{steps.at(-1) ?? "Searching…"}</Pending>}
+        {run.agentDone && campaigns.length === 0 && <p className="text-sm text-muted-foreground">No outdoor campaigns could be verified. This does not establish that competitors are absent.</p>}
         {errors.map((m) => (
           <p key={m} className="text-sm text-heat-hot">{m}</p>
         ))}
@@ -256,8 +266,10 @@ export function ResultsList({
   layer: LayerId;
   focus: PlacementFocus;
 }) {
+  const recording = run.events.find((e) => e.type === "recording");
   return (
     <div className="flex flex-col gap-8">
+      {recording?.type === "recording" && <p className="text-sm text-muted-foreground">Showing recorded research from {recording.recordedAt.slice(0, 10)} because live research could not finish.</p>}
       {run.error && (
         <p role="alert" className="border-l-4 border-heat-hot pl-4 text-sm text-heat-hot">
           The run stopped: {run.error}

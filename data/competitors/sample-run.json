@@ -1,0 +1,82 @@
+{
+  "recordedAt": "2026-11-07T22:46:48.363077+00:00",
+  "brief": {
+    "industry": "Fintech",
+    "description": "a budgeting app for shared flats",
+    "targetCustomer": "young professionals in tech who rent with roommates",
+    "customerPays": {
+      "amount": 12,
+      "per": "month"
+    },
+    "monthlyBudget": 3000,
+    "city": "new-york",
+    "markets": [
+      "Manhattan",
+      "Brooklyn",
+      "Queens",
+      "Bronx",
+      "Staten Island"
+    ]
+  },
+  "events": [
+    {
+      "type": "step",
+      "message": "Finding competitors and researching their New York outdoor campaigns"
+    },
+    {
+      "type": "step",
+      "message": "Searching: Splitwise advertising New York outdoor campaign subway billboard 2023 2024; Splitwise New York subway ad campaign Splitwise billboard Times Square; Tricount advertising New York campaign; Zently roommate app advertising New York billboard campaign; Venmo advertising New York subway campaign roommate budgeting ad"
+    },
+    {
+      "type": "step",
+      "message": "Searching: Splitwise about split expenses roommates app Splitwise about page; Tricount split bills app roommates about Tricount website; Settle Up app split bills roommates 'Settle Up' app website"
+    },
+    {
+      "type": "competitor",
+      "competitor": {
+        "name": "Splitwise",
+        "reason": "Widely used expense-splitting app explicitly for roommates and shared housing; targets users splitting rent and household bills.",
+        "sourceUrl": "https://www.splitwise.com/about"
+      }
+    },
+    {
+      "type": "step",
+      "message": "Searching: Tricount about 'tricount' roommates split bills 'about' 'tricount.com'; Settle Up app about 'Settle Up' split bills roommates 'settleup' website"
+    },
+    {
+      "type": "competitor",
+      "competitor": {
+        "name": "Tricount",
+        "reason": "Expense-splitting app used by roommates to split groceries, utilities and rent; demonstrated in Tricount blog and help pages.",
+        "sourceUrl": "https://tricount.com/blog/how-pierre-uses-tricount"
+      }
+    },
+    {
+      "type": "step",
+      "message": "Searching: Settle Up app official site 'Settle Up' split expenses 'settleup' 'settle-up' 'settleup app'; SettleUp expense splitting app website 'SettleUp' 'settle up' 'settleup.app'"
+    },
+    {
+      "type": "competitor",
+      "competitor": {
+        "name": "Settle Up",
+        "reason": "Expense-splitting app explicitly marketed for flatmates and group expenses (trips, flatmates) with official website and app store listings.",
+        "sourceUrl": "https://settleup.truelytech.com"
+      }
+    },
+    {
+      "type": "step",
+      "message": "Searching: Splitwise billboard New York campaign 'Splitwise' billboard 'New York' 'Times Square'; Splitwise subway ad 'New York' 'subway' 'advertising'"
+    },
+    {
+      "type": "step",
+      "message": "Searching: Splitwise billboard campaign New York 'Splitwise' 'billboard' 'advertising' 'NYC'; Has Splitwise advertised in New York 'Splitwise ad' 'Times Square'"
+    },
+    {
+      "type": "step",
+      "message": "Research finished: 3 competitors and 0 campaign findings. Missing evidence remains unknown coverage."
+    },
+    {
+      "type": "done"
+    }
+  ]
+}

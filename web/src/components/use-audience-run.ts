@@ -54,6 +54,13 @@ export function useAudienceRun() {
 
     try {
       const events: AgentEvent[] = [];
+      const agent = (async () => {
+        for await (const event of runCompetitorAgent(brief, ctrl.signal)) {
+          events.push(event);
+          update((r) => ({ events: [...r.events, event] }));
+        }
+        update(() => ({ agentDone: true }));
+      })();
       const [shapes, fit] = await Promise.all([
         loadShapes().then((shapes) => {
           update(() => ({ shapes }));
@@ -63,21 +70,20 @@ export function useAudienceRun() {
           update(() => ({ fit }));
           return fit;
         }),
-        (async () => {
-          for await (const event of runCompetitorAgent(brief, ctrl.signal)) {
-            events.push(event);
-            update((r) => ({ events: [...r.events, event] }));
-          }
-          update(() => ({ agentDone: true }));
-        })(),
       ]);
 
-      const layers = computeLayers(shapes, fit, campaignsOf(events));
-      const placements = await findPlacements({
-        geoids: strongest(layers, "gap", 15),
-        monthlyBudget: brief.monthlyBudget,
-      });
-      update(() => ({ placements }));
+      const rankPlacements = async () => {
+        if (ctrl.signal.aborted) return;
+        const layers = computeLayers(shapes, fit, campaignsOf(events));
+        const placements = await findPlacements({
+          geoids: strongest(layers, "gap", 15),
+          monthlyBudget: brief.monthlyBudget,
+        });
+        update(() => ({ placements }));
+      };
+      await rankPlacements();
+      await agent;
+      await rankPlacements();
     } catch (e) {
       if (!ctrl.signal.aborted) {
         update(() => ({ error: e instanceof Error ? e.message : String(e) }));
@@ -85,6 +91,6 @@ export function useAudienceRun() {
     }
   }, []);
 
-  const busy = run !== null && !run.error && run.placements === null;
+  const busy = run !== null && !run.error && (run.placements === null || !run.agentDone);
   return { run, start, busy };
 }

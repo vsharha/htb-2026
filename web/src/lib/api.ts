@@ -1,8 +1,7 @@
 // The only module the UI imports server calls from. Audience scoring is real
-// (Jev); placements and the competitor agent are still stand-ins in
-// `stand-in/`, with the same signatures from `contract.ts` the real versions
-// will keep.
+// (Jev), and competitor research streams from a Route Handler. Placement
+// pricing remains a stand-in with the signature from `contract.ts`.
 
 export { scoreAudience } from "@/lib/server/audience";
 export { findPlacements } from "@/lib/stand-in/server";
-export { runCompetitorAgent } from "@/lib/stand-in/competitor-agent";
+export { runCompetitorAgent } from "@/lib/competitor-agent";
