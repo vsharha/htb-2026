@@ -6,4 +6,4 @@ Each feature is listed as built, mocked, planned or cut, with the tracks it serv
 - Mocked: says what is faked and what the real version would need.
 - Cut: keeps its line, with the reason.
 
-Nothing yet.
+- Planned: Revolut mispricing check with real data. Recomputes the source's airport figures from published prices, audience counts and attention studies, with attention seconds and the Meta price as sliders. Serves G-Research.
