@@ -2,9 +2,6 @@
 // `stand-in/` and the real backend both produce exactly these, so the UI
 // does not change when one replaces the other.
 
-/** Cities with a prepared dataset. Boroughs below are New York's markets. */
-export const CITIES = [{ id: "new-york", name: "New York" }] as const;
-
 export const BOROUGHS = [
   "Manhattan",
   "Brooklyn",
@@ -13,6 +10,12 @@ export const BOROUGHS = [
   "Staten Island",
 ] as const;
 export type Borough = (typeof BOROUGHS)[number];
+
+/** Cities with a prepared dataset, and the areas each one maps. */
+export const CITIES = [
+  { id: "new-york", name: "New York", areas: BOROUGHS },
+] as const;
+export type CityId = (typeof CITIES)[number]["id"];
 
 export const INDUSTRIES = [
   "Fintech",
@@ -33,6 +36,8 @@ export type Brief = {
   targetCustomer: string;
   customerPays: { amount: number; per: "month" | "purchase" };
   monthlyBudget: number;
+  city: CityId;
+  /** Every area of the chosen city; the form does not let the startup narrow them. */
   markets: Borough[];
 };
 

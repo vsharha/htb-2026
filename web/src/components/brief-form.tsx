@@ -1,16 +1,10 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import type { FormEvent } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  BOROUGHS,
-  INDUSTRIES,
-  type Borough,
-  type Brief,
-  type Industry,
-} from "@/lib/contract";
+import { CITIES, INDUSTRIES, type Brief, type Industry } from "@/lib/contract";
 import { cn } from "@/lib/utils";
 
 const blank =
@@ -27,21 +21,10 @@ export function BriefForm({
   onSubmit: (brief: Brief) => void;
   busy: boolean;
 }) {
-  const [markets, setMarkets] = useState<Borough[]>([...BOROUGHS]);
-  const [error, setError] = useState<string | null>(null);
-
-  function toggleMarket(b: Borough) {
-    setMarkets((m) => (m.includes(b) ? m.filter((x) => x !== b) : [...m, b]));
-  }
-
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    if (markets.length === 0) {
-      setError("Pick at least one borough to map.");
-      return;
-    }
-    setError(null);
+    const city = CITIES.find((c) => c.id === data.get("city")) ?? CITIES[0];
     onSubmit({
       industry: data.get("industry") as Industry,
       description: String(data.get("description")).trim(),
@@ -51,7 +34,8 @@ export function BriefForm({
         per: data.get("per") as "month" | "purchase",
       },
       monthlyBudget: Number(data.get("budget")),
-      markets: BOROUGHS.filter((b) => markets.includes(b)),
+      city: city.id,
+      markets: [...city.areas],
     });
   }
 
@@ -95,46 +79,37 @@ export function BriefForm({
         <span className="whitespace-nowrap">
           $<input id="budget" name="budget" {...money} pattern="[0-9]+" placeholder="3000" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
         </span>{" "}
-        a month on ads in:
+        a month on ads in{" "}
+        <label className="sr-only" htmlFor="city">City</label>
+        <span className="whitespace-nowrap">
+          <select id="city" name="city" defaultValue={CITIES[0].id} className={cn(blank, "cursor-pointer")}>
+            {CITIES.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+            <option disabled>more cities coming</option>
+          </select>
+          .
+        </span>
       </p>
 
-      <fieldset className="flex flex-col gap-3">
-        <legend className="mb-3 font-mono text-xs tracking-wide text-muted-foreground uppercase">
-          Boroughs to map
-        </legend>
-        <div className="flex flex-wrap gap-2">
-          {BOROUGHS.map((b) => {
-            const on = markets.includes(b);
-            return (
-              <button
-                key={b}
-                type="button"
-                aria-pressed={on}
-                onClick={() => toggleMarket(b)}
-                className={cn(
-                  "rounded-full border-2 px-4 py-1.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-                  on
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-foreground/25 text-foreground/60 hover:border-foreground/50",
-                )}
-              >
-                {b}
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
+      <div className="flex flex-col gap-3">
+        <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
+          Maps all five boroughs
+        </p>
+        <ul className="flex flex-wrap gap-2">
+          {CITIES[0].areas.map((area) => (
+            <li key={area} className="rounded-full border-2 border-foreground/15 px-4 py-1.5 text-sm font-medium text-foreground/70">
+              {area}
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <div className="flex flex-wrap items-center gap-4">
         <Button type="submit" disabled={busy} className="h-12 gap-2 rounded-full px-6 text-base">
           {busy ? "Mapping your audience…" : "Map my audience"}
           <ArrowRight data-icon="inline-end" />
         </Button>
-        {error && (
-          <p role="alert" className="text-sm text-heat-hot">
-            {error}
-          </p>
-        )}
       </div>
     </form>
   );
