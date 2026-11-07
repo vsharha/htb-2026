@@ -34,6 +34,8 @@ The web app is a Next.js 16 project in `web/` (App Router, TypeScript, Tailwind 
 
 UI components come from shadcn/ui (`base-nova` style, on Base UI). Add one with `pnpm dlx shadcn@latest add <component>` from `web/`; it lands in `web/src/components/ui/`.
 
+LLM calls and AI agents go through the Vercel AI SDK (`ai` plus a provider package), not a provider's own SDK.
+
 `next dev` writes `web/AGENTS.md`, which points agents to the version-matched Next.js docs in `web/node_modules/next/dist/docs/`.
 
 ## Docs
