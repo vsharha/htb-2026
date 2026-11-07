@@ -69,3 +69,5 @@ A natural first channel is a reproduction of the BER jet-bridge calculation from
 
 - [Prediction-market mispricing](prediction-market-mispricing.md): a better fit for HRT and G-Research and easier to backtest, but finance-flavoured with no Bank of Scotland fit. This idea fits Wordsmith strongly, but its data is weaker; the prediction-market idea's Wordsmith fit hasn't been assessed.
 - [Off-peak venue hire](off-peak-venue-hire.md): the same pattern of sellers pricing by habit, in venues and event space. It could share one mispricing engine with this idea.
+
+Source article: [The Jet Bridge Arbitrage, Mispriced #007](https://mispriced1.beehiiv.com/p/the-jet-bridge-arbitrage-mispriced-007)
