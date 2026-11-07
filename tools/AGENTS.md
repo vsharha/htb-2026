@@ -1,22 +1,22 @@
 # Python tools
 
-`tools/` holds the data-gathering scripts. It is a Python 3.14 project managed with uv, with code in `tools/src/tools/`. Python 3.14 rather than 3.15 because data libraries can lag in publishing wheels for a new Python release.
+`tools/` holds the data-gathering scripts, one module per script in `tools/src/tools/`. It is a Python project managed with uv.
+
+Python is pinned to 3.14 in `.python-version`, not 3.15, because data libraries can be slow to publish wheels for a new Python release.
 
 ## Commands
 
-Run commands from `tools/`:
+Run commands from `tools/`. Use uv for everything Python: no pip or poetry, and no virtual environments made by hand.
 
 - `uv run python -m tools.<script>`: run one script
 - `uv add <package>`: add a dependency
 - `uv run ruff check` and `uv run ruff format --check`: the checks to run before each commit
 
-Use uv for everything Python. Do not use pip or poetry, and do not create virtual environments by hand.
-
 ## Where scripts write data
 
-Scripts write to two places under the repository's `data/` folder, named by source:
+Each script is named after its data source and writes to two folders under the repository's `data/`:
 
-- `data/raw/<source>/`: large gathered data, such as full downloads and scrape results. Git ignores everything in `data/raw/`, so a script must be able to re-create it.
-- `data/<source>/`: the outputs the web app and demo use, committed to Git. Keep each output small, under a few MB.
+- `data/raw/<source>/`: large gathered data, such as full downloads and scrape results. It is never committed, so the script must be able to re-create it.
+- `data/<source>/`: the outputs the web app and demo use. These are committed to Git, each under a few MB.
 
-A script for CAA data is `tools/src/tools/caa.py`, keeps its downloads in `data/raw/caa/`, and writes its outputs to `data/caa/`.
+For example, a script for CAA data would be `tools/src/tools/caa.py`, run as `uv run python -m tools.caa`. It keeps its downloads in `data/raw/caa/` and writes its outputs to `data/caa/`.
