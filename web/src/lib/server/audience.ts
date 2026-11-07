@@ -8,11 +8,11 @@
 import { experimental_decide as decide } from "ai";
 
 import type { AudienceFit, Brief, ColumnWeight } from "@/lib/contract";
+import { getAudienceModel, hasAudienceCredentials } from "@/lib/server/ai";
 import { keywordWeights } from "@/lib/stand-in/keyword-weights";
 import { readAnalysisCsv, readAnalysisJson } from "@/lib/stand-in/data-files";
 import type { TractColumn } from "@/lib/tract-columns";
 
-const JEV = "typesafe-ai/jev";
 const TIMEOUT_MS = 20_000;
 
 /**
@@ -48,7 +48,7 @@ function toWeight(answer: { score: number; probabilities?: Record<string, number
 
 async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnWeight[]> {
   const result = await decide({
-    model: JEV,
+    model: getAudienceModel(),
     state: {
       "target customer": brief.targetCustomer,
       startup: brief.description,
@@ -86,7 +86,7 @@ export async function scoreAudience(brief: Brief): Promise<AudienceFit> {
   // the project's OIDC token when no key is set.
   let weights: ColumnWeight[];
   let source: AudienceFit["source"] = "jev";
-  if (!process.env.AI_GATEWAY_API_KEY && !process.env.VERCEL_OIDC_TOKEN) {
+  if (!hasAudienceCredentials()) {
     console.warn("No AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN; weighting the audience by keywords instead of Jev.");
     weights = keywordWeights(columns, brief.targetCustomer);
     source = "keywords";
