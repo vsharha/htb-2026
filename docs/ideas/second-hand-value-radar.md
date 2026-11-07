@@ -10,7 +10,15 @@ The output is a ranked list of live listings with a "hidden value" figure, plus 
 
 ## Origin
 
-Raised by an AI agent on 7 November 2026, in a brainstorm at macmac's request, after the user ruled out career prizes and asked for ideas that fit the sponsor tracks better than the first ten. Its web facts are unchecked.
+Raised by an AI agent on 7 November 2026, in a brainstorm at macmac's request, after the user ruled out career prizes and asked for ideas that fit the sponsor tracks better than the first ten. The market was checked on 7 November 2026; the other facts are unchecked.
+
+## Existing products
+
+- Photo-to-sold-price is a crowded micro-SaaS category. **Underpriced AI** (claims 6,000+ resellers), **FlipTip AI**, **TRUSS** (enterprise pricing API), **Circulaire**, **NestLedger**, **PriceSnap**, **Flipit** and **finna** all estimate an item's value from real sold listings. ([Underpriced AI](https://underpricedai.com/), [TRUSS](https://truss.fashion/))
+- Older incumbents do the same for narrower categories: **Terapeak** (eBay's own sold-data tool), **WorthPoint**, **PriceCharting** and **Keepa**.
+- Hackathons: **KLARITY** won at TAMU Datathon 2021 with "a market price to correctly judge the value of second hand goods", which is this idea's valuation half almost word for word. A **Tech@NYU Buildathon** project goes further, from a photo to a value to AI voice calls that negotiate with buyers, and **Bloom** is another resale-value scanner. ([KLARITY](https://tamudatathon2021.devpost.com/project-gallery), [Tech@NYU](https://sw26.devpost.com/project-gallery), [Bloom](https://devpost.com/software/bloom-yhvz34))
+
+What is left is the monitoring and negotiation loop, not the valuation. That is also the part that needs marketplace accounts and breaks the platforms' terms, so it is the hardest to demo and the easiest to block. The idea would compete on execution in a niche that already has many paid products, with no answer to why a judge should prefer it to a phone app that does the same scan.
 
 ## Tracks it could serve
 
@@ -28,7 +36,7 @@ Raised by an AI agent on 7 November 2026, in a brainstorm at macmac's request, a
 
 ## Open problems
 
-Nobody has checked these on the web yet.
+These are unchecked, apart from the market check above.
 
 - Access is the main risk. eBay, Facebook Marketplace and Gumtree all defend against automation, and Facebook requires a login. eBay's public sold-listings data has been restricted over time. If sold prices cannot be read reliably, the fair-value half of the product does not exist.
 - Messaging sellers from a hacked-together agent is likely against the platforms' terms and may look like spam. The demo may have to stop at a drafted message.

@@ -10,13 +10,14 @@ It then files the claim: it finds the right operator's form, fills it with the b
 
 ## Origin
 
-Raised by an AI agent on 7 November 2026, in a brainstorm at macmac's request, after the user ruled out career prizes and asked for ideas that fit the sponsor tracks better than the first ten. Its web facts are unchecked.
+Raised by an AI agent on 7 November 2026, in a brainstorm at macmac's request, after the user ruled out career prizes and asked for ideas that fit the sponsor tracks better than the first ten. The market was checked on 7 November 2026; the other facts are unchecked.
 
 ## Existing products
 
-Not checked on the web yet.
+- The category is saturated with fee-taking startups: **Claim Bot** (35% of the refund, scans the inbox), **SmartDelay** (25%), **Railed** (10%), **fare-ly** (10%, since 2019), **DelayRepay.uk**, **DelayDog** (TfL and National Rail) and **Latetrain**, plus **AirHelp**, **Flightright** and **EUclaim** for flights. **Untap** covers trains, flights, TfL overcharges and parking notices, drafts the claim and lets the user send it, and takes no cut. ([Claim Bot](https://www.claimsbot.ai/), [Untap](https://untap.money/))
+- Hackathons: **GOOBus DeComS**, entered as "Delay Compensation for the people, by the people", won at LeedsHack 2025. **AirFair**, **Flight Delay**, **Refund Hunter** and **Points Failure** are on Devpost. ([LeedsHack 2025](https://leedshack2025.devpost.com/project-gallery))
 
-- AirHelp and similar firms already take flight claims on commission, and most train operators have their own Delay Repay portal. The difference has to be the agent that does it end to end and proactively, not the entitlement calculation.
+Every part of the idea already exists: the entitlement calculation, the proactive monitoring, the form filling and the fee model. One version has already won a hackathon. The only remaining angle is doing it without taking a cut, which is a business-model difference rather than a product one.
 
 ## Tracks it could serve
 
@@ -33,9 +34,9 @@ Not checked on the web yet.
 
 ## Open problems
 
-Nobody has checked these on the web yet.
+These are unchecked, apart from the market check above.
 
-- The market is crowded (see Existing products).
+- Crowding is the main risk. See Existing products: the entitlement calculation, monitoring and filing all exist, so this cannot be pitched as a new product.
 - Filing a claim needs a real booking reference and a real ticket. The demo must use a journey one of us actually took, with consent, or a fabricated one that is clearly labelled.
 - Submitting false claims is fraud. The agent must stop before submit and never generate a claim for a journey that did not happen.
 - Operator portals may block automated browsers, and several require an account.

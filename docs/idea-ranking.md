@@ -167,10 +167,10 @@ Daniel's ad-channel mispricing idea.
 
 ## Added after the ranking
 
-Three ideas were added on 7 November 2026, after the user ruled out career prizes and asked for ideas built around the sponsor tracks' judging notes rather than the first ten. They have not been through the debate or the judge, and their facts are unchecked, so they are unranked. In the agent's provisional view:
+Three ideas were added on 7 November 2026, after the user ruled out career prizes and asked for ideas built around the sponsor tracks' judging notes rather than the first ten. They have not been through the debate or the judge, so they are unranked. A market check on the same day, recorded in each idea file, changed the provisional view:
 
-- [Unclaimed](ideas/unclaimed-money.md) is at least level with [Flat Truth](ideas/flat-truth.md). It serves the same three strong tracks, is the most direct Bank of Scotland fit of any idea, and has a deterministic demo instead of one that depends on a data coincidence.
-- [Second-hand value radar](ideas/second-hand-value-radar.md) reaches all four Group A tracks, but marketplace access is the riskiest data source of any idea and one good listing has to exist at judging time.
-- [Delay compensation](ideas/delay-compensation.md) is strong on Bank of Scotland and G-Research, but it is crowded and narrower than the other two.
+- [Unclaimed](ideas/unclaimed-money.md) serves the same three strong tracks as [Flat Truth](ideas/flat-truth.md), but its discovery half is already in the Bank of Scotland app through Inbest, and IncomeMax already does the claiming half with human advisers. Only the agentic form filling is unbuilt, so it now ranks below Flat Truth.
+- [Second-hand value radar](ideas/second-hand-value-radar.md) reaches all four Group A tracks, but valuation from sold prices is a crowded micro-SaaS category, and KLARITY won TAMU Datathon 2021 with the same pitch. It ranks below the debated ideas.
+- [Delay compensation](ideas/delay-compensation.md) is strong on Bank of Scotland and G-Research, but a delay-compensation project won LeedsHack 2025 and several startups already take a cut of the refund. It ranks below the debated ideas.
 
 None of the three combines with an existing idea into one product.

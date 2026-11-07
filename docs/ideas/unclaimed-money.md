@@ -10,13 +10,18 @@ It returns two things. First, a total of what is going unclaimed, split into wee
 
 ## Origin
 
-Raised by an AI agent on 7 November 2026, in a brainstorm at macmac's request. It came after the user ruled out career prizes and asked for ideas that fit the sponsor tracks better than the first ten. Its web facts are unchecked.
+Raised by an AI agent on 7 November 2026, in a brainstorm at macmac's request. It came after the user ruled out career prizes and asked for ideas that fit the sponsor tracks better than the first ten. The market was checked on 7 November 2026; the other facts are unchecked.
 
 ## Existing products
 
-Not checked on the web yet.
+- **Inbest** (Edinburgh, founded 2016) is the closest company. It sells a white-label benefits calculator as an API and an embeddable widget, and it runs inside the **Lloyds, Halifax and Bank of Scotland** apps. In May 2025 the Money and Pensions Service contracted it to power the government's MoneyHelper benefits checker. Its case-management system is a tool for welfare and debt advisers, not an agent that files claims. ([Inbest](https://inbest.ai/), [PublicTechnology](https://www.publictechnology.net/2025/05/13/society-and-welfare/dwp-body-to-deploy-white-label-commercial-tool-for-government-online-benefits-calculator/))
+- **Turn2us**, **EntitledTo**, **Policy in Practice**, **MoneyHelper**, gov.scot and Citizens Advice all give the discovery step away free. The estimate is a commodity.
+- **IncomeMax** is a UK social enterprise that does the claiming step with people: advisers complete forms, make advocacy calls and challenge decisions, and it is partnered with EDF Energy. The same job, delivered as human labour. ([IncomeMax](https://www.incomemax.org.uk/))
+- Hackathon versions of the discovery step exist: **Benefits-Finder** (DevFest Columbia 2026), **MyAutoBenefits**, **MamaPal**, and the COVID-19 California Benefits Finder. ([Benefits-Finder](https://devfest-2026.devpost.com/project-gallery?page=2))
 
-- Benefit calculators are common: Turn2us, EntitledTo and Policy in Practice all estimate entitlements. The difference has to be the agentic end-to-end claim, not the estimate. That needs to be visible in the demo.
+What is not a product: one agent that takes a household's details, tests them against several unrelated schemes, and completes each application form itself. No UK company found doing that. The nearest precedent is **DoNotPay** in the US, which promised an AI that filled forms and disputed charges; the FTC fined it $193,000 in 2024, finalised in February 2025, for claiming untested capabilities and barred it from presenting itself as a lawyer substitute. ([FTC](https://www.ftc.gov/news-events/news/press-releases/2025/02/ftc-finalizes-order-donotpay-prohibits-deceptive-ai-lawyer-claims-imposes-monetary-relief-requires))
+
+So the idea is not new at either end, but the middle is unbuilt. The pitch has to be "the calculator exists, the claim does not get filed", and the demo has to show forms being completed, because that is the only part a Bank of Scotland judge cannot already find in the sponsor's own app.
 
 ## Tracks it could serve
 
@@ -33,11 +38,11 @@ Not checked on the web yet.
 
 ## Open problems
 
-Nobody has checked these on the web yet.
+These are unchecked, apart from the market check above.
 
 - The total unclaimed is reported in the billions of pounds a year, but the figure, its source and its date are unverified. Do not cite a number until it is checked.
 - The rules are genuinely complex and differ by council: 32 councils run 32 council tax reduction schemes, and some schemes change yearly. A wrong answer here is harmful in a way a wrong rent estimate is not, so the product should show which rule produced each figure and link to the source.
-- Existing benefit calculators already estimate entitlements, so the demo must make the end-to-end claim visible (see Existing products).
+- Differentiation is the main risk. See Existing products: the Bank of Scotland app already contains Inbest's calculator, so the demo must show the forms being filled, not the estimate.
 - Submitting a real benefit claim during a demo is not acceptable. The agent must stop before submit, and any live run must use a fictional persona or a teammate's consent.
 - Forms are mixed: some online, some PDF, some posted. The agent can only fill what is online, so the demo should pick schemes with real web forms.
 - Means-tested schemes need income and savings evidence that a stranger does not have. The demo needs a persona whose documents we can fabricate convincingly.
@@ -49,6 +54,6 @@ Type one persona: a renter in Edinburgh, one child, part-time work. Live browser
 
 ## Alternatives
 
-- [Flat Truth](flat-truth.md): the same three tracks, but its demo peak depends on finding a listing that maps to a landlord with a published decision. This one is deterministic.
+- [Flat Truth](flat-truth.md): the same three tracks, and this one has a deterministic demo, but Flat Truth is not already in a sponsor's app. See Existing products.
 - [Small Print Tax](small-print-tax.md): also money the household is losing, but by reading contracts rather than entitlement rules.
 - [Room Radar](room-radar.md): also a form-filling agent that stops before submit, but for a much smaller problem.
