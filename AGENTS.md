@@ -42,6 +42,12 @@ LLM calls and AI agents go through the Vercel AI SDK (`ai` plus a provider packa
 
 `next dev` writes `web/AGENTS.md`, which points agents to the version-matched Next.js docs in `web/node_modules/next/dist/docs/`.
 
+The data-gathering scripts are a Python 3.14 uv project in `pipeline/`, with code in `pipeline/src/pipeline/`. Python 3.14 rather than 3.15 because data libraries can lag in publishing wheels for a new Python release. Each script writes to `data/<source>/`, so a script for CAA data is `pipeline/src/pipeline/caa.py` and writes to `data/caa/`. Run commands from `pipeline/`:
+
+- `uv run python -m pipeline.<script>`: run one script
+- `uv add <package>`: add a dependency
+- `uv run ruff check` and `uv run ruff format --check`: the checks to run before each commit
+
 ## Docs
 
 How to write anything under `docs/` is in `docs/AGENTS.md`. Read it before creating or editing a file there. Brainstorm product direction with the user before building features.
