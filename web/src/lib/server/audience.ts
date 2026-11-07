@@ -80,12 +80,14 @@ export async function scoreAudience(brief: Brief): Promise<AudienceFit> {
     readAnalysisCsv("nyc_tracts.csv"),
   ]);
 
-  // Without a gateway key, or if Jev fails, the keyword stand-in keeps the
-  // page working, and `source` tells the page which one it got.
+  // Without gateway credentials, or if Jev fails, the keyword stand-in keeps
+  // the page working, and `source` tells the page which one it got. Locally the
+  // credential is AI_GATEWAY_API_KEY; on a Vercel deployment the AI SDK uses
+  // the project's OIDC token when no key is set.
   let weights: ColumnWeight[];
   let source: AudienceFit["source"] = "jev";
-  if (!process.env.AI_GATEWAY_API_KEY) {
-    console.warn("AI_GATEWAY_API_KEY is not set; weighting the audience by keywords instead of Jev.");
+  if (!process.env.AI_GATEWAY_API_KEY && !process.env.VERCEL_OIDC_TOKEN) {
+    console.warn("No AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN; weighting the audience by keywords instead of Jev.");
     weights = keywordWeights(columns, brief.targetCustomer);
     source = "keywords";
   } else {
