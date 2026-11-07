@@ -71,6 +71,12 @@ A teammate may run several agent sessions in parallel in one checkout, so a chan
 - Call an uncommitted change you didn't make "from another session", unless something shows who made it. Teammates work in their own clones, so their uncommitted work never appears in yours.
 - Attribute a commit by its author. A commit authored under the user's Git identity is the user's own, made from another of their sessions. Call a change a teammate's only when a different person authored it.
 
+## Suggesting a fresh thread
+
+- Suggest starting a new agent thread, once and in one line at the end of a reply, when the next request builds on nothing found or decided in this one, or when most of the context is exploration or abandoned approaches that the next step doesn't need.
+- Don't suggest it when the next step depends on what this thread established. Re-deriving that context costs more than a long history.
+- When suggesting it, give a brief of two or three lines to paste into the new thread: the goal, the relevant files, and the decisions already made.
+
 ## Running Git
 
 - The agent shell has no terminal, so a Git command that falls back to reading stdin waits until it times out. Always give `git shortlog` a revision, as in `git shortlog -sne HEAD`, and add `</dev/null` to any other command that might wait for input.
