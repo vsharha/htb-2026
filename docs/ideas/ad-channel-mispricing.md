@@ -1,6 +1,6 @@
 # Ad channel mispricing finder
 
-Status: proposed, 7 November 2026.
+Status: chosen, 7 November 2026.
 
 ## Idea
 

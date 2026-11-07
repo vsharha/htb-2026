@@ -27,6 +27,8 @@ Read `docs/event/tracks.md` or `docs/event/challenges.md` before work aimed at a
 
 ## Project
 
+The idea is locked in: the ad channel mispricing finder, chosen by the user on 7 November 2026. It finds advertising channels that are underpriced for the attention and audience they deliver. Read `docs/ideas/ad-channel-mispricing.md` before feature work on it. The track and challenge priorities above are still undecided.
+
 The web app is a Next.js 16 project in `web/` (App Router, TypeScript, Tailwind CSS 4, ESLint), managed with pnpm. Run commands from `web/`:
 
 - `pnpm dev`: dev server on http://localhost:3000
