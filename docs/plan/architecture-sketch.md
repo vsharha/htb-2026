@@ -1,6 +1,6 @@
 # Architecture sketch
 
-Status: decided, 7 November 2026, except the open questions at the end. The decisions are recorded in [product.md](../product.md). This file describes the pipeline for [the ad channel mispricing finder](../ideas/ad-channel-mispricing.md), with research on existing AI media planners behind the form.
+Status: superseded, 7 November 2026, by the pivot to [the audience heatmap](../ideas/audience-heatmap.md). The onboarding form in step 1 still applies; the rest describes the pipeline of [the ad channel mispricing finder](../ideas/ad-channel-mispricing.md), with research on existing AI media planners behind the form.
 
 ## Pipeline
 

@@ -27,7 +27,7 @@ Read `docs/event/tracks.md` or `docs/event/challenges.md` before work aimed at a
 
 ## Project
 
-The idea is locked in: the ad channel mispricing finder, chosen by the user on 7 November 2026. It finds advertising channels that are underpriced for the attention and audience they deliver. Read `docs/ideas/ad-channel-mispricing.md` before feature work on it. The track and challenge priorities above are still undecided.
+The idea is locked in: the audience heatmap, chosen by the user on 7 November 2026. A startup describes its target customer, and the product maps where in a city those customers live, work and pass through, where competitors already advertise to them, and the gap between the two, ending with placements to buy in the gap areas. The demo city is New York. Read `docs/ideas/audience-heatmap.md` before feature work on it. The track and challenge priorities above are still undecided.
 
 Python tools are managed with uv, and Node.js tools with pnpm. Do not use pip, poetry, npm or yarn.
 

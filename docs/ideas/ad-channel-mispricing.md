@@ -1,6 +1,6 @@
 # Ad channel mispricing finder
 
-Status: chosen, 7 November 2026.
+Status: merged into [audience-heatmap.md](audience-heatmap.md), 7 November 2026. The audience heatmap keeps this idea's onboarding form and its aim of reaching customers competitors miss. It maps people rather than pricing placements, because most placement prices are unpublished while public data about where people live, work and travel is plentiful.
 
 ## Idea
 
