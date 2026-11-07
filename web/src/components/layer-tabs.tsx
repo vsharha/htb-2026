@@ -55,7 +55,9 @@ export function LayerTabs({ layer, onChange }: { layer: LayerId; onChange: (laye
             if (el) items.current.set(l.id, el);
             else items.current.delete(l.id);
           }}
-          className="relative h-8 flex-1 rounded-full! px-2 text-sm transition-colors duration-300 data-pressed:bg-transparent data-pressed:text-background data-pressed:hover:bg-transparent data-pressed:hover:text-background"
+          // The sliding pill is the only background; a tab painting its own
+          // (the toggle's hover and pressed greys) would flash over the pill.
+          className="relative h-8 flex-1 rounded-full! bg-transparent px-2 text-sm text-foreground/60 transition-[color] duration-300 hover:bg-transparent hover:text-foreground aria-pressed:bg-transparent aria-pressed:text-background aria-pressed:hover:text-background motion-reduce:transition-none"
         >
           {l.label}
         </ToggleGroupItem>
