@@ -27,7 +27,7 @@ function SplitResults({ run }: { run: RunState }) {
   const { campaigns, layers } = useRunView(run);
   return (
     <div className="flex flex-col bg-card text-card-foreground lg:grid lg:h-dvh lg:grid-cols-[2fr_1fr] lg:grid-rows-[auto_1fr] lg:overflow-hidden">
-      <div className="px-5 py-4 sm:px-8 lg:col-start-2 lg:border-b lg:border-border lg:pt-8 lg:pb-6">
+      <div className="px-5 py-4 sm:px-8 lg:col-start-2 lg:pt-8 lg:pb-6">
         <SiteHeader />
       </div>
       <MapPanel
