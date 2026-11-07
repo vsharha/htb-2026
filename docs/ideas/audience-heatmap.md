@@ -26,11 +26,12 @@ An hourly view of the audience fit layer, using subway and taxi data by hour, is
 
 ## Evidence and data
 
-Checked on 7 November 2026 by querying each source's API or download index. "Checked" means we fetched the column list, a sample row and the row count or file list; no full download has been run. The New York open data portals (data.cityofnewyork.us and data.ny.gov) list no licence on these datasets.
+Checked on 7 November 2026 by querying each source's API or download index. "Checked" means we fetched the column list, a sample row and the row count or file list. "Fetched" means a source module in `tools/src/tools/sources/` downloads it and writes the processed output named. The New York open data portals (data.cityofnewyork.us and data.ny.gov) list no licence on these datasets.
 
 Who lives where:
 
-- US Census Bureau American Community Survey, 5-year estimates for 2024 (fetched): `tools.census` writes `data/census/nyc_tracts.csv`, one row for each of New York City's 2,327 census tracts (an area of about 4,000 people). Columns: population, median age, median household income, per capita income, and the shares aged 20 to 34, with a bachelor's degree or higher (of those aged 25 and over), with household income of $150,000 or more, and enrolled in college. Median household income is missing for 128 tracts and is capped at $250,001 by the Census Bureau. The API needs a key, read from `CENSUS_API_KEY` in `tools/.env`. Tract boundaries for the map are not fetched yet.
+- US Census Bureau American Community Survey, 5-year estimates for 2024 (fetched): the `census` source writes `data/census/nyc_tracts.csv`, one row for each of New York City's 2,327 census tracts (an area of about 4,000 people). Columns: population, median age, median household income, per capita income, and the shares aged 20 to 34, with a bachelor's degree or higher (of those aged 25 and over), with household income of $150,000 or more, and enrolled in college. Median household income is missing for 128 tracts and is capped at $250,001 by the Census Bureau. The API needs a key, read from `CENSUS_API_KEY` in `tools/.env`.
+- Census Bureau 2024 cartographic boundary file for New York State's tracts (fetched): the `tracts` source writes `data/tracts/nyc_tracts.geojson`, 2,324 tract shapes clipped to the shoreline. Three tracts in the Census table have no shape in this file.
 
 Who works where:
 
@@ -38,7 +39,7 @@ Who works where:
 
 Who passes through:
 
-- [MTA Subway Hourly Ridership: Beginning 2025](https://data.ny.gov/d/5wq4-mkjj) (checked): 47.4 million rows, updated 4 November 2026. Each row is one station complex, one hour and one fare class, with ridership, transfers, latitude and longitude. The fare class category, such as full fare or student, gives a rough audience signal. Earlier years are in separate datasets (2017 to 2019, and 2020 to 2024).
+- [MTA Subway Hourly Ridership: Beginning 2025](https://data.ny.gov/d/5wq4-mkjj) (checked): 47.4 million rows, updated 4 November 2026. Each row is one station complex, one hour and one fare class, with ridership, transfers, latitude and longitude. The fare class category, such as full fare or student, gives a rough audience signal. Earlier years are in separate datasets (2017 to 2019, and 2020 to 2024). Fetched: the `subway` source averages the four weeks from Monday 5 October to Sunday 1 November 2026, one day per query because longer queries time out, and writes `data/subway/stations.csv` (428 station complexes with weekly riders and the share on each fare class) and `data/subway/hourly.csv` (average riders per station, weekday and hour). The "Students" fare class covers school students' fare cards and "Fair Fare" is the city's discount for low-income riders.
 - [Pickups and Drop-offs by Taxi Zone and Industry](https://data.cityofnewyork.us/d/c5iv-bn4s) (checked): monthly counts per taxi zone for yellow taxis, green taxis and high-volume ride-hail companies, with data to September 2026. [Taxi zone shapes](https://data.cityofnewyork.us/d/8meu-9t5y) are a separate dataset.
 - TLC [trip record files](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) (file list checked): monthly Parquet files to September 2026 for yellow taxis and high-volume ride-hail. Fares and tips per trip could serve as a rough income signal; the columns were not checked.
 - [Citi Bike trip data](https://s3.amazonaws.com/tripdata/index.html) (file list checked): monthly files to October 2026, under Citi Bike's [data sharing policy](https://www.citibikenyc.com/data-sharing-policy), which was not read.
@@ -46,8 +47,9 @@ Who passes through:
 
 Where ads can be bought:
 
-- [LinkNYC Kiosk Locations](https://data.cityofnewyork.us/d/s4kf-3yrf) (checked): 2,255 sites with address, coordinates and census tract. By kiosk type: 2,032 live Link1.0 kiosks, 151 live Link5G kiosks marked "Ad", 57 live Link5G kiosks marked "NonAd", and a few removed or payphones. Only the Link5G types say whether they carry ads; whether Link1.0 kiosks do is unchecked.
-- [Bus Stop Shelters](https://data.cityofnewyork.us/d/t4f2-8md7) (checked): 3,312 shelters with coordinates and neighbourhood, updated 1 October 2026. The data has no field saying whether a shelter carries advertising.
+- [LinkNYC Kiosk Locations](https://data.cityofnewyork.us/d/s4kf-3yrf) (checked): 2,255 sites with address, coordinates and census tract. By kiosk type: 2,032 live Link1.0 kiosks, 151 live Link5G kiosks marked "Ad", 57 live Link5G kiosks marked "NonAd", and a few removed or payphones. Only the Link5G types say whether they carry ads; whether Link1.0 kiosks do is unchecked. Fetched with the bus shelters by the `placements` source, which keeps live kiosks only.
+- [Bus Stop Shelters](https://data.cityofnewyork.us/d/t4f2-8md7) (checked): 3,312 shelters with coordinates and neighbourhood, updated 1 October 2026. The data has no field saying whether a shelter carries advertising. The `placements` source writes kiosks and shelters to `data/placements/nyc_placements.csv` (5,556 rows), with carries_ads set to yes, no or unknown.
+- Joined per tract (fetched): `tools.analyze` writes `data/analysis/nyc_tracts.geojson`, each tract's shape with its Census columns, the subway station complexes within 1,300 feet (about a five-minute walk) and their weekly riders, and its counts of LinkNYC kiosks, kiosks marked as carrying ads, and bus shelters. 1,373 tracts have a station nearby and 125 contain a kiosk marked as carrying ads. Startup-specific scoring and competitor data aren't joined yet.
 - [DOB Sign Application Filings](https://data.cityofnewyork.us/d/nyis-y4yr) (checked): 15,288 filings, but only from April 2013 to October 2017. It covers all signs, not only advertising, and gives an address and tax lot rather than coordinates. Not usable as a current billboard map.
 
 Competitors:
