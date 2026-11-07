@@ -76,7 +76,7 @@ export function useAudienceRun() {
         if (ctrl.signal.aborted) return;
         const layers = computeLayers(shapes, fit, campaignsOf(events));
         const placements = await findPlacements({
-          geoids: strongest(layers, "gap", 15),
+          geoids: strongest(layers, "gap", Object.keys(layers).length),
           monthlyBudget: brief.monthlyBudget,
         });
         update(() => ({ placements }));

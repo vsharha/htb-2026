@@ -4,6 +4,7 @@
 // shelters, but invents their costs, measurement methods and minimum spends.
 
 import type { Borough, Placement, PlacementQuery } from "@/lib/contract";
+import { selectPlacements } from "@/lib/placement-selection";
 
 import { delay, hashUnit, readAnalysisCsv } from "./data-files";
 
@@ -31,16 +32,6 @@ export async function findPlacements(query: PlacementQuery): Promise<Placement[]
       };
     });
 
-  // Stand-in minimum spends: a budget under $2,000 a month rules out bus shelters.
-  const affordable = placements.filter(
-    (p) => query.monthlyBudget >= 2000 || p.kind === "linknyc",
-  );
-  affordable.sort(
-    (a, b) =>
-      rank.get(a.geoid)! - rank.get(b.geoid)! ||
-      a.costPerAudienceMember - b.costPerAudienceMember,
-  );
-
   await delay(400);
-  return affordable.slice(0, 12);
+  return selectPlacements(placements, query);
 }
