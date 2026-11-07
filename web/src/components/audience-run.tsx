@@ -1,26 +1,49 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState } from "react";
 
 import { BriefForm } from "@/components/brief-form";
-import { RunResults } from "@/components/run-results";
+import { HeatGlow } from "@/components/heat-glow";
+import { ResultsSplit } from "@/components/results-split";
+import { SiteHeader } from "@/components/site-header";
 import { useAudienceRun } from "@/components/use-audience-run";
+import type { Brief } from "@/lib/contract";
 
 const sheet = "bg-card text-card-foreground shadow-[0_24px_60px_-20px_rgb(21_23_28/0.35)]";
 
-export function AudienceRun({ header }: { header: ReactNode }) {
+/**
+ * The form on the heat glow until it is submitted, then the results filling
+ * the window. The form stays mounted while hidden, so editing the brief
+ * brings it back with the answers still in it.
+ */
+export function AudienceRun() {
   const { run, start, busy } = useAudienceRun();
+  const [brief, setBrief] = useState<Brief | null>(null);
+  const [editing, setEditing] = useState(true);
+
+  function submit(next: Brief) {
+    setBrief(next);
+    setEditing(false);
+    start(next);
+  }
+
+  const showResults = !editing && run && brief;
 
   return (
     <>
-      <section className={`${sheet} flex flex-col gap-12 rounded-b-[2.5rem] px-6 pt-8 pb-12 sm:px-14 sm:pt-12 sm:pb-16`}>
-        {header}
-        <BriefForm onSubmit={start} busy={busy} />
-      </section>
-      {run && (
-        <section className={`${sheet} mb-16 rounded-[2.5rem] px-6 py-10 sm:mb-24 sm:px-14 sm:py-14`}>
-          <RunResults run={run} />
-        </section>
+      <div hidden={!!showResults} className="relative isolate flex-1">
+        <HeatGlow />
+        <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-3 sm:px-8">
+          <section className={`${sheet} flex flex-col gap-12 rounded-b-[2.5rem] px-6 pt-8 pb-12 sm:px-14 sm:pt-12 sm:pb-16`}>
+            <SiteHeader />
+            <BriefForm onSubmit={submit} busy={busy} />
+          </section>
+        </main>
+      </div>
+      {showResults && (
+        <main className="flex-1">
+          <ResultsSplit run={run} brief={brief} onEditBrief={() => setEditing(true)} />
+        </main>
       )}
     </>
   );

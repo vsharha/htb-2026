@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { LayerTabs } from "@/components/layer-tabs";
-import { MapPanel } from "@/components/map-panel";
 import { campaignsOf, type RunState } from "@/components/use-audience-run";
 import { usePlacementFocus, type PlacementFocus } from "@/components/use-placement-focus";
 import type { Campaign, Placement } from "@/lib/contract";
@@ -231,26 +229,22 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
   );
 }
 
-/** What explains the selected layer, optionally under the layer tabs. */
+/** What explains the selected layer. */
 export function ResultsList({
   run,
   layers,
   campaigns,
   layer,
   focus,
-  onLayerChange,
 }: {
   run: RunState;
   layers: TractLayers | null;
   campaigns: Campaign[];
   layer: LayerId;
   focus: PlacementFocus;
-  /** Shows the layer tabs at the top; omit when the page places them itself. */
-  onLayerChange?: (layer: LayerId) => void;
 }) {
   return (
     <div className="flex flex-col gap-8">
-      {onLayerChange && <LayerTabs layer={layer} onChange={onLayerChange} />}
       {run.error && (
         <p role="alert" className="border-l-4 border-heat-hot pl-4 text-sm text-heat-hot">
           The run stopped: {run.error}
@@ -259,25 +253,6 @@ export function ResultsList({
       {layer === "gap" && <GapTab run={run} layers={layers} focus={focus} />}
       {layer === "fit" && <CustomersTab run={run} layers={layers} />}
       {layer === "competition" && <CompetitorsTab run={run} campaigns={campaigns} />}
-    </div>
-  );
-}
-
-/** Map above the results, for pages that scroll as a whole. */
-export function RunResults({ run }: { run: RunState }) {
-  const { layer, setLayer, campaigns, layers, focus } = useRunView(run);
-  return (
-    <div className="flex flex-col gap-10">
-      <MapPanel
-        shapes={run.shapes}
-        layers={layers}
-        campaigns={campaigns}
-        placements={run.placements}
-        layer={layer}
-        focus={focus}
-        className="h-[70vh] min-h-[28rem] rounded-2xl"
-      />
-      <ResultsList run={run} layers={layers} campaigns={campaigns} layer={layer} focus={focus} onLayerChange={setLayer} />
     </div>
   );
 }
