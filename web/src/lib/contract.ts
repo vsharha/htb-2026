@@ -75,6 +75,15 @@ export type Station = {
 
 export type Competitor = { name: string; reason: string; sourceUrl: string };
 
+export type CampaignLocation = {
+  latitude: number;
+  longitude: number;
+  label: string;
+  precision: "station" | "address" | "area";
+  source: "station" | "geoapify";
+  attribution: string;
+};
+
 export type Campaign = {
   competitor: string;
   title: string;
@@ -87,6 +96,9 @@ export type Campaign = {
   coverage: "current" | "historical" | "unknown";
   /** The subway station the server matched the campaign to, or null when it could not place it. */
   station: Station | null;
+  /** Older recordings may contain only a station match. */
+  mapLocation?: CampaignLocation | null;
+  locationNote?: string;
 };
 
 /** One message streamed by the competitor-campaign agent's Route Handler. */

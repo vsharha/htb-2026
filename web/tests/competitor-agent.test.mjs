@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { registerHooks } from "node:module";
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { campaignCoverage, confirmedSource, matchStation, parseStations, sourceUrl } from "../src/lib/server/campaign-evidence.ts";
 import { runCompetitorAgent } from "../src/lib/competitor-agent.ts";
-import { computeLayers } from "../src/lib/gap.ts";
+registerHooks({ resolve(specifier, context, nextResolve) {
+  if (specifier === "@/lib/campaign-location") return nextResolve(new URL("../src/lib/campaign-location.ts", import.meta.url).href, context);
+  return nextResolve(specifier, context);
+} });
+const { computeLayers } = await import("../src/lib/gap.ts");
 
 const stations = [
   { id: "1", name: "Grand Central-42 St (4,5,6)", borough: "Manhattan", latitude: 40.75, longitude: -73.98, weeklyRiders: 10 },

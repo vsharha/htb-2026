@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { campaignsOf, type RunState } from "@/components/use-audience-run";
 import { usePlacementFocus, type PlacementFocus } from "@/components/use-placement-focus";
 import type { Campaign, Placement } from "@/lib/contract";
+import { getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { computeLayers, strongest, type LayerId, type TractLayers } from "@/lib/gap";
 import { tractLabel } from "@/lib/tracts";
 
@@ -124,7 +125,7 @@ function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | n
         )}
         {layers && !run.agentDone && <Pending>Updating as competitors&rsquo; ads are found…</Pending>}
         <p className="text-xs text-muted-foreground">
-          Only campaigns with confirmed current dates and station locations affect the map. Unsearched areas and missing evidence mean unknown coverage.
+          Campaign markers include approximate locations and unknown dates. Only current campaigns matched to a station or street address affect the heatmap. Missing evidence means unknown coverage.
         </p>
       </Section>
 
@@ -199,7 +200,7 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
   const competitors = run.events.flatMap((e) => (e.type === "competitor" ? [e.competitor] : []));
   const steps = run.events.flatMap((e) => (e.type === "step" ? [e.message] : []));
   const errors = run.events.flatMap((e) => (e.type === "error" ? [e.message] : []));
-  const unplaced = campaigns.filter((c) => !c.station).length;
+  const unplaced = campaigns.filter((c) => !getCampaignLocation(c)).length;
 
   return (
     <>
@@ -220,26 +221,28 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
 
       <Section title="Their ads" aside={`${campaigns.length} found`}>
         <ul className="flex flex-col gap-2.5 text-sm" aria-live="polite">
-          {campaigns.map((c) => (
-            <li key={`${c.sourceUrl}|${c.title}|${c.station?.id}`} className="border-l-4 border-heat-hot pl-3">
+          {campaigns.map((c, i) => {
+            const location = getCampaignLocation(c);
+            return <li key={`${c.sourceUrl}|${c.title}|${i}`} className="border-l-4 border-heat-hot pl-3">
               <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
                 {c.competitor}: {c.title}
               </a>
               <div className="font-mono text-xs text-muted-foreground">
-                {c.station ? c.station.name : "No station matched"} · {c.kind}
+                {location ? LOCATION_PRECISION_LABELS[location.precision] : "Location not resolved"} · {c.kind}
               </div>
               <p className="text-xs text-muted-foreground">
                 {c.coverage === "current" ? "Confirmed current dates" : c.coverage === "historical" ? "Historical campaign" : "Current coverage unknown"}
                 {(c.startsOn || c.endsOn) && `: ${c.startsOn ?? "unknown start"} to ${c.endsOn ?? "unknown end"}`}
               </p>
-              {c.location && <p className="text-xs text-muted-foreground">{c.location}</p>}
+              {(location || c.location) && <p className="text-xs text-muted-foreground">{location?.label ?? c.location}</p>}
+              {!location && <p className="text-xs text-muted-foreground">{c.locationNote ?? "The source does not identify a specific location we can map."}</p>}
               {c.evidence && <p className="mt-1 text-xs text-muted-foreground">{c.evidence}</p>}
-            </li>
-          ))}
+            </li>;
+          })}
         </ul>
         {unplaced > 0 && (
           <p className="text-xs text-muted-foreground">
-            {unplaced === 1 ? "1 ad isn’t on the map" : `${unplaced} ads aren’t on the map`}: no station matched.
+            {unplaced === 1 ? "1 ad isn’t on the map" : `${unplaced} ads aren’t on the map`}: no reliable location match.
           </p>
         )}
         {!run.agentDone && !run.error && <Pending>{steps.at(-1) ?? "Searching…"}</Pending>}

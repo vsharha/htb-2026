@@ -5,6 +5,8 @@ import { jsonSchema, stepCountIs, tool, ToolLoopAgent } from "ai";
 
 import type { AgentEvent, Brief, Campaign, Competitor } from "@/lib/contract";
 import { getCompetitorAI } from "@/lib/server/ai";
+import { getCampaignLocation, campaignAffectsHeatmap } from "@/lib/campaign-location";
+import { geocodeCampaignLocation } from "@/lib/server/geocoding";
 import { campaignCoverage, confirmedSource, matchStation, parseStations, sourceUrl } from "./campaign-evidence";
 
 const SYSTEM = `You research competitors and their outdoor advertising in New York City.
@@ -19,6 +21,7 @@ Keep historical campaigns with their known dates; do not describe them as runnin
 Campaign startsOn and endsOn are YYYY-MM-DD dates explicitly supported by the source, not publication dates. Use null when unknown.
 Use stationName only for subway advertising explicitly placed at that station in the evidence. Do not infer a station from a neighbourhood or nearby billboard.
 Use the exact station name from the supplied list; line names in parentheses can be omitted. Include that name in your factual evidence summary.
+For other campaign types, put the specific landmark, neighbourhood or street address stated by the source in location. The server geocodes it. Never invent an address or coordinates. Report one location per finding.
 Find up to six campaign locations in total, across at most three competitors. Finish by calling finishResearch, even when no campaigns were found.`;
 
 type Finding = {
@@ -98,18 +101,27 @@ export async function runCompetitorResearch(brief: Brief, signal: AbortSignal, e
           const url = confirmedSource(finding.sourceUrl, sources);
           if (!url) return { accepted: false, reason: "Use a supporting URL returned by research, or search for one. These are the most recent URLs available.", availableSources: [...sources].slice(-40) };
           if (!finding.title.trim() || !finding.evidence.trim()) return { accepted: false, reason: "A title and factual evidence summary are required." };
-          const key = `${competitor.name}|${url}|${finding.title.toLowerCase()}|${finding.stationName}`;
+          const key = `${competitor.name}|${url}|${finding.title.toLowerCase()}|${finding.stationName}|${finding.location}`;
           if (campaigns.has(key)) return { accepted: true, duplicate: true };
           if (campaigns.size >= 6) return { accepted: false, reason: "Six campaign locations already reported. Finish the research." };
           const station = finding.kind === "subway" ? matchStation(stations, finding.stationName, finding.evidence) : null;
           const coverage = campaignCoverage(finding.startsOn, finding.endsOn, today);
+          let mapLocation = getCampaignLocation({ ...finding, station, coverage });
+          let locationNote: string | undefined;
+          if (!mapLocation && finding.location) {
+            emit({ type: "step", message: `Locating ${competitor.name}'s campaign: ${finding.location}` });
+            const result = await geocodeCampaignLocation(finding.location, signal);
+            mapLocation = result.location;
+            locationNote = result.note;
+          }
           campaigns.add(key);
-          emit({ type: "campaign", campaign: {
+          const campaign: Campaign = {
             competitor: competitor.name, title: finding.title, kind: finding.kind, sourceUrl: url,
             evidence: finding.evidence, location: finding.location, station,
-            startsOn: finding.startsOn, endsOn: finding.endsOn, coverage,
-          } });
-          return { accepted: true, mapped: station !== null && coverage === "current", coverage };
+            startsOn: finding.startsOn, endsOn: finding.endsOn, coverage, mapLocation, locationNote,
+          };
+          emit({ type: "campaign", campaign });
+          return { accepted: true, mapped: mapLocation !== null, affectsHeatmap: campaignAffectsHeatmap(campaign), coverage };
         },
       }),
       finishResearch: tool({

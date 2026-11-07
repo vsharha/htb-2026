@@ -62,8 +62,12 @@ export function MapPanel({
         {layer !== "fit" && (
           <ul className="mt-3 flex flex-col gap-1.5 text-xs">
             <li className="flex items-center gap-2">
-              <span className="size-4 shrink-0 rounded-full border-2 border-foreground" />
-              Confirmed current subway ad
+              <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground"><span className="size-1.5 rounded-full bg-foreground" /></span>
+              Current ad, matched location
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="size-4 shrink-0 rounded-full border-2 border-dashed border-foreground" />
+              Approximate, historical or undated ad
             </li>
             <li className="flex items-center gap-2">
               <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground bg-background font-mono text-[9px] font-semibold">
@@ -73,6 +77,7 @@ export function MapPanel({
             </li>
           </ul>
         )}
+        <a href="https://www.geoapify.com/" target="_blank" rel="noreferrer" className="pointer-events-auto mt-2 block text-[10px] text-muted-foreground underline underline-offset-2">Location lookup powered by Geoapify</a>
       </div>
     </section>
   );

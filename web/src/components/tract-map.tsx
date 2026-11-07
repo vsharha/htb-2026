@@ -3,12 +3,13 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { setWorkerUrl, type ExpressionSpecification } from "maplibre-gl";
-import { useEffect, useMemo, useRef } from "react";
-import Map, { Layer, Marker, NavigationControl, Source, type MapRef } from "react-map-gl/maplibre";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Map, { Layer, Marker, NavigationControl, Popup, Source, type MapRef } from "react-map-gl/maplibre";
 
 import type { PlacementFocus } from "@/components/use-placement-focus";
 
 import type { Campaign, Placement } from "@/lib/contract";
+import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import type { LayerId, TractLayers, TractShapes } from "@/lib/gap";
 
 // MapLibre looks for its worker next to its own module, where the bundler
@@ -26,7 +27,6 @@ function heatRamp(id: LayerId): ExpressionSpecification {
     1, "rgba(224, 51, 79, 0.75)",
   ];
 }
-const INK = "#15171c";
 
 /** CARTO's light basemap: streets and water in greys, so the tract colours carry the map. */
 const BASEMAP = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
@@ -47,6 +47,7 @@ export function TractMap({
   focus: PlacementFocus;
 }) {
   const map = useRef<MapRef>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
 
   // A click on a placement row brings its marker into view.
   const selected = focus.selected;
@@ -67,21 +68,12 @@ export function TractMap({
     [shapes, layers],
   );
 
-  const stations = useMemo(
-    () => ({
-      type: "FeatureCollection" as const,
-      features: campaigns.flatMap((c) =>
-        c.station && c.coverage === "current"
-          ? [{
-              type: "Feature" as const,
-              properties: { name: c.station.name },
-              geometry: { type: "Point" as const, coordinates: [c.station.longitude, c.station.latitude] },
-            }]
-          : [],
-      ),
-    }),
-    [campaigns],
-  );
+  const campaignMarkers = campaigns.flatMap((campaign, i) => {
+    const location = getCampaignLocation(campaign);
+    return location ? [{ campaign, location, id: i }] : [];
+  });
+  const popupCampaign = selectedCampaign && campaigns.includes(selectedCampaign) ? selectedCampaign : null;
+  const popupLocation = popupCampaign && getCampaignLocation(popupCampaign);
 
   return (
     <Map
@@ -98,14 +90,33 @@ export function TractMap({
         <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer) }} />
         <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.3, "line-opacity": 0.6 }} />
       </Source>
-      <Source id="stations" type="geojson" data={stations}>
-        <Layer
-          id="station-ring"
-          type="circle"
-          layout={{ visibility: layer === "fit" ? "none" : "visible" }}
-          paint={{ "circle-radius": 7, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": INK, "circle-stroke-width": 2 }}
-        />
-      </Source>
+      {layer !== "fit" && campaignMarkers.map(({ campaign, location, id }) => (
+        <Marker key={id} longitude={location.longitude} latitude={location.latitude} anchor="center" style={{ zIndex: selectedCampaign === campaign ? 5 : 3 }}>
+          <button
+            type="button"
+            aria-label={`Campaign: ${campaign.competitor}, ${campaign.title}. ${LOCATION_PRECISION_LABELS[location.precision]}`}
+            onClick={() => {
+              map.current?.easeTo({ center: [location.longitude, location.latitude], duration: 250 });
+              setSelectedCampaign(campaign);
+            }}
+            className={"flex size-6 cursor-pointer items-center justify-center rounded-full border-2 border-foreground bg-background/95 shadow-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " + (campaignAffectsHeatmap(campaign) ? "" : "border-dashed")}
+          >
+            {campaignAffectsHeatmap(campaign) && <span className="size-2 rounded-full bg-foreground" />}
+          </button>
+        </Marker>
+      ))}
+      {layer !== "fit" && popupCampaign && popupLocation && (
+        <Popup longitude={popupLocation.longitude} latitude={popupLocation.latitude} offset={16} maxWidth="280px" closeOnClick={false} onClose={() => setSelectedCampaign(null)}>
+          <div className="flex max-h-[calc(27.5dvh-4rem)] flex-col gap-1.5 overflow-y-auto p-1 font-sans text-sm text-foreground lg:max-h-[calc(50dvh-4rem)]">
+            <strong>{popupCampaign.competitor}: {popupCampaign.title}</strong>
+            <span>{popupLocation.label}</span>
+            <span className="text-xs text-muted-foreground">{LOCATION_PRECISION_LABELS[popupLocation.precision]}</span>
+            <span className="text-xs text-muted-foreground">{popupCampaign.coverage === "current" ? "Confirmed current dates" : popupCampaign.coverage === "historical" ? "Historical campaign" : "Campaign dates unknown"}</span>
+            <a href={popupCampaign.sourceUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">Read campaign source</a>
+            <span className="text-[10px] text-muted-foreground">{popupLocation.attribution}</span>
+          </div>
+        </Popup>
+      )}
       {/* Placements come from the gap, so the customers view leaves them out. */}
       {layer !== "fit" &&
         placements?.map((p, i) => {

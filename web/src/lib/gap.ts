@@ -3,6 +3,7 @@
 // map already loads and the results of the two server calls.
 
 import type { AudienceFit, Campaign } from "@/lib/contract";
+import { campaignAffectsHeatmap, getCampaignLocation } from "@/lib/campaign-location";
 
 type Position = [number, number];
 
@@ -22,7 +23,7 @@ export type LayerId = "gap" | "fit" | "competition";
 /** Per tract, each layer's value from 0 to 1. */
 export type TractLayers = Record<string, Record<LayerId, number>>;
 
-/** A campaign's reach falls to about a third at this distance from its station. */
+/** A campaign's reach falls to about a third at this distance from its matched location. */
 const CAMPAIGN_REACH_KM = 1;
 
 /** Mean of the outer ring's vertices; close enough to the centre for tract-sized shapes. */
@@ -48,9 +49,10 @@ export function computeLayers(
   fit: AudienceFit,
   campaigns: Campaign[],
 ): TractLayers {
-  const stations: Position[] = campaigns.flatMap((c) =>
-    c.station && c.coverage === "current" ? [[c.station.longitude, c.station.latitude] as Position] : [],
-  );
+  const locations: Position[] = campaigns.flatMap((campaign) => {
+    const location = getCampaignLocation(campaign);
+    return campaignAffectsHeatmap(campaign) && location ? [[location.longitude, location.latitude] as Position] : [];
+  });
   const layers: TractLayers = {};
   for (const feature of shapes.features) {
     const { geoid } = feature.properties;
@@ -58,7 +60,7 @@ export function computeLayers(
     if (audience === undefined) continue;
     const here = centre(feature.geometry);
     let competition = 0;
-    for (const s of stations) {
+    for (const s of locations) {
       const d = distanceKm(here, s) / CAMPAIGN_REACH_KM;
       competition = Math.max(competition, Math.exp(-d * d));
     }
