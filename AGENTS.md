@@ -60,6 +60,10 @@ A teammate may run several agent sessions in parallel in one checkout, so a chan
 - Call an uncommitted change you didn't make "from another session", unless something shows who made it. Teammates work in their own clones, so their uncommitted work never appears in yours.
 - Attribute a commit by its author. A commit authored under the user's Git identity is the user's own, made from another of their sessions. Call a change a teammate's only when a different person authored it.
 
+## Running Git
+
+- The agent shell has no terminal, so a Git command that falls back to reading stdin waits until it times out. Always give `git shortlog` a revision, as in `git shortlog -sne HEAD`, and add `</dev/null` to any other command that might wait for input.
+
 ## Committing
 
 - Start every task with `git pull --rebase --autostash`, so you work on teammates' latest pushes.
