@@ -1,6 +1,6 @@
 # Idea ranking
 
-Ten project ideas, ranked. Each has its own file in `ideas/`. This is a recommendation, not a decision. The team decides what we build.
+Ten project ideas, ranked, plus three added after the ranking. Each has its own file in `ideas/`. This is a recommendation, not a decision. The team decides what we build.
 
 ## How it was ranked
 
@@ -164,3 +164,13 @@ Daniel's ad-channel mispricing idea.
   - It reaches only two tracks.
   - InstaLily leaves us unranked if we miss even one simple bug.
   - Debugging demos look alike.
+
+## Added after the ranking
+
+Three ideas were added on 7 November 2026, after the user ruled out career prizes and asked for ideas built around the sponsor tracks' judging notes rather than the first ten. They have not been through the debate or the judge, and their facts are unchecked, so they are unranked. In the agent's provisional view:
+
+- [Unclaimed](ideas/unclaimed-money.md) is at least level with [Flat Truth](ideas/flat-truth.md). It serves the same three strong tracks, is the most direct Bank of Scotland fit of any idea, and has a deterministic demo instead of one that depends on a data coincidence.
+- [Second-hand value radar](ideas/second-hand-value-radar.md) reaches all four Group A tracks, but marketplace access is the riskiest data source of any idea and one good listing has to exist at judging time.
+- [Delay compensation](ideas/delay-compensation.md) is strong on Bank of Scotland and G-Research, but it is crowded and narrower than the other two.
+
+None of the three combines with an existing idea into one product.
