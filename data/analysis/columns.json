@@ -48,6 +48,78 @@
     "measures": "lives"
   },
   {
+    "name": "jobs",
+    "scaled": "jobs_scaled",
+    "description": "number of jobs done in the tract",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_age_29_under",
+    "scaled": "share_jobs_age_29_under_scaled",
+    "description": "share of jobs held by workers aged 29 or younger",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_high_earnings",
+    "scaled": "share_jobs_high_earnings_scaled",
+    "description": "share of jobs paying more than $3,333 a month",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_degree",
+    "scaled": "share_jobs_degree_scaled",
+    "description": "share of workers aged 30 and over with a bachelor's degree or higher",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_information",
+    "scaled": "share_jobs_information_scaled",
+    "description": "share of jobs in information: software, media, publishing and telecoms",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_finance",
+    "scaled": "share_jobs_finance_scaled",
+    "description": "share of jobs in finance and insurance",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_professional",
+    "scaled": "share_jobs_professional_scaled",
+    "description": "share of jobs in professional services: law, consulting, design, research",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_education",
+    "scaled": "share_jobs_education_scaled",
+    "description": "share of jobs in education",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_health",
+    "scaled": "share_jobs_health_scaled",
+    "description": "share of jobs in health care and social assistance",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_retail",
+    "scaled": "share_jobs_retail_scaled",
+    "description": "share of jobs in retail",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_arts",
+    "scaled": "share_jobs_arts_scaled",
+    "description": "share of jobs in arts, entertainment and recreation",
+    "measures": "works"
+  },
+  {
+    "name": "share_jobs_food",
+    "scaled": "share_jobs_food_scaled",
+    "description": "share of jobs in hotels, restaurants and bars",
+    "measures": "works"
+  },
+  {
     "name": "weekly_riders_nearby",
     "scaled": "weekly_riders_nearby_scaled",
     "description": "weekly subway riders at stations within a five-minute walk",

@@ -2,9 +2,12 @@
 
 Run from tools/ with `uv run python -m tools.analyze`. Writes to data/analysis/:
 
-- nyc_tracts.geojson: one feature per tract with its Census demographics, the
-  subway riders passing nearby and its advertising placements. Each column in
-  FEATURES also appears as `<column>_scaled`, its percentile rank from 0 to 1.
+- nyc_tracts.geojson: each tract's shape with its geoid and borough only, so the
+  browser can load the map once.
+- nyc_tracts.csv: one row per tract with its Census demographics, the jobs done
+  there, the subway riders passing nearby and its advertising placements. Each
+  column in FEATURES also appears as `<column>_scaled`, its percentile rank
+  from 0 to 1.
 - columns.json: the FEATURES list, with each column's description and whether
   it measures where people live, work or pass through. The web app builds its
   Jev questions from the descriptions.
@@ -18,10 +21,11 @@ import json
 import geopandas as gpd
 import pandas as pd
 
-from tools.sources import census, placements, subway, tracts
+from tools.sources import census, lodes, placements, subway, tracts
 from tools.sources._common import DATA, ROOT
 
 OUTPUT = DATA / "analysis" / "nyc_tracts.geojson"
+TABLE_OUTPUT = DATA / "analysis" / "nyc_tracts.csv"
 COLUMNS_OUTPUT = DATA / "analysis" / "columns.json"
 PLACEMENTS_OUTPUT = DATA / "analysis" / "nyc_placements.csv"
 
@@ -45,6 +49,36 @@ FEATURES = {
         "lives",
     ),
     "share_college_students": ("share of residents enrolled in college", "lives"),
+    "jobs": ("number of jobs done in the tract", "works"),
+    "share_jobs_age_29_under": (
+        "share of jobs held by workers aged 29 or younger",
+        "works",
+    ),
+    "share_jobs_high_earnings": (
+        "share of jobs paying more than $3,333 a month",
+        "works",
+    ),
+    "share_jobs_degree": (
+        "share of workers aged 30 and over with a bachelor's degree or higher",
+        "works",
+    ),
+    "share_jobs_information": (
+        "share of jobs in information: software, media, publishing and telecoms",
+        "works",
+    ),
+    "share_jobs_finance": ("share of jobs in finance and insurance", "works"),
+    "share_jobs_professional": (
+        "share of jobs in professional services: law, consulting, design, research",
+        "works",
+    ),
+    "share_jobs_education": ("share of jobs in education", "works"),
+    "share_jobs_health": (
+        "share of jobs in health care and social assistance",
+        "works",
+    ),
+    "share_jobs_retail": ("share of jobs in retail", "works"),
+    "share_jobs_arts": ("share of jobs in arts, entertainment and recreation", "works"),
+    "share_jobs_food": ("share of jobs in hotels, restaurants and bars", "works"),
     "weekly_riders_nearby": (
         "weekly subway riders at stations within a five-minute walk",
         "passes",
@@ -63,6 +97,12 @@ def _with_census(shapes: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     numeric = people.columns.drop("geoid")
     people[numeric] = people[numeric].apply(pd.to_numeric, errors="coerce")
     return shapes.merge(people, on="geoid", how="left")
+
+
+def _with_jobs(shapes: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    result = shapes.merge(lodes.load(), on="geoid", how="left")
+    result["jobs"] = result["jobs"].fillna(0).astype(int)
+    return result
 
 
 def _with_subway(shapes: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -119,16 +159,20 @@ def _with_placements(shapes: gpd.GeoDataFrame, sites: pd.DataFrame) -> gpd.GeoDa
 
 def _with_scaled(shapes: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     result = shapes.copy()
-    unpopulated = result["population"].fillna(0) == 0
+    empty = {
+        "lives": result["population"].fillna(0) == 0,
+        "works": result["jobs"] == 0,
+    }
     for column, (_, measures) in FEATURES.items():
         # Percentile rank, so skewed columns such as riders spread over 0 to 1.
-        # A populated tract missing the raw value gets 0.5, the city median,
-        # which neither raises nor lowers its weighted score. A tract with no
-        # residents, such as a park or airport, gets 0 on resident columns so
-        # empty land doesn't show as an average audience.
+        # A tract missing the raw value gets 0.5, the city median, which
+        # neither raises nor lowers its weighted score. A tract with no
+        # residents gets 0 on resident columns, and one with no jobs gets 0 on
+        # job columns, so a park or a residential block doesn't show as an
+        # average audience for what it lacks.
         scaled = result[column].rank(pct=True, method="average").fillna(0.5)
-        if measures == "lives":
-            scaled = scaled.mask(unpopulated, 0.0)
+        if measures in empty:
+            scaled = scaled.mask(empty[measures], 0.0)
         result[f"{column}_scaled"] = scaled.round(4)
     return result
 
@@ -148,18 +192,25 @@ def _column_list() -> list[dict[str, str]]:
 def main() -> None:
     shapes = tracts.load()
     shapes = _with_census(shapes)
+    shapes = _with_jobs(shapes)
     shapes = _with_subway(shapes)
     sites = _placements_with_tract(shapes)
     shapes = _with_placements(shapes, sites)
     shapes = _with_scaled(shapes)
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    shapes.to_file(OUTPUT, driver="GeoJSON", COORDINATE_PRECISION=5)
+    shapes[["geoid", "borough", "geometry"]].to_file(
+        OUTPUT, driver="GeoJSON", COORDINATE_PRECISION=5
+    )
+    pd.DataFrame(shapes.drop(columns="geometry")).to_csv(TABLE_OUTPUT, index=False)
     COLUMNS_OUTPUT.write_text(json.dumps(_column_list(), indent=2) + "\n")
     sites.to_csv(PLACEMENTS_OUTPUT, index=False)
 
     outside = sites["geoid"].isna().sum()
-    print(f"Wrote {len(shapes)} tracts to {OUTPUT.relative_to(ROOT)}")
+    print(
+        f"Wrote {len(shapes)} tracts to {OUTPUT.relative_to(ROOT)} "
+        f"and {TABLE_OUTPUT.relative_to(ROOT)}"
+    )
     print(f"Wrote {len(FEATURES)} columns to {COLUMNS_OUTPUT.relative_to(ROOT)}")
     print(
         f"Wrote {len(sites)} placements to {PLACEMENTS_OUTPUT.relative_to(ROOT)}, "
