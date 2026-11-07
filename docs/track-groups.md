@@ -33,11 +33,13 @@ Viridien wants a computer-vision pipeline that extracts lithological intervals f
 
 Viridien judges correctness, efficiency and simplicity, so adding technology for challenge prizes is likely to cost marks. It suits one teammate working in parallel as a separate module. Vultr GPUs are the only challenge that would help.
 
-## Metaview's overall prize fits any group
+## What fits any group
+
+### Metaview's overall prize
 
 Metaview's prize goes to the best project of the event, with no theme, so any project can compete for it. No judging criteria are given. A broadly impressive, polished demo is the safest bet, which favours Group A's consumer-facing product over Group C's narrow pipeline. Metaview's own product is AI for hiring, but nothing suggests a hiring theme earns extra marks.
 
-## Challenges that fit any group
+### MLH challenges
 
 | Challenge | Why it fits any group | Caveat |
 |---|---|---|
