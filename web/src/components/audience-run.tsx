@@ -18,7 +18,7 @@ export function AudienceRun({ header }: { header: ReactNode }) {
         <BriefForm onSubmit={start} busy={busy} />
       </section>
       {run && (
-        <section className={`${sheet} rounded-[2.5rem] px-6 py-10 sm:px-14 sm:py-14`}>
+        <section className={`${sheet} mb-16 rounded-[2.5rem] px-6 py-10 sm:mb-24 sm:px-14 sm:py-14`}>
           <RunResults run={run} />
         </section>
       )}
