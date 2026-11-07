@@ -25,7 +25,9 @@ InstaLily and JetBrains.
 - Wordsmith is a weak fit. InstaLily's sandbox blocks outbound traffic except to the gateway and listed sites, so a browser agent would only work in the JetBrains version.
 - Challenges that fit: Entire, strongly. Gemini is borderline, because InstaLily's Gemini models come through an OpenAI-compatible gateway rather than the Gemini API directly.
 
-## Viridien on its own
+## Group C: lithology extraction
+
+Viridien alone.
 
 Viridien wants a computer-vision pipeline that extracts lithological intervals from scanned geological reports, using a fixed dataset of 50 images. It overlaps with no other track; G-Research, framed as hidden data in PDFs, is a stretch.
 
@@ -33,19 +35,19 @@ Viridien judges correctness, efficiency and simplicity, so adding technology for
 
 ## Metaview's overall prize fits any group
 
-Metaview's prize goes to the best project of the event, with no theme, so any project can compete for it. No judging criteria are given. A broadly impressive, polished demo is the safest bet, which favours Group A's consumer-facing product over Viridien's narrow pipeline. Metaview's own product is AI for hiring, but nothing suggests a hiring theme earns extra marks.
+Metaview's prize goes to the best project of the event, with no theme, so any project can compete for it. No judging criteria are given. A broadly impressive, polished demo is the safest bet, which favours Group A's consumer-facing product over Group C's narrow pipeline. Metaview's own product is AI for hiring, but nothing suggests a hiring theme earns extra marks.
 
 ## Challenges that fit any group
 
 | Challenge | Why it fits any group | Caveat |
 |---|---|---|
 | Entire | It judges how the team works, not what it builds, and the team already works with several coding agents. | Its setup goes in the root `AGENTS.md`, which needs approval to change. |
-| Gemini | Every group except Viridien uses a language model. Free key from Google AI Studio. | Borderline for InstaLily, as above. |
-| Vultr | Hosts the backend or demo, or runs Viridien on GPUs. Free credits on sign-up. | Does not apply to InstaLily's agent, which runs in InstaLily's sandbox. |
-| Auth0 | Login is cheap to add to any web app. | No use for a command-line agent or the Viridien pipeline. |
+| Gemini | Every group except Group C uses a language model. Free key from Google AI Studio. | Borderline for InstaLily, as above. |
+| Vultr | Hosts the backend or demo, or runs Group C's pipeline on GPUs. Free credits on sign-up. | Does not apply to InstaLily's agent, which runs in InstaLily's sandbox. |
+| Auth0 | Login is cheap to add to any web app. | No use for a command-line agent or Group C's pipeline. |
 
 Tiger Data and ElevenLabs fit only Group A. Solana fits no group well.
 
 ## Reach of each group
 
-Every group can also compete for Metaview's overall prize. Group A with Wordsmith reaches four sponsor tracks plus Entire, Gemini, Vultr, Auth0 and Tiger Data, with no conflicting rules. Group B reaches two tracks, and InstaLily's contract alone is a large amount of work. Viridien reaches one track.
+Every group can also compete for Metaview's overall prize. Group A with Wordsmith reaches four sponsor tracks plus Entire, Gemini, Vultr, Auth0 and Tiger Data, with no conflicting rules. Group B reaches two tracks, and InstaLily's contract alone is a large amount of work. Group C reaches one track.
