@@ -44,6 +44,12 @@ LLM calls and AI agents go through the Vercel AI SDK (`ai` plus a provider packa
 
 The data-gathering scripts are a Python project in `tools/`. Gather data through a script there, not by hand, in `web/`, or with a one-off command, so anyone can re-run it. Read `tools/AGENTS.md` before working on them or on the data they write to `data/`.
 
+## Questions and disagreement
+
+- For questions about this project, inspect the relevant files and conventions before answering. Ground recommendations in repository evidence, not generic advice.
+- When a request is missing a decision that the code and sensible defaults don't settle, ask before starting work that depends on it. If a question tool is available, ask with it rather than in prose. Ask across several turns if one round is not enough.
+- Disagreement is welcome. If a requested change is worse than the current version, say so before applying it. If overruled, apply it without re-arguing, but still report anything new, such as a separate problem or the concern coming true.
+
 ## Docs
 
 How to write anything under `docs/` is in `docs/AGENTS.md`. Read it before creating or editing a file there. Brainstorm product direction with the user before building features.

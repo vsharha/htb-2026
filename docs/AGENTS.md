@@ -2,6 +2,25 @@
 
 Rules for writing files under `docs/`.
 
+## Writing
+
+- Do not coin abbreviations, acronyms or capitalised names for project concepts. Use the term already in the codebase, or a plain description, because invented shorthand cannot be searched for later.
+- Define a term the reader cannot look up in half a sentence at first use. This matters most for names the document coins itself, since they exist nowhere else.
+- Describe what code does and under what conditions. Do not assert importance with a metaphor in place of the mechanism.
+- Lead with the answer, so a reader who stops after the first sentence still has it.
+- One idea per paragraph, carried by its first sentence.
+- Headings name their content, such as "Why the request times out", not "Analysis".
+- Short, active sentences. Split anything past roughly thirty words unless splitting reads worse.
+- Never drop a fact, quantity or qualifier to read more simply. Plain wording is the goal; less precision is not. This protects facts about the subject, not superseded statements about it.
+
+## Correcting existing docs
+
+- Before correcting a document, search all of it for statements the change makes false. If the search finds any beyond the passage being edited, list them with line numbers in the reply. Fixing only the passage you happened to read is the usual failure.
+- Replace each false statement in place. Delete what is now wrong rather than writing around it.
+- What changed, and why the old text was wrong, goes in the reply, not the document.
+- The result must read as if written today from scratch. A reader who has never seen the previous version cannot tell which parts changed.
+- The exceptions are the history these rules ask for: a changed decision in `product.md` is updated in place with its new date, and a dropped or merged idea keeps its file with the reason.
+
 ## Event docs
 
 `docs/event/` summarises the original sponsor and MLH material in `reference/`.
