@@ -30,7 +30,7 @@ Checked on 7 November 2026 by querying each source's API or download index. "Che
 
 Who lives where:
 
-- US Census Bureau American Community Survey: income, age, education and household type per census tract (an area of about 4,000 people). The API at api.census.gov now refuses requests without a key ("Missing Key"), so a free key is needed. Not otherwise checked.
+- US Census Bureau American Community Survey, 5-year estimates for 2024 (fetched): `tools.census` writes `data/census/nyc_tracts.csv`, one row for each of New York City's 2,327 census tracts (an area of about 4,000 people). Columns: population, median age, median household income, per capita income, and the shares aged 20 to 34, with a bachelor's degree or higher (of those aged 25 and over), with household income of $150,000 or more, and enrolled in college. Median household income is missing for 128 tracts and is capped at $250,001 by the Census Bureau. The API needs a key, read from `CENSUS_API_KEY` in `tools/.env`. Tract boundaries for the map are not fetched yet.
 
 Who works where:
 
@@ -77,7 +77,6 @@ No search has been run yet. From memory: foot-traffic and audience-mapping produ
 
 - Licences: the New York open data portals list none on the datasets checked, and Citi Bike's data sharing policy has not been read.
 - Billboards have no current public map. The only sign dataset stops in 2017, so the placements step relies on LinkNYC kiosks and bus shelters, and on shelters only if we can find which ones carry advertising.
-- The Census API needs a free key, which nobody has requested yet.
 - The competitor-campaign agent may find few campaigns for small competitors, leaving the competition layer mostly made of stores and offices, which show where competitors are, not where they advertise.
 - Turning a one-sentence target customer into census and trip filters is untested, and some customers, such as "developers at Series A startups", have no direct census field.
 - Prices for LinkNYC kiosks and bus shelters are probably unpublished, so cost per audience member would be an estimate. How to estimate it is undecided.
