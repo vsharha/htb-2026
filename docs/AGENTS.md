@@ -1,10 +1,10 @@
 # Docs
 
-Rules for writing files under `docs/`. They add to the root `AGENTS.md`, which still applies.
+Rules for writing files under `docs/`.
 
 ## Event docs
 
-`docs/event/` summarises the original sponsor and MLH material in `reference/`. Change it only with the user's approval.
+`docs/event/` summarises the original sponsor and MLH material in `reference/`.
 
 - `tracks.md` has one section per sponsor track and `challenges.md` one per MLH challenge, each under a heading, with no summary tables.
 - A section that draws on material in `reference/` names that file on its "Source" line.

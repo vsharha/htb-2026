@@ -1,3 +1,6 @@
+# --isolated gives each session its own in-memory browser profile, so
+# several agents on one machine don't share one. .mcp.json runs the same
+# server for Claude Code.
 [mcp_servers.playwright]
 command = "pnpm"
 args = ["dlx", "@playwright/mcp@latest", "--isolated"]

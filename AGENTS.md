@@ -21,14 +21,9 @@ Priority challenges, most important first: TODO, not decided yet.
 
 ## Reference
 
-- `docs/event/tracks.md`: each sponsor track's prizes, brief and judging notes.
-- `docs/event/challenges.md`: each MLH challenge's technology, prize, what qualifies, and sign-up.
-- `docs/event/schedule.md`: the event schedule.
-- `docs/product.md`, `docs/status.md`, `docs/pitch/` and `docs/ideas/`: the product plan, what is built, pitch material, and candidate ideas. See "Docs" below.
+Read `docs/event/tracks.md` or `docs/event/challenges.md` before work aimed at a specific track or challenge.
 
-Read the relevant file before work aimed at a specific track or challenge.
-
-`reference/` holds the original source files these docs are summarised from: sponsor material in `reference/tracks/`, one folder per sponsor, and MLH material in `reference/mlh/`. Read a file there only when the user asks, for example to update `docs/event/tracks.md` from new material. Otherwise use the summaries in `docs/event/`.
+`reference/` holds the original sponsor and MLH files that `docs/event/` summarises. Read a file there only when the user asks, for example to update `docs/event/tracks.md` from new material. Otherwise use the summaries in `docs/event/`.
 
 ## Project
 
@@ -43,11 +38,9 @@ How to write anything under `docs/` is in `docs/AGENTS.md`. Read it before creat
 - Record each decision the user makes or confirms in `docs/product.md`.
 - Update `docs/status.md` when a feature is built, mocked or cut, and when a change affects what it claims.
 
-## Agent skills and tools
+## Agent skills
 
-- Skills live in `.agents/skills/`, one folder each. `.claude/skills` is a symlink to `../.agents/skills`, so Claude Code and Codex read the same files. Edit skills only at the real path.
-- Load the `frontend-design` skill before UI work. It is vendored from Anthropic's `claude-plugins-official` marketplace, under the Apache 2.0 licence in its folder.
-- Both agents get the same Playwright MCP server, configured in `.mcp.json` for Claude Code and `.codex/config.toml` for Codex. It runs with `--isolated`, so each session gets its own in-memory browser profile and several agents on one machine don't share one.
+Load the `frontend-design` skill before UI work. It is vendored from Anthropic's `claude-plugins-official` marketplace, under the Apache 2.0 licence in its folder.
 
 ## Frontend work
 
@@ -92,6 +85,6 @@ A teammate may run several agent sessions in parallel in one checkout, so a chan
 
 ## Secrets and code quality
 
-- Never print or disclose secret values; check only whether a key exists. Never open `.env` files; only `.env.example` may be read. `.gitignore` excludes `.env*` except `.env.example`.
+- Never print or disclose secret values; check only whether a key exists. Never open `.env` files; only `.env.example` may be read.
 - Avoid type, lint and framework suppression directives. An unavoidable one comes with an explanation.
 - Comments describe the code as it stands, and appear only for non-obvious rationale, constraints or gotchas.
