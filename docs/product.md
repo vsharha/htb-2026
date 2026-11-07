@@ -2,7 +2,15 @@
 
 ## What it is
 
-TODO: what the product is, who it is for, and what sets it apart. Written once the team has chosen a direction.
+The ad channel mispricing finder tells a startup where to advertise to reach its customers for less than the channels its competitors crowd into. A startup fills in a short form about its product, customer, budget and markets. It gets back a ranked list of specific placements, such as a particular airport's jet bridges, a students' union's media pack or a niche newsletter. Each comes with a real price and contact, a cost comparison against Meta, a way to measure results, and a drafted enquiry to the seller.
+
+It is for startups that want customers beyond Meta and Google but have no media agency and a limited budget.
+
+Three things set it apart from AI media planners and ad marketplaces:
+
+- It discovers placements for each startup instead of choosing from a fixed catalogue, and it leaves out channels the startup's competitors already buy.
+- It ranks placements by cost per thousand attentive seconds weighted by audience value, not by cost per thousand impressions. The source behind the idea shows the ranking flips: Berlin Brandenburg's jet bridges are about 9% dearer than Meta per impression but 2.78 times cheaper per attentive second, assuming four seconds of attention.
+- It checks every placement against a real rate card or contact, and marks it unverified when it can't find one.
 
 ## Decisions
 
