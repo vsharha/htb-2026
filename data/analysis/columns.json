@@ -1,0 +1,56 @@
+[
+  {
+    "name": "population",
+    "scaled": "population_scaled",
+    "description": "number of residents",
+    "measures": "lives"
+  },
+  {
+    "name": "median_age",
+    "scaled": "median_age_scaled",
+    "description": "median age of residents; higher means older",
+    "measures": "lives"
+  },
+  {
+    "name": "median_household_income",
+    "scaled": "median_household_income_scaled",
+    "description": "median household income of residents, capped at $250,001",
+    "measures": "lives"
+  },
+  {
+    "name": "per_capita_income",
+    "scaled": "per_capita_income_scaled",
+    "description": "income per resident",
+    "measures": "lives"
+  },
+  {
+    "name": "share_age_20_34",
+    "scaled": "share_age_20_34_scaled",
+    "description": "share of residents aged 20 to 34",
+    "measures": "lives"
+  },
+  {
+    "name": "share_degree",
+    "scaled": "share_degree_scaled",
+    "description": "share of residents aged 25 and over with a bachelor's degree or higher",
+    "measures": "lives"
+  },
+  {
+    "name": "share_income_150k",
+    "scaled": "share_income_150k_scaled",
+    "description": "share of households with income of $150,000 or more",
+    "measures": "lives"
+  },
+  {
+    "name": "share_college_students",
+    "scaled": "share_college_students_scaled",
+    "description": "share of residents enrolled in college",
+    "measures": "lives"
+  },
+  {
+    "name": "weekly_riders_nearby",
+    "scaled": "weekly_riders_nearby_scaled",
+    "description": "weekly subway riders at stations within a five-minute walk",
+    "measures": "passes"
+  }
+]
