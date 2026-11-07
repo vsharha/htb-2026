@@ -7,7 +7,7 @@ const providers = createProviderRegistry({ openai, gateway });
 type ModelId = `openai:${string}` | `gateway:${string}`;
 
 export const AI_MODELS = {
-  competitor: "openai:gpt-5-mini",
+  competitor: "openai:gpt-5.6-luna",
   audience: "gateway:typesafe-ai/jev",
 } as const satisfies { competitor: ModelId; audience: `gateway:${string}` };
 

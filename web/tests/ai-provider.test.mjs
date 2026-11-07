@@ -27,8 +27,8 @@ function withEnvironment(values, run) {
 
 test("model defaults resolve through the SDK registry and ignore environment model overrides", () => {
   withEnvironment({ OPENAI_COMPETITOR_MODEL: "not-a-model", COMPETITOR_MODEL: "not-a-model", AUDIENCE_MODEL: "not-a-model" }, () => {
-    assert.equal(AI_MODELS.competitor, "openai:gpt-5-mini");
-    assert.equal(getCompetitorAI().model.modelId, "gpt-5-mini");
+    assert.equal(AI_MODELS.competitor, "openai:gpt-5.6-luna");
+    assert.equal(getCompetitorAI().model.modelId, "gpt-5.6-luna");
     assert.equal(getAudienceModel().modelId, "typesafe-ai/jev");
   });
 });
@@ -38,7 +38,7 @@ test("switching an OpenAI model keeps the compatible hosted search setup", () =>
   assert.equal(research.model.modelId, "another-model");
   assert.equal(research.tools.web_search.id, "openai.web_search");
   assert.equal(research.providerOptions.openai.store, false);
-  assert.throws(() => getCompetitorAI("gateway:openai/gpt-5-mini"), /no search adapter/);
+  assert.throws(() => getCompetitorAI("gateway:openai/gpt-5.6-luna"), /no search adapter/);
 });
 
 test("credentials are checked separately for research and audience scoring", () => {
