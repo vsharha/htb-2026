@@ -42,16 +42,7 @@ LLM calls and AI agents go through the Vercel AI SDK (`ai` plus a provider packa
 
 `next dev` writes `web/AGENTS.md`, which points agents to the version-matched Next.js docs in `web/node_modules/next/dist/docs/`.
 
-The data-gathering scripts are a Python 3.14 uv project in `pipeline/`, with code in `pipeline/src/pipeline/`. Python 3.14 rather than 3.15 because data libraries can lag in publishing wheels for a new Python release. Scripts write to two places under `data/`, named by source:
-
-- `data/raw/<source>/`: large gathered data, such as full downloads and scrape results. Git ignores everything in `data/raw/`, so a script must be able to re-create it.
-- `data/<source>/`: the outputs the web app and demo use, committed to Git. Keep each output small, under a few MB.
-
-A script for CAA data is `pipeline/src/pipeline/caa.py`, keeps its downloads in `data/raw/caa/`, and writes its outputs to `data/caa/`. Run commands from `pipeline/`:
-
-- `uv run python -m pipeline.<script>`: run one script
-- `uv add <package>`: add a dependency
-- `uv run ruff check` and `uv run ruff format --check`: the checks to run before each commit
+The data-gathering scripts are a Python project in `tools/`. Read `tools/AGENTS.md` before working on them or on the data they write to `data/`.
 
 ## Docs
 
