@@ -92,18 +92,13 @@ export function BriefForm({
         </span>
       </p>
 
-      <div className="flex flex-col gap-3">
-        <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
-          Maps all five boroughs
-        </p>
-        <ul className="flex flex-wrap gap-2">
-          {CITIES[0].areas.map((area) => (
-            <li key={area} className="rounded-full border-2 border-foreground/15 px-4 py-1.5 text-sm font-medium text-foreground/70">
-              {area}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ul aria-label="Boroughs mapped" className="flex flex-wrap gap-2">
+        {CITIES[0].areas.map((area) => (
+          <li key={area} className="rounded-full border-2 border-foreground/15 px-4 py-1.5 text-sm font-medium text-foreground/70">
+            {area}
+          </li>
+        ))}
+      </ul>
 
       <div className="flex flex-wrap items-center gap-4">
         <Button type="submit" disabled={busy} className="h-12 gap-2 rounded-full px-6 text-base">
