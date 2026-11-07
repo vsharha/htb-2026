@@ -14,9 +14,3 @@ export function tractLabel(geoid: string) {
   const tract = Number(geoid.slice(5)) / 100;
   return `Tract ${tract}, ${borough}`;
 }
-
-export function topTracts(scores: Record<string, number>, n: number) {
-  return Object.entries(scores)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, n);
-}

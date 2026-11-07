@@ -1,16 +1,12 @@
 "use client";
 
-import type { AgentEvent, AudienceFit, Placement } from "@/lib/contract";
-import { tractLabel, topTracts } from "@/lib/tracts";
-import { cn } from "@/lib/utils";
+import { useMemo } from "react";
 
-export type RunState = {
-  fit: AudienceFit | null;
-  events: AgentEvent[];
-  agentDone: boolean;
-  placements: Placement[] | null;
-  error: string | null;
-};
+import { MapPanel } from "@/components/map-panel";
+import { campaignsOf, type RunState } from "@/components/use-audience-run";
+import { computeLayers, strongest } from "@/lib/gap";
+import { tractLabel } from "@/lib/tracts";
+import { cn } from "@/lib/utils";
 
 /** The heatmap's colour for a score from 0 to 1. */
 export function heatColor(score: number) {
@@ -36,8 +32,12 @@ function Pending({ children }: { children: React.ReactNode }) {
 
 export function RunResults({ run }: { run: RunState }) {
   const weights = run.fit?.weights.filter((w) => w.weight > 0).sort((a, b) => b.weight - a.weight);
-  const campaigns = run.events.filter((e) => e.type === "campaign");
+  const campaigns = useMemo(() => campaignsOf(run.events), [run.events]);
   const competitors = run.events.filter((e) => e.type === "competitor");
+  const layers = useMemo(
+    () => (run.shapes && run.fit ? computeLayers(run.shapes, run.fit, campaigns) : null),
+    [run.shapes, run.fit, campaigns],
+  );
 
   return (
     <div className="flex flex-col gap-12">
@@ -46,6 +46,8 @@ export function RunResults({ run }: { run: RunState }) {
           The run stopped: {run.error}
         </p>
       )}
+
+      <MapPanel shapes={run.shapes} layers={layers} campaigns={campaigns} placements={run.placements} />
 
       <div className="grid gap-12 lg:grid-cols-3">
         <Panel title="Who we looked for">
@@ -70,22 +72,23 @@ export function RunResults({ run }: { run: RunState }) {
           )}
         </Panel>
 
-        <Panel title="Strongest audience areas">
-          {!run.fit ? (
+        <Panel title="Biggest gaps">
+          {!layers ? (
             <Pending>Scoring 2,324 census tracts…</Pending>
           ) : (
             <ol className="flex flex-col">
-              {topTracts(run.fit.scores, 10).map(([geoid, score]) => (
+              {strongest(layers, "gap", 10).map((geoid) => (
                 <li key={geoid} className="flex items-center gap-3 border-b border-border py-2 text-sm">
-                  <span className="size-3 shrink-0 rounded-full" style={{ background: heatColor(score) }} />
+                  <span className="size-3 shrink-0 rounded-full" style={{ background: heatColor(layers[geoid].gap) }} />
                   <span className="flex-1">{tractLabel(geoid)}</span>
                   <span className="font-mono text-xs tabular-nums text-muted-foreground">
-                    top {Math.max((1 - score) * 100, 0.1).toFixed(1)}%
+                    {layers[geoid].gap.toFixed(2)}
                   </span>
                 </li>
               ))}
             </ol>
           )}
+          {layers && !run.agentDone && <Pending>Updating as competitors&rsquo; ads are found…</Pending>}
         </Panel>
 
         <Panel title="Where competitors advertise">
