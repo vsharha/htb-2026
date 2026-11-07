@@ -20,9 +20,9 @@ The same project can be entered into any number of these tracks, and can win mor
 ## G-Research: Make the invisible visible
 
 - Prizes: 1st Nintendo Switch 2s. No other places listed.
-- Source: `reference/tracks/g-research/brief.txt`
+- Source: `reference/tracks/g-research/` (challenge and stand slides)
 - Brief: choose something that's hard to observe and show what data about it is hidden, how to find it, and what can be done with it. Teams can build tools to collect their own data or dig into public data. Examples given: your own sleep or study habits, how a music genre changes over time, a market's mood.
-- Judging notes: none given beyond the brief's three questions: what is hidden, how it is found, and what it enables.
+- Judging notes: none given beyond the brief's three questions: what is hidden, how it is found, and what it enables. The slides point teams to the G-Research stand for more detail.
 
 ## JetBrains: Help the Developer
 
