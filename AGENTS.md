@@ -31,10 +31,12 @@ Stack, commands and layout: TODO once chosen.
 
 ## Docs
 
-How to write anything under `docs/` is in `docs/AGENTS.md`. Read it before creating or editing a file there. Keep the product docs current without being asked:
+How to write anything under `docs/` is in `docs/AGENTS.md`. Read it before creating or editing a file there. Brainstorm product direction with the user before building features.
 
-- Brainstorm product direction with the user and record it before building features.
-- Record each idea raised while brainstorming in `docs/ideas/`.
+Never record an idea in `docs/ideas/` unasked, whoever raised it. Once an idea has been explored, ask the user whether to record it, and record it only if they agree.
+
+Keep the other product docs current without being asked:
+
 - Record each decision the user makes or confirms in `docs/product.md`.
 - Update `docs/status.md` when a feature is built, mocked or cut, and when a change affects what it claims.
 

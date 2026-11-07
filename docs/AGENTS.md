@@ -24,10 +24,11 @@ Agents keep these current without being asked.
 
 ## Ideas
 
-`ideas/` holds candidate product ideas from brainstorming, one file per idea, named in kebab case after the idea (`ad-channel-mispricing.md`). An idea is not a decision. Anyone may add or edit one without approval.
+`ideas/` holds candidate product ideas from brainstorming, one file per idea, named in kebab case after the idea (`ad-channel-mispricing.md`). An idea is not a decision. Idea files are not among the shared files that need approval in the root `AGENTS.md`.
 
-- Record an idea when the user or a teammate raises it while brainstorming. An idea an agent proposes is recorded only if the user asks, and its Origin says so.
-- When an idea is compared with another, give the other its own file and link to it rather than describing it inline.
+- Record an idea only after it has been explored and the user agrees to record it. This holds whether the user, a teammate or an agent raised it. An idea counts as explored once its track fit, open problems and demo scope have been discussed, which is what its file needs. At that point, ask the user whether to record it.
+- Origin says who raised the idea, including when an agent did.
+- When an idea is compared with another, link to the other's file rather than describing it inline. If the other has no file yet, describe it briefly and offer to record it once it has been explored.
 - When the user chooses an idea, set its status to chosen and record the decision in `product.md`. When an idea is dropped or merged into another, set its status and reason; never delete the file, because the reasons stay useful.
 - Judge track fit against the judging notes in `event/tracks.md`, not the track title alone.
 
