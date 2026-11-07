@@ -5,6 +5,8 @@ The web app is a Next.js 16 project (App Router, TypeScript, Tailwind CSS 4, ESL
 - `pnpm dev`: dev server on http://localhost:3000
 - `pnpm lint`, `pnpm typecheck` and `pnpm build`: the checks to run before each commit
 
+Copy `.env.example` to `.env.local` and fill it in before running the app. It lists the AI Gateway key that Jev's audience scoring needs; without it, scoring falls back to keyword matching.
+
 ## Next.js version
 
 Next.js 16 has breaking changes from earlier versions in APIs, conventions and file structure, so code written from memory of Next.js 15 or older may not work. Before writing routing, data-fetching, caching or config code, read the relevant guide in `node_modules/next/dist/docs/`, which matches the installed version. Breaking changes from 15 are listed in `node_modules/next/dist/docs/01-app/02-guides/upgrading/version-16.md`.
