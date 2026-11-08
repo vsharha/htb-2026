@@ -139,10 +139,13 @@
   animation: results-expand 1200ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Runs the reveal backwards; reverse also mirrors the easing. */
+/*
+ * The reveal's keyframes backwards. The curve is not the reveal's mirrored,
+ * which would leave the sheet barely moving for the first half second.
+ */
 .results-collapse {
   overflow: hidden;
-  animation: results-expand 1200ms cubic-bezier(0.22, 1, 0.36, 1) reverse both;
+  animation: results-expand 700ms cubic-bezier(0.6, 0, 0.67, 0.4) reverse both;
 }
 
 @keyframes heat-glow-drift {
