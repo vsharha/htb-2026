@@ -3,6 +3,7 @@
 import { Settings as SettingsIcon } from "lucide-react";
 import { useState } from "react";
 
+import { ModeToggle } from "@/components/mode-toggle";
 import { PALETTES, paletteTheme, updateSettings, useSettings, type PaletteId } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +14,7 @@ import { cn } from "@/lib/utils";
  */
 export function SettingsMenu() {
   const [open, setOpen] = useState(false);
-  const { corners, palette, heat, cost, mode, dark } = useSettings();
+  const { corners, palette, heat, cost, dark } = useSettings();
 
   return (
     <div className="fixed right-5 bottom-5 z-50 flex flex-col items-end gap-2">
@@ -26,29 +27,10 @@ export function SettingsMenu() {
           <h2 className="font-heading text-base font-semibold">Settings</h2>
           <p className="text-xs text-muted-foreground">Experimental interface options, saved in this browser.</p>
 
-          <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-sm">
-            <input
-              type="checkbox"
-              checked={dark}
-              onChange={(e) => updateSettings({ mode: e.target.checked ? "dark" : "light" })}
-              className="mt-0.5 size-4 accent-[var(--tab-active)]"
-            />
-            <span>
-              Night mode
-              <span className="block text-xs text-muted-foreground">
-                {mode === "system" ? "Following the system setting." : "Chosen for this browser."}
-              </span>
-            </span>
-          </label>
-          {mode !== "system" && (
-            <button
-              type="button"
-              onClick={() => updateSettings({ mode: "system" })}
-              className="mt-1 cursor-pointer text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
-            >
-              Follow the system setting again
-            </button>
-          )}
+          <div className="mt-4 flex items-center justify-between gap-3 text-sm">
+            <span>Night mode</span>
+            <ModeToggle />
+          </div>
 
           <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-sm">
             <input
