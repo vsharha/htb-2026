@@ -1,0 +1,37 @@
+{
+  "cli_version": "0.13.1",
+  "checkpoint_id": "01M6X1NK74X58DTVM32G3ACQFK",
+  "session_id": "ses_e45e5eae0ffeysk34Hv5cIdZEe",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-08T07:41:23.08775623Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "web/src/components/run-results.tsx"
+  ],
+  "agent": "OpenCode",
+  "model": "",
+  "turn_id": "1029e8036d85",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 18039,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 70016,
+    "output_tokens": 1075,
+    "api_call_count": 8
+  },
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
