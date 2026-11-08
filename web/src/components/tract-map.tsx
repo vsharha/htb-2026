@@ -13,7 +13,7 @@ import type { MapFocus } from "@/components/use-map-focus";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
-import { PALETTES, useSettings, type Heat } from "@/lib/settings";
+import { PALETTES, useSettings, type Heat, type HeatStyle } from "@/lib/settings";
 import { tractCode, tractName } from "@/lib/tracts";
 
 // MapLibre looks for its worker next to its own module, where the bundler
@@ -40,7 +40,16 @@ function rgb(hex: string) {
   return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
 }
 
-function heatRamp(id: LayerId, layers: TractLayers | null, heat: Heat): ExpressionSpecification {
+function heatRamp(id: LayerId, layers: TractLayers | null, heat: Heat, style: HeatStyle): ExpressionSpecification {
+  if (style === "classic") {
+    // The earlier ramp: fixed score stops, so every tract is tinted by its score.
+    return [
+      "interpolate", ["linear"], ["get", id],
+      0, `rgba(${rgb(heat.mid)}, 0.1)`,
+      0.5, `rgba(${rgb(heat.mid)}, 0.45)`,
+      1, `rgba(${rgb(heat.hot)}, 0.75)`,
+    ];
+  }
   const values = Object.values(layers ?? {}).map((t) => t[id]);
   // Before any scores arrive there is nothing to rank, so the map stays faded.
   const sorted = (values.length ? values : [0, 1]).sort((a, b) => a - b);
@@ -87,7 +96,7 @@ export function TractMap({
   focus: MapFocus;
   campaignFocus: MapFocus;
 }) {
-  const { palette } = useSettings();
+  const { palette, heat: heatStyle } = useSettings();
   const map = useRef<MapRef>(null);
 
   // A click on a placement or campaign row brings its marker into view.
@@ -150,7 +159,7 @@ export function TractMap({
     >
       <NavigationControl position="top-right" showCompass={false} />
       <Source id="tracts" type="geojson" data={tracts}>
-        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer, layers, PALETTES[palette].heat), "fill-opacity": showTracts ? 1 : 0 }} />
+        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer, layers, PALETTES[palette].heat, heatStyle), "fill-opacity": showTracts ? 1 : 0 }} />
         <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.3, "line-opacity": showTracts ? 0.6 : 0 }} />
       </Source>
       {layer !== "fit" &&

@@ -6,7 +6,14 @@ import { LAYERS } from "@/components/layer-tabs";
 import type { MapFocus } from "@/components/use-map-focus";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
+import { useSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
+
+// The legend bar draws the same ramp as the map for each heat style.
+const FADE_LEGEND =
+  "linear-gradient(to right, transparent 0%, color-mix(in oklch, var(--heat-mid) 3%, transparent) 40%, color-mix(in oklch, var(--heat-mid) 50%, transparent) 65%, color-mix(in oklch, var(--heat-hot) 85%, transparent))";
+const CLASSIC_LEGEND =
+  "linear-gradient(to right, color-mix(in oklch, var(--heat-mid) 10%, transparent), color-mix(in oklch, var(--heat-mid) 45%, transparent), color-mix(in oklch, var(--heat-hot) 75%, transparent))";
 
 // MapLibre needs the browser's WebGL, so the map is never rendered on the server.
 const TractMap = dynamic(() => import("@/components/tract-map").then((m) => m.TractMap), {
@@ -46,6 +53,7 @@ export function MapPanel({
 }) {
   const audienceOnly = recommendationLayer(campaigns) === "fit";
   const current = LAYERS.find((l) => l.id === layer)!;
+  const { heat: heatStyle } = useSettings();
   const showCampaigns = layer !== "fit";
   // Placements show on every layer that lists them; Customers lists them only without a Gap tab.
   const showPlacements = showCampaigns || audienceOnly;
@@ -65,7 +73,7 @@ export function MapPanel({
           <>
             <div
               className="h-2 rounded-full"
-              style={{ background: "linear-gradient(to right, transparent 0%, color-mix(in oklch, var(--heat-mid) 3%, transparent) 40%, color-mix(in oklch, var(--heat-mid) 50%, transparent) 65%, color-mix(in oklch, var(--heat-hot) 85%, transparent))" }}
+              style={{ background: heatStyle === "classic" ? CLASSIC_LEGEND : FADE_LEGEND }}
             />
             <div className="mt-1.5 flex justify-between gap-3 text-xs text-muted-foreground">
               <span>{current.low}</span>

@@ -8,9 +8,11 @@ import { useSyncExternalStore } from "react";
 
 export type Corners = "rounded" | "sharp";
 export type PaletteId = "default" | "blue" | "purple" | "teal";
-export type Settings = { corners: Corners; palette: PaletteId };
+/** "fade" keeps the weakest 65% of tracts nearly clear; "classic" is the earlier ramp that tints every tract by its score. */
+export type HeatStyle = "fade" | "classic";
+export type Settings = { corners: Corners; palette: PaletteId; heat: HeatStyle };
 
-const DEFAULTS: Settings = { corners: "rounded", palette: "default" };
+const DEFAULTS: Settings = { corners: "rounded", palette: "default", heat: "fade" };
 const STORAGE_KEY = "placewise-settings";
 
 /** The heatmap's colours, which the map needs as plain values rather than CSS variables. */
@@ -130,6 +132,7 @@ function load() {
     current = {
       corners: saved.corners === "sharp" ? "sharp" : "rounded",
       palette: saved.palette in PALETTES ? saved.palette : "default",
+      heat: saved.heat === "classic" ? "classic" : "fade",
     };
   } catch {
     current = DEFAULTS;

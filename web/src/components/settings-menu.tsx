@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  */
 export function SettingsMenu() {
   const [open, setOpen] = useState(false);
-  const { corners, palette } = useSettings();
+  const { corners, palette, heat } = useSettings();
 
   return (
     <div className="fixed right-5 bottom-5 z-50 flex flex-col items-end gap-2">
@@ -35,6 +35,21 @@ export function SettingsMenu() {
             <span>
               Sharp corners
               <span className="block text-xs text-muted-foreground">Every border radius becomes 1px. Unchecked, corners are rounded.</span>
+            </span>
+          </label>
+
+          <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
+              checked={heat === "fade"}
+              onChange={(e) => updateSettings({ heat: e.target.checked ? "fade" : "classic" })}
+              className="mt-0.5 size-4 accent-foreground"
+            />
+            <span>
+              Fade weak tracts
+              <span className="block text-xs text-muted-foreground">
+                On: only the strongest third of tracts glow. Off: the earlier ramp, where every tract is tinted by its score.
+              </span>
             </span>
           </label>
 
