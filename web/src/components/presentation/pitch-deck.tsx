@@ -199,7 +199,7 @@ function ProblemSlide() {
   );
 }
 
-type PipelineNode = { name: string; detail: string; x: number; y: number };
+type PipelineNode = { name: string; detail: ReactNode; x: number; y: number };
 
 /**
  * Box positions inside the 1118 x 320 diagram, in pixels. The connector paths
@@ -207,9 +207,13 @@ type PipelineNode = { name: string; detail: string; x: number; y: number };
  * moving its paths.
  */
 const pipelineNodes: PipelineNode[] = [
-  { name: "Your brief", detail: "Startup, customer and budget", x: 0, y: 100 },
-  { name: "Audience fit", detail: "Census, jobs and subway data", x: 299, y: 0 },
-  { name: "Competitors", detail: "Agent finds their outdoor ads", x: 299, y: 200 },
+  { name: "Your prompt", detail: "Startup, customer and budget", x: 0, y: 100 },
+  { name: "Audience fit", detail: "System 1 classifier on census, jobs and subway data", x: 299, y: 0 },
+  { name: "Competitors", detail: (
+      <>
+        <span className="font-bold text-heat-hot">Agent</span> finds their outdoor ads
+      </>
+    ), x: 299, y: 200 },
   { name: "Gap", detail: "Strong audience, no competitor ads", x: 598, y: 100 },
   { name: "Placements", detail: "Up to 12 kiosks and bus shelters to buy", x: 898, y: 100 },
 ];
