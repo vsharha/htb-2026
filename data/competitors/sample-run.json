@@ -1,14 +1,14 @@
 {
-  "recordedAt": "2026-11-07T22:46:48.363077+00:00",
+  "recordedAt": "2026-11-08T08:16:26.902Z",
   "brief": {
-    "industry": "Fintech",
-    "description": "a budgeting app for shared flats",
-    "targetCustomer": "young professionals in tech who rent with roommates",
+    "industry": "Consumer app",
+    "description": "a dating app for people looking for a serious relationship",
+    "targetCustomer": "single professionals in their late twenties and thirties living in Manhattan and Brooklyn",
     "customerPays": {
-      "amount": 12,
+      "amount": 30,
       "per": "month"
     },
-    "monthlyBudget": 3000,
+    "monthlyBudget": 8000,
     "city": "new-york",
     "markets": [
       "Manhattan",
@@ -21,62 +21,588 @@
   "events": [
     {
       "type": "step",
-      "message": "Finding competitors and researching their New York outdoor campaigns"
+      "message": "Finding brands that advertise outdoors to this customer; each then gets its own placement search"
     },
     {
       "type": "step",
-      "message": "Searching: Splitwise advertising New York outdoor campaign subway billboard 2023 2024; Splitwise New York subway ad campaign Splitwise billboard Times Square; Tricount advertising New York campaign; Zently roommate app advertising New York billboard campaign; Venmo advertising New York subway campaign roommate budgeting ad"
+      "message": "Searching: \"serious relationship dating app\" \"subway ads\" NYC 2026; \"dating app for professionals\" NYC billboard subway campaign; dating app New York out-of-home campaign subway billboard bus shelter 2025 2026; site:outfront.com New York dating app advertising campaign OR site:intersection.com dating app New York OR site:jcdecaux.com dating app New York"
     },
     {
       "type": "step",
-      "message": "Searching: Splitwise about split expenses roommates app Splitwise about page; Tricount split bills app roommates about Tricount website; Settle Up app split bills roommates 'Settle Up' app website"
+      "message": "Reading www.outfront.com"
     },
     {
       "type": "competitor",
       "competitor": {
-        "name": "Splitwise",
-        "reason": "Widely used expense-splitting app explicitly for roommates and shared housing; targets users splitting rent and household bills.",
-        "sourceUrl": "https://www.splitwise.com/about",
-        "website": "https://splitwise.com"
+        "name": "Hinge",
+        "reason": "Dating app positioned around meaningful, real-life relationships; OUTFRONT documents its 2026 New York City Subway campaign and describes real couples who met on the app.",
+        "sourceUrl": "https://www.outfront.com/blog/hinge-no-ordinary-love-campaign-celebrates-real-life-connection",
+        "website": "https://hinge.co"
       }
-    },
-    {
-      "type": "step",
-      "message": "Searching: Tricount about 'tricount' roommates split bills 'about' 'tricount.com'; Settle Up app about 'Settle Up' split bills roommates 'settleup' website"
     },
     {
       "type": "competitor",
       "competitor": {
-        "name": "Tricount",
-        "reason": "Expense-splitting app used by roommates to split groceries, utilities and rent; demonstrated in Tricount blog and help pages.",
-        "sourceUrl": "https://tricount.com/blog/how-pierre-uses-tricount",
-        "website": "https://tricount.com"
+        "name": "The League",
+        "reason": "Curated dating membership for people with shared ambition, closely matching serious-dating professionals; LBB reports its October 2026 New York billboard activation.",
+        "sourceUrl": "https://lbbonline.com/news/the-league-breaking-entering-s-nyc-billboard?edition=asia",
+        "website": "https://theleague.com"
       }
-    },
-    {
-      "type": "step",
-      "message": "Searching: Settle Up app official site 'Settle Up' split expenses 'settleup' 'settle-up' 'settleup app'; SettleUp expense splitting app website 'SettleUp' 'settle up' 'settleup.app'"
     },
     {
       "type": "competitor",
       "competitor": {
-        "name": "Settle Up",
-        "reason": "Expense-splitting app explicitly marketed for flatmates and group expenses (trips, flatmates) with official website and app store listings.",
-        "sourceUrl": "https://settleup.truelytech.com",
-        "website": "https://settleup.truelytech.com"
+        "name": "Tinder",
+        "reason": "Dating app competitor; AdQuick lists a named NYC August 2026 refresh campaign with billboard, bus-wrap and digital transit-shelter inventory.",
+        "sourceUrl": "https://www.adquick.com/campaigns/fd6ktpls09/plan?unit_slug=1619-broadway-ws-20ft-n-o-49th-st-f-s-000963",
+        "website": "https://tinder.com"
+      }
+    },
+    {
+      "type": "competitor",
+      "competitor": {
+        "name": "Cerca",
+        "reason": "Dating app designed for mutual connections and explicitly launched in New York City; its agency case study documents subway placements and street-level activations.",
+        "sourceUrl": "https://www.anvara.com/customers/cerca",
+        "website": "https://cercaapp.com"
+      }
+    },
+    {
+      "type": "competitor",
+      "competitor": {
+        "name": "Plenty of Fish",
+        "reason": "Dating app competitor; OUTFRONT documents its NYC subway takeover and reports app-install impact from the OOH campaign.",
+        "sourceUrl": "https://www.outfront.com/resources/ooh-case-studies/mta-network-plenty-of-fish",
+        "website": "https://pof.com"
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Hinge",
+        "title": "No Ordinary Love",
+        "kind": "subway",
+        "sourceUrl": "https://www.outfront.com/blog/hinge-no-ordinary-love-campaign-celebrates-real-life-connection",
+        "evidence": "OUTFRONT describes Hinge's No Ordinary Love campaign in the New York City Subway and says it featured real couples who met on Hinge; the source does not provide a specific station or explicit campaign dates.",
+        "location": null,
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": null,
+        "reach": "citywide"
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "The League",
+        "title": "New York billboard activation",
+        "kind": "billboard",
+        "sourceUrl": "https://lbbonline.com/news/the-league-breaking-entering-s-nyc-billboard?edition=asia",
+        "evidence": "LBB reports The League's New York billboard activation in October 2026; the source describes the campaign as a NYC billboard but does not provide a specific address.",
+        "location": null,
+        "station": null,
+        "startsOn": "2026-10-01",
+        "endsOn": "2026-10-31",
+        "coverage": "historical",
+        "mapLocation": null
       }
     },
     {
       "type": "step",
-      "message": "Searching: Splitwise billboard New York campaign 'Splitwise' billboard 'New York' 'Times Square'; Splitwise subway ad 'New York' 'subway' 'advertising'"
+      "message": "Locating Tinder's campaign: 1619 Broadway, Manhattan"
     },
     {
       "type": "step",
-      "message": "Searching: Splitwise billboard campaign New York 'Splitwise' 'billboard' 'advertising' 'NYC'; Has Splitwise advertised in New York 'Splitwise ad' 'Times Square'"
+      "message": "Locating Tinder's campaign: 49th Street and Broadway, Manhattan"
     },
     {
       "type": "step",
-      "message": "Research finished: 3 competitors and 0 campaign findings. Missing evidence remains unknown coverage."
+      "message": "Locating Tinder's campaign: 50th Street and Broadway, Manhattan"
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Tinder",
+        "title": "August 2026 NYC refresh campaign",
+        "kind": "other",
+        "sourceUrl": "https://www.adquick.com/campaigns/fd6ktpls09/plan?unit_slug=1619-broadway-ws-20ft-n-o-49th-st-f-s-000963",
+        "evidence": "AdQuick lists Tinder's August 2026 New York campaign plan using billboard, bus-wrap and digital transit-shelter inventory; the source identifies 1619 Broadway, west side, between 49th Street and 50th Street, Manhattan.",
+        "location": "1619 Broadway, Manhattan",
+        "station": null,
+        "startsOn": "2026-08-01",
+        "endsOn": "2026-08-31",
+        "coverage": "historical",
+        "mapLocation": {
+          "latitude": 40.7610907,
+          "longitude": -73.9844945,
+          "label": "1619 Broadway, Manhattan, New York, NY 10019, United States of America",
+          "precision": "address",
+          "source": "geoapify",
+          "attribution": "© OpenStreetMap contributors"
+        }
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Tinder",
+        "title": "August 2026 NYC refresh campaign",
+        "kind": "other",
+        "sourceUrl": "https://www.adquick.com/campaigns/fd6ktpls09/plan?unit_slug=1619-broadway-ws-20ft-n-o-49th-st-f-s-000963",
+        "evidence": "AdQuick lists Tinder's August 2026 New York campaign plan using billboard, bus-wrap and digital transit-shelter inventory; the source identifies 1619 Broadway, west side, between 49th Street and 50th Street, Manhattan.",
+        "location": "49th Street and Broadway, Manhattan",
+        "station": null,
+        "startsOn": "2026-08-01",
+        "endsOn": "2026-08-31",
+        "coverage": "historical",
+        "mapLocation": {
+          "latitude": 40.7608,
+          "longitude": -73.98451,
+          "label": "49 ST & BROADWAY, Manhattan",
+          "precision": "address",
+          "source": "street-centerline",
+          "attribution": "NYC Street Centerline (CSCL), NYC Open Data"
+        }
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Tinder",
+        "title": "August 2026 NYC refresh campaign",
+        "kind": "other",
+        "sourceUrl": "https://www.adquick.com/campaigns/fd6ktpls09/plan?unit_slug=1619-broadway-ws-20ft-n-o-49th-st-f-s-000963",
+        "evidence": "AdQuick lists Tinder's August 2026 New York campaign plan using billboard, bus-wrap and digital transit-shelter inventory; the source identifies 1619 Broadway, west side, between 49th Street and 50th Street, Manhattan.",
+        "location": "50th Street and Broadway, Manhattan",
+        "station": null,
+        "startsOn": "2026-08-01",
+        "endsOn": "2026-08-31",
+        "coverage": "historical",
+        "mapLocation": {
+          "latitude": 40.76143,
+          "longitude": -73.98405,
+          "label": "50 ST & BROADWAY, Manhattan",
+          "precision": "address",
+          "source": "street-centerline",
+          "attribution": "NYC Street Centerline (CSCL), NYC Open Data"
+        }
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Cerca",
+        "title": "NYC subway and street-level launch campaign",
+        "kind": "subway",
+        "sourceUrl": "https://www.anvara.com/customers/cerca",
+        "evidence": "Anvara's case study says Cerca used subway placements and street-level activations for its New York City launch; no specific station or campaign dates are given.",
+        "location": null,
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": null
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Plenty of Fish",
+        "title": "MTA network subway takeover",
+        "kind": "subway",
+        "sourceUrl": "https://www.outfront.com/resources/ooh-case-studies/mta-network-plenty-of-fish",
+        "evidence": "OUTFRONT documents a Plenty of Fish subway takeover across the MTA network and reports app-install impact; the source does not provide a specific station or campaign dates.",
+        "location": null,
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": null,
+        "reach": "citywide"
+      }
+    },
+    {
+      "type": "step",
+      "message": "Searching: \"app for serious relationships\" \"New York\" subway advertising; \"dating app for single professionals\" \"New York\" billboard; \"relationship-focused dating app\" NYC \"out of home\"; \"Manhattan and Brooklyn\" dating app campaign subway"
+    },
+    {
+      "type": "step",
+      "message": "Searching for Hinge's New York placements"
+    },
+    {
+      "type": "step",
+      "message": "Searching for The League's New York placements"
+    },
+    {
+      "type": "step",
+      "message": "Searching for Tinder's New York placements"
+    },
+    {
+      "type": "step",
+      "message": "Searching for Cerca's New York placements"
+    },
+    {
+      "type": "step",
+      "message": "Searching for Plenty of Fish's New York placements"
+    },
+    {
+      "type": "step",
+      "message": "Cerca: Searching: Cerca subway station NYC; Cerca billboard New York; Cerca station domination; Cerca campaign 2026"
+    },
+    {
+      "type": "step",
+      "message": "The League: Searching: The League subway station NYC; The League billboard New York 2026; The League station domination NYC; The League campaign site:outfront.com"
+    },
+    {
+      "type": "step",
+      "message": "Plenty of Fish: Searching: Plenty of Fish subway station NYC campaign billboard bus shelter; Plenty of Fish billboard New York OOH campaign; Plenty of Fish station domination NYC campaign; Plenty of Fish campaign 2026 NYC"
+    },
+    {
+      "type": "step",
+      "message": "Hinge: Searching: Hinge subway station NYC billboard campaign 2026; Hinge billboard New York subway station campaign; Hinge campaign 2026 New York City subway OUTFRONT; Hinge station domination New York"
+    },
+    {
+      "type": "step",
+      "message": "Tinder: Searching: Tinder subway station NYC campaign; Tinder billboard New York campaign 2026; Tinder campaign site:outfront.com New York"
+    },
+    {
+      "type": "step",
+      "message": "Cerca: Searching: site:anvara.com/customers/cerca Cerca subway placements street-level activations; \"Cerca\" dating app New York subway advertising; \"Cerca\" dating app billboard NYC; \"Cerca\" \"New York City\" campaign dating app"
+    },
+    {
+      "type": "step",
+      "message": "Hinge: Reading www.campaignlive.com"
+    },
+    {
+      "type": "step",
+      "message": "The League: Searching: \"The League\" \"New York\" billboard dating app; \"The League\" NYC advertising campaign; \"The League\" \"wild posting\" New York; \"The League\" LinkNYC"
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Plenty of Fish",
+        "title": "Gallery of D*ck Pics station domination",
+        "kind": "subway",
+        "sourceUrl": "https://oaaa.org/wp-content/uploads/2023/12/Redefining-Dating-Norms_MPA_2023_Final.pdf",
+        "evidence": "The OAAA case study says Plenty of Fish’s “Gallery of D*ck Pics” campaign ran in NYC from May 8 through June 6, 2023, using a major transit domination with signage on turnstiles, stairways, walkways and digital screens. It identifies the activation as a Manhattan subway station; OUTFRONT’s campaign coverage identifies that station as Broadway-Lafayette, where the ads occupied the station. The supplied station list’s exact name is Broadway-Lafayette St/Bleecker St.",
+        "location": "Broadway-Lafayette subway station, Manhattan",
+        "station": {
+          "id": "619",
+          "name": "Broadway-Lafayette St/Bleecker St (6,B,D,F,M)",
+          "borough": "Manhattan",
+          "latitude": 40.725605,
+          "longitude": -73.99543,
+          "weeklyRiders": 217060
+        },
+        "startsOn": "2023-05-08",
+        "endsOn": "2023-06-06",
+        "coverage": "historical",
+        "mapLocation": {
+          "latitude": 40.725605,
+          "longitude": -73.99543,
+          "label": "Broadway-Lafayette St/Bleecker St (6,B,D,F,M)",
+          "precision": "station",
+          "source": "station",
+          "attribution": "MTA subway station data"
+        }
+      }
+    },
+    {
+      "type": "step",
+      "message": "Locating The League's campaign: Columbus Circle, Manhattan"
+    },
+    {
+      "type": "step",
+      "message": "Locating The League's campaign: West 4th, Manhattan"
+    },
+    {
+      "type": "step",
+      "message": "Locating The League's campaign: Bedford Avenue, Brooklyn"
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Cerca",
+        "title": "CERCA rebrand outdoor rollout",
+        "kind": "subway",
+        "sourceUrl": "https://www.creativeboom.com/news/saint-urbain-rebrands-cerca-the-dating-app-built-on-mutuals-rather-than-strangers",
+        "evidence": "Creative Boom's February 25, 2026 report says the CERCA rebrand rollout used subway posters, and shows rebrand posters displayed on underground station tiles. No specific station, location, or campaign run dates are stated.",
+        "location": null,
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": null
+      }
+    },
+    {
+      "type": "step",
+      "message": "Tinder: Reading www.marketingbrew.com"
+    },
+    {
+      "type": "step",
+      "message": "Locating Tinder's campaign: Bedford Avenue, Brooklyn"
+    },
+    {
+      "type": "step",
+      "message": "Locating Tinder's campaign: Union Square, Manhattan"
+    },
+    {
+      "type": "step",
+      "message": "Locating Hinge's campaign: West Village, Manhattan"
+    },
+    {
+      "type": "step",
+      "message": "Locating Hinge's campaign: SoHo, Manhattan"
+    },
+    {
+      "type": "step",
+      "message": "Locating Hinge's campaign: Williamsburg, Brooklyn"
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Hinge",
+        "title": "Let's Be Real",
+        "kind": "billboard",
+        "sourceUrl": "https://www.globaldatinginsights.com/news/hinge-launches-new-billboard-ad-campaign-in-new-york-city",
+        "evidence": "Global Dating Insights reported on October 17, 2017 that Hinge launched a New York City billboard campaign using real responses to Hinge personality questions, with the tagline “Let’s be real.” The billboards were placed around the West Village, SoHo and Williamsburg.",
+        "location": "West Village, Manhattan",
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": {
+          "latitude": 40.7341857,
+          "longitude": -74.00558,
+          "label": "West Village, New York",
+          "precision": "area",
+          "source": "geoapify",
+          "attribution": "© OpenStreetMap contributors"
+        }
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Hinge",
+        "title": "Let's Be Real",
+        "kind": "billboard",
+        "sourceUrl": "https://www.globaldatinginsights.com/news/hinge-launches-new-billboard-ad-campaign-in-new-york-city",
+        "evidence": "Global Dating Insights reported on October 17, 2017 that Hinge launched a New York City billboard campaign using real responses to Hinge personality questions, with the tagline “Let’s be real.” The billboards were placed around the West Village, SoHo and Williamsburg.",
+        "location": "SoHo, Manhattan",
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": {
+          "latitude": 40.72288,
+          "longitude": -73.9987505,
+          "label": "SoHo, New York",
+          "precision": "area",
+          "source": "geoapify",
+          "attribution": "© OpenStreetMap contributors"
+        }
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Hinge",
+        "title": "Let's Be Real",
+        "kind": "billboard",
+        "sourceUrl": "https://www.globaldatinginsights.com/news/hinge-launches-new-billboard-ad-campaign-in-new-york-city",
+        "evidence": "Global Dating Insights reported on October 17, 2017 that Hinge launched a New York City billboard campaign using real responses to Hinge personality questions, with the tagline “Let’s be real.” The billboards were placed around the West Village, SoHo and Williamsburg.",
+        "location": "Williamsburg, Brooklyn",
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": {
+          "latitude": 40.714622,
+          "longitude": -73.95345,
+          "label": "Williamsburg, New York",
+          "precision": "area",
+          "source": "geoapify",
+          "attribution": "© OpenStreetMap contributors"
+        }
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Hinge",
+        "title": "Real Dating Profiles / Prompt Responses",
+        "kind": "other",
+        "sourceUrl": "https://ca.bmoutdoor.com/info/hinge-nyc-prompts",
+        "evidence": "BM Outdoor reported on June 4, 2026 that Hinge ran an OOH campaign across New York City featuring real user prompt responses on subway platforms and billboards. The source says the campaign appeared on billboards and subway platforms throughout New York City; it does not name specific stations or provide campaign run dates.",
+        "location": null,
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": null,
+        "reach": "citywide"
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "The League",
+        "title": "Goaldigger NYC OOH campaign",
+        "kind": "subway",
+        "sourceUrl": "https://www.linkedin.com/posts/kevin-hanlon-4884057_inside-the-leagues-goaldigger-campaign-activity-7115439508770148352-8Cq2",
+        "evidence": "A post summarizing the Goaldigger campaign says The League took over NYC with MTA subway station dominations at Columbus Circle, West 4th, and Bedford Ave, plus digital placements and wild postings. Using the supplied station list, these correspond to 59 St-Columbus Circle, W 4 St-Wash Sq, and Bedford Av. The source does not state campaign run dates.",
+        "location": "Columbus Circle, Manhattan",
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": {
+          "latitude": 40.7678499,
+          "longitude": -73.9823119,
+          "label": "Columbus Circle, Manhattan, New York, NY 10107, United States of America",
+          "precision": "area",
+          "source": "geoapify",
+          "attribution": "© OpenStreetMap contributors"
+        }
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "The League",
+        "title": "Goaldigger NYC OOH campaign",
+        "kind": "subway",
+        "sourceUrl": "https://www.linkedin.com/posts/kevin-hanlon-4884057_inside-the-leagues-goaldigger-campaign-activity-7115439508770148352-8Cq2",
+        "evidence": "A post summarizing the Goaldigger campaign says The League took over NYC with MTA subway station dominations at Columbus Circle, West 4th, and Bedford Ave, plus digital placements and wild postings. Using the supplied station list, these correspond to 59 St-Columbus Circle, W 4 St-Wash Sq, and Bedford Av. The source does not state campaign run dates.",
+        "location": "West 4th, Manhattan",
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": null,
+        "locationNote": "Several New York locations match; a more specific address is needed."
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "The League",
+        "title": "Goaldigger NYC OOH campaign",
+        "kind": "subway",
+        "sourceUrl": "https://www.linkedin.com/posts/kevin-hanlon-4884057_inside-the-leagues-goaldigger-campaign-activity-7115439508770148352-8Cq2",
+        "evidence": "A post summarizing the Goaldigger campaign says The League took over NYC with MTA subway station dominations at Columbus Circle, West 4th, and Bedford Ave, plus digital placements and wild postings. Using the supplied station list, these correspond to 59 St-Columbus Circle, W 4 St-Wash Sq, and Bedford Av. The source does not state campaign run dates.",
+        "location": "Bedford Avenue, Brooklyn",
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": null,
+        "locationNote": "Several New York locations match; a more specific address is needed."
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Tinder",
+        "title": "It Starts With a Swipe NYC subway campaign",
+        "kind": "subway",
+        "sourceUrl": "https://www.marketingbrew.com/stories/2023/05/08/why-dating-apps-are-using-the-subway-to-help-new-yorkers-find-love",
+        "evidence": "Marketing Brew reports that Tinder began its first subway campaign in March 2023, titled “It Starts With a Swipe,” and that ads could be seen at Bedford Avenue in Brooklyn and Union Square in Manhattan. The campaign featured diverse couples and taglines including “a toothbrush at their place” and “someone to go to heaven with.”",
+        "location": "Bedford Avenue, Brooklyn",
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": null,
+        "locationNote": "Several New York locations match; a more specific address is needed."
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Tinder",
+        "title": "It Starts With a Swipe NYC subway campaign",
+        "kind": "subway",
+        "sourceUrl": "https://www.marketingbrew.com/stories/2023/05/08/why-dating-apps-are-using-the-subway-to-help-new-yorkers-find-love",
+        "evidence": "Marketing Brew reports that Tinder began its first subway campaign in March 2023, titled “It Starts With a Swipe,” and that ads could be seen at Bedford Avenue in Brooklyn and Union Square in Manhattan. The campaign featured diverse couples and taglines including “a toothbrush at their place” and “someone to go to heaven with.”",
+        "location": "Union Square, Manhattan",
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": {
+          "latitude": 40.736812,
+          "longitude": -73.990653,
+          "label": "Union Square West, Manhattan, New York, NY 10003, United States of America",
+          "precision": "area",
+          "source": "geoapify",
+          "attribution": "© OpenStreetMap contributors"
+        }
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Tinder",
+        "title": "Tinder NYC static OOH campaign",
+        "kind": "billboard",
+        "sourceUrl": "https://www.linkedin.com/posts/pearl-media-llc._tinder-outofhome-swellshark-activity-7153465314423304193-r4QM",
+        "evidence": "Pearl Media posted that Tinder’s campaign was turning heads across NYC and dominating some of its static installations; the post identifies the formats as out-of-home and billboard, but does not name a specific location or campaign dates.",
+        "location": null,
+        "station": null,
+        "startsOn": null,
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": null,
+        "reach": "citywide"
+      }
+    },
+    {
+      "type": "campaign",
+      "campaign": {
+        "competitor": "Tinder",
+        "title": "The best part of Tinder isn’t on Tinder",
+        "kind": "other",
+        "sourceUrl": "https://www.adsoftheworld.com/campaigns/the-best-part-of-tinder-isn-t-on-tinder",
+        "evidence": "Ads of the World reports that Tinder’s “The best part of Tinder isn’t on Tinder” campaign included OOH and was rolling out in October 2026. The source does not specify a New York City placement or location, so this is recorded as an OOH campaign with no location claim.",
+        "location": null,
+        "station": null,
+        "startsOn": "2026-10-01",
+        "endsOn": null,
+        "coverage": "unknown",
+        "mapLocation": null
+      }
+    },
+    {
+      "type": "step",
+      "message": "Research complete: 5 competitors and 20 campaign findings. Missing evidence remains unknown coverage."
+    },
+    {
+      "type": "research",
+      "summary": {
+        "status": "complete",
+        "searches": 9,
+        "sources": 245,
+        "rejectedSources": 0,
+        "competitorsSearched": [
+          "Cerca",
+          "The League",
+          "Plenty of Fish",
+          "Hinge",
+          "Tinder"
+        ],
+        "competitorsCompleted": [
+          "Plenty of Fish",
+          "Cerca",
+          "Hinge",
+          "The League",
+          "Tinder"
+        ]
+      }
     },
     {
       "type": "done"

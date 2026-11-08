@@ -7,11 +7,11 @@ from urllib.request import Request, urlopen
 
 OUTPUT = Path(__file__).resolve().parents[4] / "data/competitors/sample-run.json"
 BRIEF = {
-    "industry": "Fintech",
-    "description": "a budgeting app for shared flats",
-    "targetCustomer": "young professionals in tech who rent with roommates",
-    "customerPays": {"amount": 12, "per": "month"},
-    "monthlyBudget": 3000,
+    "industry": "Consumer app",
+    "description": "a dating app for people looking for a serious relationship",
+    "targetCustomer": "single professionals in their late twenties and thirties living in Manhattan and Brooklyn",
+    "customerPays": {"amount": 30, "per": "month"},
+    "monthlyBudget": 8000,
     "city": "new-york",
     "markets": ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"],
 }

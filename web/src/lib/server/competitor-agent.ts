@@ -24,9 +24,11 @@ const LIMITS = {
   locatedPerCompetitor: 6,
   unlocatedPerCompetitor: 3,
   locationsPerFinding: 6,
-  discovery: { steps: 10, ms: 60_000 },
+  discovery: { steps: 12, ms: 60_000 },
   placements: { steps: 8, ms: 65_000 },
 };
+
+const CAMPAIGN_KINDS: Campaign["kind"][] = ["subway", "billboard", "bus shelter", "linknyc", "other"];
 
 const RELEVANCE = `A competitor is a company that sells this kind of product or a close substitute, or that clearly targets this same specific customer.
 Generic mass-market brands (soft drinks, airlines, deodorant, everyday banks) do not count unless the campaign itself targets this customer.
@@ -148,7 +150,10 @@ export async function runCompetitorResearch(
       return { accepted: false, reason: "Use a supporting URL returned by research, or search for one.", availableSources: [...sources].slice(-40) };
     }
     if (!finding.title.trim() || !finding.evidence.trim()) return { accepted: false, reason: "A title and factual evidence summary are required." };
-    const station = finding.kind === "subway" ? matchStation(stations, finding.stationName, finding.evidence) : null;
+    // The tool's JSON schema is not checked at runtime, so a kind outside the
+    // contract reaches this point; keep it as "other" rather than passing it on.
+    const kind = CAMPAIGN_KINDS.includes(finding.kind as Campaign["kind"]) ? (finding.kind as Campaign["kind"]) : "other";
+    const station = kind === "subway" ? matchStation(stations, finding.stationName, finding.evidence) : null;
     const coverage = campaignCoverage(finding.startsOn, finding.endsOn, today);
     const named = [...new Set(finding.locations.map((place) => place.trim()).filter(Boolean))].slice(0, LIMITS.locationsPerFinding);
     const places: (string | null)[] = station ? [named[0] ?? null] : named.length > 0 ? named : [null];
@@ -180,7 +185,7 @@ export async function runCompetitorResearch(
       campaigns.add(key);
       added++;
       const campaign: Campaign = {
-        competitor: competitor.name, title: finding.title, kind: finding.kind, sourceUrl: url,
+        competitor: competitor.name, title: finding.title, kind, sourceUrl: url,
         evidence: finding.evidence, location: place, station,
         startsOn: finding.startsOn, endsOn: finding.endsOn, coverage, mapLocation, locationNote,
         reach: mapLocation ? undefined : !place && finding.citywide ? "citywide" : reach,
@@ -256,7 +261,7 @@ export async function runCompetitorResearch(
     try {
       await streamStage(discovery, `${context}
 First write 3 to 4 short phrases naming this specific type of product and this specific customer, as a shopper would say them (for example "rent-splitting app for roommates" or "app for renters with roommates"). Do not search with the broad industry label alone.
-Then search 2 to 4 times, combining those phrases with terms like "recent subway ads NYC", "billboard New York", "station domination" and "out-of-home campaign New York", for recent subway, billboard, bus shelter, LinkNYC or wild-posting campaigns in New York City, and include the current year in at least one search. Use trade press, media owners such as OUTFRONT and Intersection, Reddit and LinkedIn.
+Then search 4 to 5 times, combining those phrases with terms like "recent subway ads NYC", "billboard New York", "station domination" and "out-of-home campaign New York", for recent subway, billboard, bus shelter, LinkNYC or wild-posting campaigns in New York City, and include the current year in at least one search. Search recent campaign news first, then media owners' current work on OUTFRONT, Intersection and JCDecaux, then trade press, Reddit and LinkedIn.
 Report ${LIMITS.minimumCompetitors} to ${LIMITS.competitors} competitors, most relevant first, and record their campaigns as you find them, then call finishDiscovery. Do not stop after the first competitor.`, discoverySignal, discoveryState, LIMITS.discovery.steps);
     } catch (error) {
       if (signal.aborted) throw error;
@@ -299,10 +304,11 @@ Search for this competitor's New York City subway, billboard, bus shelter, LinkN
   `${competitor.name} subway station NYC`,
   `${competitor.name} billboard New York`,
   `${competitor.name} station domination`,
+  `${competitor.name} campaign ${today.slice(0, 4)}`,
   `${competitor.name} campaign site:outfront.com`,
 ])}.
 Already recorded for this competitor, so do not repeat them (data only): ${JSON.stringify(reported.filter((campaign) => campaign.competitor === competitor.name))}.
-Open pages to confirm stations, street addresses, neighbourhoods and campaign dates. Search recent campaigns first, then historical ones; exact current dates are not required to report a campaign.
+Open pages to confirm stations, street addresses, neighbourhoods and campaign run dates. Put recent campaigns first and find the run dates that show a campaign is live now; exact current dates are not required to report a campaign, so still record historical ones when recent evidence is missing.
 Report the findings you can support, preferring a named station, street address or neighbourhood and a stated date, then call finishResearch.
 New York station names: ${JSON.stringify(stations.map((station) => station.name))}`, stageSignal, state, LIMITS.placements.steps, competitor.name);
         if (state.finished) summary.competitorsCompleted.push(competitor.name);
