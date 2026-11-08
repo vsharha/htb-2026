@@ -7,14 +7,14 @@ import { useSyncExternalStore } from "react";
 // one small store, read with useSettings().
 
 export type Corners = "rounded" | "sharp";
-export type PaletteId = "default" | "classic" | "blue" | "purple" | "navy";
+export type PaletteId = "classic" | "teal" | "blue" | "purple" | "navy";
 /** "fade" paints five percentile classes with the bottom half clear; "classic" is the earlier ramp that tints every tract by its score. */
 export type HeatStyle = "fade" | "classic";
 export type Settings = { corners: Corners; palette: PaletteId; heat: HeatStyle; cost: boolean };
 
-const DEFAULTS: Settings = { corners: "rounded", palette: "default", heat: "fade", cost: true };
+const DEFAULTS: Settings = { corners: "rounded", palette: "classic", heat: "fade", cost: true };
 // Bumped when the default palette changed, so saved choices do not hide it.
-const STORAGE_KEY = "placewise-settings-2";
+const STORAGE_KEY = "placewise-settings-3";
 
 /** The heatmap's colours, which the map needs as plain values rather than CSS variables. */
 export type Heat = { mid: string; hot: string };
@@ -37,11 +37,22 @@ export type Palette = {
 };
 
 export const PALETTES: Record<PaletteId, Palette> = {
+  classic: {
+    label: "Classic",
+    swatches: ["#eceff3", "#c9cfd8", "#2b59c3", "#f2b134", "#e0334f"],
+    heat: { mid: "#f2b134", hot: "#e0334f" },
+    ramp: ["#F7D58E", "#F2B134", "#EC7A3F", "#E0334F"],
+    accent: "#E0334F",
+    accentDark: "#A5192F",
+    ink3: "#8A929E",
+    tab: "#15171C",
+    vars: {},
+  },
   // Ink, border and background tokens with a teal ramp and a coral accent:
   // sidebar text is ink, and teal appears only in the map fill, the active
   // layer tab and the legend bar.
-  default: {
-    label: "Default",
+  teal: {
+    label: "Teal, coral",
     swatches: ["#EEF6F5", "#BFE0DC", "#7FC2BA", "#2F8F86", "#0B5450", "#F2603D"],
     heat: { mid: "#7FC2BA", hot: "#2F8F86" },
     ramp: ["#BFE0DC", "#7FC2BA", "#2F8F86", "#0B5450"],
@@ -71,17 +82,6 @@ export const PALETTES: Record<PaletteId, Palette> = {
       "--heat-mid": "#7FC2BA",
       "--heat-hot": "#2F8F86",
     },
-  },
-  classic: {
-    label: "Classic",
-    swatches: ["#eceff3", "#c9cfd8", "#2b59c3", "#f2b134", "#e0334f"],
-    heat: { mid: "#f2b134", hot: "#e0334f" },
-    ramp: ["#F7D58E", "#F2B134", "#EC7A3F", "#E0334F"],
-    accent: "#E0334F",
-    accentDark: "#A5192F",
-    ink3: "#8A929E",
-    tab: "#15171C",
-    vars: {},
   },
   blue: {
     label: "Blue, lime",
@@ -213,7 +213,7 @@ function load() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
     current = {
       corners: saved.corners === "sharp" ? "sharp" : "rounded",
-      palette: saved.palette in PALETTES ? saved.palette : "default",
+      palette: saved.palette in PALETTES ? saved.palette : DEFAULTS.palette,
       heat: saved.heat === "classic" ? "classic" : "fade",
       cost: saved.cost !== false,
     };
