@@ -237,7 +237,7 @@ function HowItWorksSlide() {
         the target customer implies each of 21 measures, like age, income, industry of work and subway traffic, and the app
         weights every census tract by them. Meanwhile a research agent finds competitors and searches for their subway ads
         and billboards in the city. Where high audience fit meets no observed competition, the app picks up to 12 kiosks and
-        bus shelters, spread at least 500 metres apart, each with a QR code, promo code or landing page to measure it.
+        bus shelters, spread at least 500 metres apart.
       </Notes>
     </Slide>
   );

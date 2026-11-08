@@ -7,7 +7,7 @@ function site(id, geoid, metresNorth, overrides = {}) {
     id, geoid, kind: "linknyc", address: id, borough: "Manhattan",
     latitude: 40.7 + metresNorth / 6_371_000 * 180 / Math.PI,
     longitude: -74, carriesAds: "yes", costPerAudienceMember: 0.02,
-    measurement: "QR code", ...overrides,
+    ...overrides,
   };
 }
 const query = (geoids, monthlyBudget = 5000) => ({ geoids, monthlyBudget });

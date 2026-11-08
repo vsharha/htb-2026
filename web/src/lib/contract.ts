@@ -139,7 +139,6 @@ export type Placement = {
   carriesAds: "yes" | "no" | "unknown";
   /** Estimated US dollars per target customer reached. */
   costPerAudienceMember: number;
-  measurement: "QR code" | "promo code" | "landing page";
 };
 
 export type PlacementQuery = {

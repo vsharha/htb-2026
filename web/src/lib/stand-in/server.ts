@@ -1,14 +1,12 @@
 "use server";
 
 // Stand-in for the placement Server Function. It reads the real kiosks and
-// shelters, but invents their costs, measurement methods and minimum spends.
+// shelters, but invents their costs and minimum spends.
 
 import type { Borough, Placement, PlacementQuery } from "@/lib/contract";
 import { selectPlacements } from "@/lib/placement-selection";
 
 import { delay, hashUnit, readAnalysisCsv } from "./data-files";
-
-const MEASUREMENTS: Placement["measurement"][] = ["QR code", "promo code", "landing page"];
 
 export async function findPlacements(query: PlacementQuery): Promise<Placement[]> {
   const rows = await readAnalysisCsv("nyc_placements.csv");
@@ -28,7 +26,6 @@ export async function findPlacements(query: PlacementQuery): Promise<Placement[]
         geoid: r.geoid,
         carriesAds: r.carries_ads as Placement["carriesAds"],
         costPerAudienceMember: Number((base * (0.6 + hashUnit(r.placement_id))).toFixed(3)),
-        measurement: MEASUREMENTS[Math.floor(hashUnit(r.placement_id + "m") * 3)],
       };
     });
 

@@ -136,7 +136,6 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
               {p.address} · {tractName(p.geoid)}
               <span className="ml-1.5 text-[10px] opacity-60">{tractCode(p.geoid)}</span>
             </span>
-            <span className="shrink-0">{p.measurement}</span>
           </span>
         </span>
       </button>
