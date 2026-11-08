@@ -60,6 +60,8 @@ export type AudienceFit = {
   weights: ColumnWeight[];
   /** Census tract GEOID to a score from 0 to 1. Tracts outside the brief's markets are absent. */
   scores: Record<string, number>;
+  /** Whether the decision model weighted the columns, and how long it took. */
+  stats?: { model: string; durationMs: number; inputTokens?: number };
   /** Which decision model weighted the columns, or the keyword fallback because neither could be reached. */
   source: "systemone" | "jev" | "keywords";
 };

@@ -112,6 +112,20 @@ function Pending({ children }: { children: React.ReactNode }) {
 }
 
 /**
+ * The wait while the self-hosted decision model scores every tract. The count
+ * shows the page is working, because CPU inference takes about a minute and a
+ * half and a still spinner reads as a hang.
+ */
+function Scoring() {
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setSeconds((s) => s + 1), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  return <Pending>Scoring 2,324 census tracts with the self-hosted model… {seconds}s</Pending>;
+}
+
+/**
  * The neighbourhoods holding the most tracts in the top 3% on a layer, with
  * how many each holds. Grouping by neighbourhood reads as places a marketer
  * knows, where a list of tracts reads as codes.
@@ -243,7 +257,7 @@ function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | n
     <>
       <Section title="Biggest observed gaps">
         {!layers ? (
-          <Pending>Scoring 2,324 census tracts…</Pending>
+          <Scoring />
         ) : (
           <NeighborhoodRanking layers={layers} layer="gap" />
         )}
@@ -269,7 +283,7 @@ function CustomersTab({ run, layers, focus, placements }: { run: RunState; layer
     <>
       <Section title="Most customers">
         {!layers ? (
-          <Pending>Scoring 2,324 census tracts…</Pending>
+          <Scoring />
         ) : (
           <NeighborhoodRanking layers={layers} layer="fit" />
         )}
@@ -281,6 +295,12 @@ function CustomersTab({ run, layers, focus, placements }: { run: RunState; layer
         {run.fit?.source === "keywords" && (
           <p className="text-xs text-muted-foreground">
             The decision model couldn&rsquo;t be reached, so these weights come from keywords in your target customer.
+          </p>
+        )}
+        {run.fit?.stats && (
+          <p className="text-xs text-muted-foreground">
+            {run.fit.stats.model} answered 21 traits in {(run.fit.stats.durationMs / 1000).toFixed(1)} s
+            {run.fit.stats.inputTokens ? ` from ${run.fit.stats.inputTokens.toLocaleString()} input tokens` : ""} on Vultr CPU.
           </p>
         )}
         {!weights ? (
