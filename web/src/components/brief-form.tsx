@@ -4,11 +4,62 @@ import type { FormEvent } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CITIES, INDUSTRIES, type Brief, type Industry } from "@/lib/contract";
 import { cn } from "@/lib/utils";
 
+// The select popups render in a portal, outside the sentence, so they repeat
+// its type size rather than inheriting it.
+const sentenceType = "font-heading text-[clamp(1.6rem,3.6vw,2.75rem)] font-medium tracking-tight";
+
 const blank =
   "max-w-full rounded-none border-0 [field-sizing:content] border-b-2 border-foreground/25 bg-transparent px-1 text-foreground outline-none transition-colors placeholder:text-foreground/30 hover:border-foreground/50 focus-visible:border-heat-cool focus-visible:bg-heat-cool/5";
+
+const trigger =
+  "inline-flex h-auto gap-1.5 py-0 pr-0.5 pl-1 text-[1em] cursor-pointer data-[size=default]:h-auto focus-visible:ring-0 data-placeholder:text-foreground/30 data-popup-open:border-heat-cool group-data-attempted/form:data-placeholder:border-heat-hot [&_svg]:size-[0.5em] [&_svg]:translate-y-[0.06em] [&_svg]:stroke-[2.5] [&_svg]:text-foreground/45";
+
+type Option = { value: string; label: string; disabled?: boolean };
+
+function BlankSelect({
+  name,
+  label,
+  options,
+  defaultValue = null,
+  placeholder,
+  required,
+}: {
+  name: string;
+  label: string;
+  options: Option[];
+  defaultValue?: string | null;
+  placeholder?: string;
+  required?: boolean;
+}) {
+  return (
+    <Select name={name} items={options} defaultValue={defaultValue} required={required}>
+      <SelectTrigger aria-label={label} className={cn(blank, trigger)}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent className={cn(sentenceType, "w-auto min-w-(--anchor-width) rounded-2xl p-1.5 shadow-xl ring-foreground/10")}>
+        {options.map((o) => (
+          <SelectItem key={o.value} value={o.value} disabled={o.disabled} className="rounded-xl py-[0.15em] pr-[1.4em] pl-[0.35em] text-[1em] leading-[1.4] [&_svg]:size-[0.5em] [&>span:last-child]:right-[0.4em] [&>span:last-child]:size-auto">
+            {o.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+const INDUSTRY_OPTIONS = INDUSTRIES.map((i) => ({ value: i, label: i.toLowerCase() }));
+const PER_OPTIONS = [
+  { value: "month", label: "month" },
+  { value: "purchase", label: "purchase" },
+];
+const CITY_OPTIONS: Option[] = [
+  ...CITIES.map((c) => ({ value: c.id, label: c.name })),
+  { value: "more", label: "more cities coming", disabled: true },
+];
 
 // Text inputs rather than type="number": they size to their content and have
 // no spinner arrows. `pattern` keeps the browser's validation.
@@ -40,6 +91,9 @@ export function BriefForm({
       onSubmit(SAMPLE_BRIEF);
       return;
     }
+    // A select's own input is hidden, so the browser's error bubble never shows
+    // for it; data-attempted underlines an unpicked select instead.
+    e.currentTarget.dataset.attempted = "";
     if (!e.currentTarget.reportValidity()) return;
 
     const city = CITIES.find((c) => c.id === data.get("city")) ?? CITIES[0];
@@ -58,16 +112,10 @@ export function BriefForm({
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-10">
-      <p className="font-heading text-[clamp(1.6rem,3.6vw,2.75rem)] leading-[1.55] font-medium tracking-tight text-balance">
+    <form noValidate onSubmit={handleSubmit} className="group/form flex flex-col gap-10">
+      <p className={cn(sentenceType, "leading-[1.55] text-balance")}>
         We&rsquo;re a{" "}
-        <label className="sr-only" htmlFor="industry">Industry</label>
-        <select id="industry" name="industry" required defaultValue="" className={cn(blank, "cursor-pointer pr-2 invalid:text-foreground/30 [&>option]:text-foreground")}>
-          <option value="" disabled>pick an industry</option>
-          {INDUSTRIES.map((i) => (
-            <option key={i} value={i}>{i.toLowerCase()}</option>
-          ))}
-        </select>{" "}
+        <BlankSelect name="industry" label="Industry" options={INDUSTRY_OPTIONS} placeholder="pick an industry" required />{" "}
         startup building{" "}
         <label className="sr-only" htmlFor="description">What the startup builds, in one sentence</label>
         <span className="whitespace-nowrap">
@@ -84,13 +132,8 @@ export function BriefForm({
           $<input id="pays" name="pays" {...money} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="12" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
         </span>{" "}
         per{" "}
-        <label className="sr-only" htmlFor="per">Paid per</label>
         <span className="whitespace-nowrap">
-          <select id="per" name="per" defaultValue="month" className={cn(blank, "cursor-pointer")}>
-            <option value="month">month</option>
-            <option value="purchase">purchase</option>
-          </select>
-          ,
+          <BlankSelect name="per" label="Paid per" options={PER_OPTIONS} defaultValue="month" />,
         </span>{" "}
         and we can spend{" "}
         <label className="sr-only" htmlFor="budget">Monthly advertising budget, in US dollars</label>
@@ -98,15 +141,8 @@ export function BriefForm({
           $<input id="budget" name="budget" {...money} pattern="[0-9]+" placeholder="3000" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
         </span>{" "}
         a month on ads in{" "}
-        <label className="sr-only" htmlFor="city">City</label>
         <span className="whitespace-nowrap">
-          <select id="city" name="city" defaultValue={CITIES[0].id} className={cn(blank, "cursor-pointer")}>
-            {CITIES.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-            <option disabled>more cities coming</option>
-          </select>
-          .
+          <BlankSelect name="city" label="City" options={CITY_OPTIONS} defaultValue={CITIES[0].id} />.
         </span>
       </p>
 
