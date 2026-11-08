@@ -4,6 +4,7 @@ import { PencilLine } from "lucide-react";
 
 import { LayerTabs } from "@/components/layer-tabs";
 import { MapPanel } from "@/components/map-panel";
+import { Button } from "@/components/ui/button";
 import { ResultsList, useRunView } from "@/components/run-results";
 import { SiteHeader } from "@/components/site-header";
 import type { RunState } from "@/components/use-audience-run";
@@ -60,14 +61,10 @@ export function ResultsSplit({
             <BriefSummary brief={brief} />
           </p>
           {onEditBrief && (
-            <button
-              type="button"
-              onClick={onEditBrief}
-              className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-border px-3 py-1 text-sm font-medium transition-colors outline-none hover:bg-foreground/5 focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              <PencilLine className="size-3.5" aria-hidden />
+            <Button variant="outline" size="sm" onClick={onEditBrief} className="cursor-pointer rounded-full px-3">
+              <PencilLine aria-hidden />
               Edit
-            </button>
+            </Button>
           )}
         </div>
         <ResultsList run={run} layers={layers} campaigns={campaigns} competitors={competitors} layer={layer} hasGap={hasGap} focus={focus} campaignFocus={campaignFocus} />
