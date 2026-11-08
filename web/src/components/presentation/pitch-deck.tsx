@@ -208,7 +208,11 @@ type PipelineNode = { name: string; detail: ReactNode; x: number; y: number };
  */
 const pipelineNodes: PipelineNode[] = [
   { name: "Your prompt", detail: "Startup, customer and budget", x: 0, y: 100 },
-  { name: "Audience fit", detail: "System 1 classifier on census, jobs and subway data", x: 299, y: 0 },
+  { name: "Audience fit", detail: (
+      <>
+        <span className="font-bold text-heat-hot">System 1</span> classifier on census, jobs and subway data
+      </>
+    ), x: 299, y: 0 },
   { name: "Competitors", detail: (
       <>
         <span className="font-bold text-heat-hot">Agent</span> finds their outdoor ads
