@@ -2,8 +2,8 @@
 
 Run from tools/ with `uv run python -m tools.analyze`. Writes to data/analysis/:
 
-- nyc_tracts.geojson: each tract's shape with its geoid and borough only, so the
-  browser can load the map once.
+- nyc_tracts.geojson: each tract's shape with its geoid, borough and neighbourhood
+  name only, so the browser can load the map once.
 - nyc_tracts.csv: one row per tract with its Census demographics, the jobs done
   there, the subway riders passing nearby and its advertising placements. Each
   column in FEATURES also appears as `<column>_scaled`, its percentile rank
@@ -24,7 +24,15 @@ import json
 import geopandas as gpd
 import pandas as pd
 
-from tools.sources import census, lodes, placements, streets, subway, tracts
+from tools.sources import (
+    census,
+    lodes,
+    neighborhoods,
+    placements,
+    streets,
+    subway,
+    tracts,
+)
 from tools.sources._common import DATA, ROOT
 
 OUTPUT = DATA / "analysis" / "nyc_tracts.geojson"
@@ -194,6 +202,8 @@ def _column_list() -> list[dict[str, str]]:
 
 def main() -> None:
     shapes = tracts.load()
+    shapes = shapes.merge(neighborhoods.load(), on="geoid", how="left")
+    shapes["neighborhood"] = shapes["neighborhood"].fillna("")
     shapes = _with_census(shapes)
     shapes = _with_jobs(shapes)
     shapes = _with_subway(shapes)
@@ -202,7 +212,7 @@ def main() -> None:
     shapes = _with_scaled(shapes)
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    shapes[["geoid", "borough", "geometry"]].to_file(
+    shapes[["geoid", "borough", "neighborhood", "geometry"]].to_file(
         OUTPUT, driver="GeoJSON", COORDINATE_PRECISION=5
     )
     pd.DataFrame(shapes.drop(columns="geometry")).to_csv(TABLE_OUTPUT, index=False)
