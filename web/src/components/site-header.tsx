@@ -1,7 +1,9 @@
+import { Wordmark } from "@/components/wordmark";
+
 export function SiteHeader() {
   return (
     <header>
-      <span className="font-heading text-2xl font-bold tracking-tight">Placewise</span>
+      <Wordmark className="text-2xl" />
     </header>
   );
 }

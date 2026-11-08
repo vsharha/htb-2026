@@ -5,6 +5,7 @@ import "./globals.css";
 const display = Bricolage_Grotesque({
   variable: "--font-display",
   subsets: ["latin"],
+  axes: ["opsz"],
 });
 
 const sans = Instrument_Sans({

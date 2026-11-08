@@ -4,6 +4,7 @@ import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { Deck, Notes, Slide } from "spectacle";
 
 import { Button } from "@/components/ui/button";
+import { Wordmark } from "@/components/wordmark";
 
 /**
  * Spectacle's theme points at the app's CSS variables rather than copying
@@ -34,7 +35,7 @@ const SLIDE_COUNT = 5;
 function SlideFooter({ number }: { number: number }) {
   return (
     <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-24 pb-10 font-mono text-sm text-muted-foreground">
-      <span className="font-heading text-lg font-bold tracking-tight text-foreground">Placewise</span>
+      <Wordmark className="text-lg text-foreground" />
       <span>
         {number} / {SLIDE_COUNT}
       </span>
@@ -148,7 +149,9 @@ function CoverSlide() {
         <SlideGlow />
         <div className={`${sheet} relative max-w-[880px] rounded-[2rem] px-16 py-14`}>
           <Eyebrow>HackTheBurgh 2026 · Demo city: New York</Eyebrow>
-          <h1 className="mt-6 font-heading text-[9rem] leading-[0.9] font-bold tracking-[-0.04em]">Placewise</h1>
+          <h1 className="mt-6 text-[9rem] leading-[0.9]">
+            <Wordmark className="tracking-[-0.04em]" />
+          </h1>
           <p className="mt-8 text-[2.1rem] leading-snug text-balance">
             Street advertising for startups, placed where your customers are and your competitors aren&rsquo;t.
           </p>
