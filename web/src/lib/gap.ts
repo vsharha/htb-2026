@@ -3,7 +3,7 @@
 // map already loads and the results of the two server calls.
 
 import type { AudienceFit, Campaign } from "@/lib/contract";
-import { campaignAffectsHeatmap, getCampaignLocation } from "@/lib/campaign-location";
+import { campaignAffectsHeatmap, campaignCompetitionWeight, getCampaignLocation } from "@/lib/campaign-location";
 
 type Position = [number, number];
 
@@ -53,9 +53,10 @@ export function computeLayers(
   fit: AudienceFit,
   campaigns: Campaign[],
 ): TractLayers {
-  const locations: Position[] = campaigns.flatMap((campaign) => {
+  const locations = campaigns.flatMap((campaign) => {
     const location = getCampaignLocation(campaign);
-    return campaignAffectsHeatmap(campaign) && location ? [[location.longitude, location.latitude] as Position] : [];
+    const weight = campaignCompetitionWeight(campaign);
+    return weight && location ? [{ position: [location.longitude, location.latitude] as Position, weight, affectsGap: campaignAffectsHeatmap(campaign) }] : [];
   });
   const layers: TractLayers = {};
   for (const feature of shapes.features) {
@@ -64,14 +65,18 @@ export function computeLayers(
     if (audience === undefined) continue;
     const here = centre(feature.geometry);
     let competition = 0;
+    let preciseCompetition = 0;
     for (const s of locations) {
-      const d = distanceKm(here, s) / CAMPAIGN_REACH_KM;
-      competition = Math.max(competition, Math.exp(-d * d));
+      const d = distanceKm(here, s.position) / CAMPAIGN_REACH_KM;
+      const influence = s.weight * Math.exp(-d * d);
+      competition = Math.max(competition, influence);
+      // Approximate locations inform the map without changing placement recommendations.
+      if (s.affectsGap) preciseCompetition = Math.max(preciseCompetition, influence);
     }
     layers[geoid] = {
       fit: audience,
       competition,
-      gap: audience * (1 - competition),
+      gap: audience * (1 - preciseCompetition),
     };
   }
   return layers;

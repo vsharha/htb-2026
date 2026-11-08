@@ -8,7 +8,7 @@ registerHooks({ resolve(specifier, context, nextResolve) {
   if (specifier === "@/lib/campaign-location") return nextResolve(new URL("../src/lib/campaign-location.ts", import.meta.url).href, context);
   return nextResolve(specifier, context);
 } });
-const { computeLayers } = await import("../src/lib/gap.ts");
+const { computeLayers, recommendationLayer } = await import("../src/lib/gap.ts");
 
 const stations = [
   { id: "1", name: "Grand Central-42 St (4,5,6)", borough: "Manhattan", latitude: 40.75, longitude: -73.98, weeklyRiders: 10 },
@@ -66,6 +66,33 @@ test("historical and undated campaigns cannot lower the gap score", () => {
   for (const coverage of ["current", "recent"]) {
     assert.equal(computeLayers(shapes, fit, [{ station: stations[0], coverage }])["1"].gap, 0);
   }
+});
+
+test("recent approximate ads colour competition at half strength without changing recommendations", () => {
+  const shapes = { features: [0, 0.01].map((offset, i) => ({ properties: { geoid: String(i) }, geometry: { type: "Polygon", coordinates: [[[-73.98 + offset, 40.75], [-73.98 + offset, 40.75]]] } })) };
+  const fit = { scores: { "0": 0.8, "1": 0.7 } };
+  const mapLocation = { latitude: 40.75, longitude: -73.98, precision: "area" };
+  for (const coverage of ["current", "recent"]) {
+    const campaign = { mapLocation, coverage };
+    const approximate = computeLayers(shapes, fit, [campaign]);
+    const precise = computeLayers(shapes, fit, [{ ...campaign, mapLocation: { ...mapLocation, precision: "address" } }]);
+    assert.equal(approximate["0"].competition, 0.5);
+    assert.ok(approximate["1"].competition > 0);
+    assert.ok(approximate["1"].competition < approximate["0"].competition);
+    for (const geoid of ["0", "1"]) {
+      assert.equal(approximate[geoid].competition, precise[geoid].competition / 2);
+      assert.equal(approximate[geoid].gap, fit.scores[geoid]);
+    }
+    assert.equal(recommendationLayer([campaign]), "fit");
+    const mixed = computeLayers(shapes, fit, [campaign, { station: { ...stations[0], longitude: -73.96 }, coverage }]);
+    const preciseOnly = computeLayers(shapes, fit, [{ station: { ...stations[0], longitude: -73.96 }, coverage }]);
+    assert.ok(mixed["0"].competition > preciseOnly["0"].competition);
+    assert.equal(mixed["0"].gap, preciseOnly["0"].gap);
+  }
+  for (const coverage of ["historical", "unknown"]) {
+    assert.equal(computeLayers(shapes, fit, [{ mapLocation, coverage }])["0"].competition, 0);
+  }
+  assert.equal(computeLayers(shapes, fit, [{ coverage: "recent", reach: "citywide" }])["0"].competition, 0);
 });
 
 test("SDK transport decodes split SSE chunks and emits each finding once", async () => {

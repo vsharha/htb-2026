@@ -11,7 +11,7 @@ import { campaignId } from "@/components/use-audience-run";
 import type { MapFocus } from "@/components/use-map-focus";
 
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
-import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
+import { campaignAffectsHeatmap, campaignCompetitionWeight, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
 import { clusterByDistance, worldPixel } from "@/lib/cluster";
 import { layerHeatStyle, paletteTheme, useSettings, type HeatStyle, type PaletteTheme } from "@/lib/settings";
@@ -225,7 +225,7 @@ export function TractMap({
     return location ? [{ campaign, location, id: campaignId(campaign, i) }] : [];
   });
   const audienceOnly = recommendationLayer(campaigns) === "fit";
-  const showTracts = layer !== "competition" || !audienceOnly;
+  const showTracts = layer !== "competition" || campaigns.some((campaign) => campaignCompetitionWeight(campaign) > 0);
   const [hoveredTract, setHoveredTract] = useState<{ geoid: string; value: number; longitude: number; latitude: number } | null>(null);
   // Separate from campaignFocus.hovered, which a sidebar row also sets: the row already names its app.
   const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);

@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 
 import { LAYERS } from "@/components/layer-tabs";
 import type { MapFocus } from "@/components/use-map-focus";
-import { getCampaignLocation } from "@/lib/campaign-location";
+import { campaignCompetitionWeight, getCampaignLocation } from "@/lib/campaign-location";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
 import { layerHeatStyle, paletteTheme, useSettings } from "@/lib/settings";
@@ -58,6 +58,8 @@ export function MapPanel({
   className?: string;
 }) {
   const audienceOnly = recommendationLayer(campaigns) === "fit";
+  const hasCompetition = campaigns.some((campaign) => campaignCompetitionWeight(campaign) > 0);
+  const hasApproximateCompetition = campaigns.some((campaign) => campaignCompetitionWeight(campaign) === 0.5);
   const current = LAYERS.find((l) => l.id === layer)!;
   const { heat, palette, dark } = useSettings();
   const heatStyle = layerHeatStyle(layer, heat);
@@ -76,7 +78,7 @@ export function MapPanel({
       )}
 
       <div className="pointer-events-none absolute bottom-9 left-3 w-52 rounded-lg bg-background/95 p-3 shadow-sm sm:bottom-4 sm:left-4 sm:w-56">
-        {layer === "competition" && audienceOnly ? (
+        {layer === "competition" && !hasCompetition ? (
           <p className="text-xs text-muted-foreground">Recent competition coverage unknown</p>
         ) : (
           <>
@@ -97,6 +99,9 @@ export function MapPanel({
               <span className="text-right">{current.high}</span>
             </div>
           </>
+        )}
+        {layer === "competition" && hasApproximateCompetition && (
+          <p className="mt-2 text-xs text-muted-foreground">Recent ads with approximate locations have half the influence on colour.</p>
         )}
         {layer === "competition" && citywide > 0 && (
           <p className="mt-2 text-xs text-muted-foreground">

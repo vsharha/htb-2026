@@ -23,3 +23,9 @@ export function campaignAffectsHeatmap(campaign: Campaign) {
   const location = getCampaignLocation(campaign);
   return (campaign.coverage === "current" || campaign.coverage === "recent") && location !== null && location.precision !== "area";
 }
+
+export function campaignCompetitionWeight(campaign: Campaign) {
+  const location = getCampaignLocation(campaign);
+  if (!location || (campaign.coverage !== "current" && campaign.coverage !== "recent")) return 0;
+  return location.precision === "area" ? 0.5 : 1;
+}
