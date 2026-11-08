@@ -157,8 +157,18 @@
     transform: translate(0, 0) scale(1);
   }
   to {
-    transform: translate(var(--drift-x), var(--drift-y)) scale(1.25);
+    transform: translate(var(--drift-x), var(--drift-y)) scale(1.4);
   }
+}
+
+@keyframes heat-glow-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.heat-glow-spin {
+  animation: heat-glow-spin 30s linear infinite;
 }
 
 .heat-glow-drift {
@@ -175,7 +185,8 @@
     animation: none;
   }
 
-  .heat-glow-drift {
+  .heat-glow-drift,
+  .heat-glow-spin {
     animation: none;
   }
 }
