@@ -26,10 +26,6 @@ setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url)
 // percentile and red at the top. A layer whose values bunch up, such as
 // competition with few ads, would otherwise colour the whole city. The legend
 // in map-panel.tsx draws the same ramp.
-/** Placement markers grow and darken as their cost per customer falls, between these sizes. */
-const MARKER_MIN_PX = 22;
-const MARKER_MAX_PX = 30;
-
 const FADE_BELOW = 0.65;
 const GLOW_AT = 0.8;
 
@@ -118,8 +114,6 @@ export function TractMap({
     return location ? [{ campaign, location, id: campaignId(campaign, i) }] : [];
   });
   const audienceOnly = recommendationLayer(campaigns) === "fit";
-  const costs = placements?.map((p) => p.costPerAudienceMember) ?? [];
-  const costSpread = costs.length ? { min: Math.min(...costs), max: Math.max(...costs) } : null;
   const showTracts = layer !== "competition" || !audienceOnly;
   const [hoveredTract, setHoveredTract] = useState<{ geoid: string; value: number; longitude: number; latitude: number } | null>(null);
 
@@ -185,11 +179,8 @@ export function TractMap({
       {(layer !== "fit" || audienceOnly) &&
         placements?.map((p, i) => {
           const active = focus.hovered === p.id || focus.selected?.id === p.id;
-          // 0 for the dearest placement in the list, 1 for the cheapest.
-          const cheap = costSpread && costSpread.max > costSpread.min ? (costSpread.max - p.costPerAudienceMember) / (costSpread.max - costSpread.min) : 0.5;
-          const size = MARKER_MIN_PX + cheap * (MARKER_MAX_PX - MARKER_MIN_PX);
           return (
-            <Marker key={p.id} longitude={p.longitude} latitude={p.latitude} anchor="center" style={{ zIndex: active ? 4 : cheap > 0.5 ? 3 : 2 }}>
+            <Marker key={p.id} longitude={p.longitude} latitude={p.latitude} anchor="center" style={{ zIndex: active ? 2 : 1 }}>
               <button
                 type="button"
                 aria-label={`Placement ${i + 1}: ${p.address}`}
@@ -198,14 +189,9 @@ export function TractMap({
                 onFocus={() => focus.hover(p.id)}
                 onBlur={() => focus.hover(null)}
                 onClick={() => focus.select(p.id, "map")}
-                style={{
-                  width: size,
-                  height: size,
-                  ...(active ? {} : { background: `color-mix(in oklab, var(--foreground) ${Math.round(cheap * 100)}%, var(--background))`, color: cheap > 0.5 ? "var(--background)" : "var(--foreground)" }),
-                }}
                 className={
-                  "flex cursor-pointer items-center justify-center rounded-full border-2 border-foreground font-mono text-[11px] font-semibold tabular-nums shadow-sm transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
-                  (active ? "scale-125 bg-foreground text-background" : "")
+                  "flex size-6 cursor-pointer items-center justify-center rounded-full border-2 border-foreground font-mono text-[11px] font-semibold tabular-nums shadow-sm transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
+                  (active ? "scale-125 bg-foreground text-background" : "bg-background text-foreground")
                 }
               >
                 {i + 1}
