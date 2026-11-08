@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.13.1",
+  "checkpoint_id": "01M6WAWJ25JSAP6WBAEPQVEB50",
+  "session_id": "ses_e4756ba8affeMYCub6YXiksvuE",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-08T01:03:14.781125602Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/status.md",
+    "web/src/components/tract-map.tsx"
+  ],
+  "agent": "OpenCode",
+  "model": "deepseek-v4.1-flash",
+  "turn_id": "cc62bb295682",
+  "checkpoint_transcript_start": 50,
+  "transcript_lines_at_start": 50,
+  "compact_transcript_start": 50,
+  "token_usage": {
+    "input_tokens": 3001,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 286208,
+    "output_tokens": 961,
+    "api_call_count": 6
+  },
+  "redaction": {
+    "replacements": 1494,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 1494,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 1
+  }
+}
