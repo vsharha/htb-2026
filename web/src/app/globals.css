@@ -149,7 +149,7 @@
 }
 
 .heat-glow-rotate {
-  animation: heat-glow-rotate 2400ms linear both;
+  animation: heat-glow-rotate 1200ms linear both;
 }
 
 @media (prefers-reduced-motion: reduce) {
