@@ -28,7 +28,7 @@ export type Settings = {
   dark: boolean;
 };
 
-const DEFAULTS: Settings = { corners: "rounded", palette: "warm", heat: "fade", cost: true, mode: "system", dark: false };
+const DEFAULTS: Settings = { corners: "rounded", palette: "warm", heat: "fade", cost: true, mode: "light", dark: false };
 // Bumped when the default palette changed, so saved choices do not hide it.
 const STORAGE_KEY = "placewise-settings-4";
 
@@ -469,7 +469,7 @@ function load() {
   loaded = true;
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
-    const mode: Mode = saved.mode === "light" || saved.mode === "dark" ? saved.mode : "system";
+    const mode: Mode = saved.mode === "system" || saved.mode === "dark" || saved.mode === "light" ? saved.mode : DEFAULTS.mode;
     current = {
       corners: saved.corners === "sharp" ? "sharp" : "rounded",
       palette: saved.palette in PALETTES ? saved.palette : DEFAULTS.palette,
@@ -479,7 +479,7 @@ function load() {
       dark: resolveDark(mode),
     };
   } catch {
-    current = { ...DEFAULTS, dark: systemDark() };
+    current = DEFAULTS;
   }
   apply(current);
   // While following the system, a change there switches the app with it.
