@@ -73,7 +73,13 @@ export type Station = {
   weeklyRiders: number;
 };
 
-export type Competitor = { name: string; reason: string; sourceUrl: string };
+export type Competitor = {
+  name: string;
+  reason: string;
+  sourceUrl: string;
+  /** The competitor's own site, which a logo is loaded from. Null when research couldn't establish it. */
+  website: string | null;
+};
 
 export type CampaignLocation = {
   latitude: number;

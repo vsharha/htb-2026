@@ -37,7 +37,7 @@ export function ResultsSplit({
   /** Shows an edit button beside the brief summary. */
   onEditBrief?: () => void;
 }) {
-  const { layer, setLayer, campaigns, layers, focus, campaignFocus } = useRunView(run);
+  const { layer, setLayer, campaigns, competitors, layers, focus, campaignFocus } = useRunView(run);
   return (
     <div className="flex flex-col bg-card text-card-foreground lg:grid lg:h-dvh lg:grid-cols-[2fr_1fr] lg:grid-rows-[auto_1fr] lg:overflow-hidden">
       <div className="flex flex-col gap-5 px-5 py-4 sm:px-8 lg:col-start-2 lg:pt-8 lg:pb-2">
@@ -48,6 +48,7 @@ export function ResultsSplit({
         shapes={run.shapes}
         layers={layers}
         campaigns={campaigns}
+        competitors={competitors}
         placements={run.placements}
         layer={layer}
         focus={focus}
@@ -70,7 +71,7 @@ export function ResultsSplit({
             </button>
           )}
         </div>
-        <ResultsList run={run} layers={layers} campaigns={campaigns} layer={layer} focus={focus} campaignFocus={campaignFocus} />
+        <ResultsList run={run} layers={layers} campaigns={campaigns} competitors={competitors} layer={layer} focus={focus} campaignFocus={campaignFocus} />
       </aside>
     </div>
   );

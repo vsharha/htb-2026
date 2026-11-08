@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 
 import { LAYERS } from "@/components/layer-tabs";
 import type { MapFocus } from "@/components/use-map-focus";
-import type { Campaign, Placement } from "@/lib/contract";
+import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +26,7 @@ export function MapPanel({
   shapes,
   layers,
   campaigns,
+  competitors,
   placements,
   layer,
   focus,
@@ -35,6 +36,7 @@ export function MapPanel({
   shapes: TractShapes | null;
   layers: TractLayers | null;
   campaigns: Campaign[];
+  competitors: Competitor[];
   placements: Placement[] | null;
   layer: LayerId;
   focus: MapFocus;
@@ -48,7 +50,7 @@ export function MapPanel({
   return (
     <section className={cn("relative overflow-hidden", className)}>
       {shapes ? (
-        <TractMap shapes={shapes} layers={layers} layer={layer} campaigns={campaigns} placements={placements} focus={focus} campaignFocus={campaignFocus} />
+        <TractMap shapes={shapes} layers={layers} layer={layer} campaigns={campaigns} competitors={competitors} placements={placements} focus={focus} campaignFocus={campaignFocus} />
       ) : (
         <MapPlaceholder>Loading New York&rsquo;s census tracts…</MapPlaceholder>
       )}
@@ -72,8 +74,8 @@ export function MapPanel({
         {layer !== "fit" && (
           <ul className="mt-3 flex flex-col gap-1.5 text-xs">
             <li className="flex items-center gap-2">
-              <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground"><span className="size-1.5 rounded-full bg-foreground" /></span>
-              Current ad, matched location
+              <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground"><span className="size-2 rounded-[2px] bg-foreground/25" /></span>
+              Current ad, at a matched location
             </li>
             <li className="flex items-center gap-2">
               <span className="size-4 shrink-0 rounded-full border-2 border-dashed border-foreground" />

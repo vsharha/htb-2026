@@ -36,7 +36,8 @@
       "competitor": {
         "name": "Splitwise",
         "reason": "Widely used expense-splitting app explicitly for roommates and shared housing; targets users splitting rent and household bills.",
-        "sourceUrl": "https://www.splitwise.com/about"
+        "sourceUrl": "https://www.splitwise.com/about",
+        "website": "https://splitwise.com"
       }
     },
     {
@@ -48,7 +49,8 @@
       "competitor": {
         "name": "Tricount",
         "reason": "Expense-splitting app used by roommates to split groceries, utilities and rent; demonstrated in Tricount blog and help pages.",
-        "sourceUrl": "https://tricount.com/blog/how-pierre-uses-tricount"
+        "sourceUrl": "https://tricount.com/blog/how-pierre-uses-tricount",
+        "website": "https://tricount.com"
       }
     },
     {
@@ -60,7 +62,8 @@
       "competitor": {
         "name": "Settle Up",
         "reason": "Expense-splitting app explicitly marketed for flatmates and group expenses (trips, flatmates) with official website and app store listings.",
-        "sourceUrl": "https://settleup.truelytech.com"
+        "sourceUrl": "https://settleup.truelytech.com",
+        "website": "https://settleup.truelytech.com"
       }
     },
     {

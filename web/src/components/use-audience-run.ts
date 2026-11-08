@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 
 import { findPlacements, runCompetitorAgent, scoreAudience } from "@/lib/api";
-import type { AgentEvent, AudienceFit, Brief, Campaign, Placement } from "@/lib/contract";
+import type { AgentEvent, AudienceFit, Brief, Campaign, Competitor, Placement } from "@/lib/contract";
 import { computeLayers, recommendationLayer, strongest, type TractShapes } from "@/lib/gap";
 
 export type RunState = {
@@ -42,6 +42,10 @@ export function campaignId(campaign: Campaign, index: number) {
 
 export function campaignsOf(events: AgentEvent[]): Campaign[] {
   return events.flatMap((e) => (e.type === "campaign" ? [e.campaign] : []));
+}
+
+export function competitorsOf(events: AgentEvent[]): Competitor[] {
+  return events.flatMap((e) => (e.type === "competitor" ? [e.competitor] : []));
 }
 
 export function useAudienceRun() {

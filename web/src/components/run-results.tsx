@@ -3,9 +3,10 @@
 import { MapPin } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { campaignId, campaignsOf, type RunState } from "@/components/use-audience-run";
+import { CompetitorLogo } from "@/components/competitor-logo";
+import { campaignId, campaignsOf, competitorsOf, type RunState } from "@/components/use-audience-run";
 import { useMapFocus, type MapFocus } from "@/components/use-map-focus";
-import type { Campaign, Placement } from "@/lib/contract";
+import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { computeLayers, recommendationLayer, strongest, type LayerId, type TractLayers } from "@/lib/gap";
 import { researchOutcome } from "@/lib/research-outcome";
@@ -27,6 +28,7 @@ const TOP_TRACTS = 5;
 export function useRunView(run: RunState) {
   const [layer, setLayer] = useState<LayerId>("gap");
   const campaigns = useMemo(() => campaignsOf(run.events), [run.events]);
+  const competitors = useMemo(() => competitorsOf(run.events), [run.events]);
   const layers = useMemo(
     () => (run.shapes && run.fit ? computeLayers(run.shapes, run.fit, campaigns) : null),
     [run.shapes, run.fit, campaigns],
@@ -42,7 +44,7 @@ export function useRunView(run: RunState) {
       campaignMarks.select(id, from);
     },
   };
-  return { layer, setLayer, campaigns, layers, focus, campaignFocus };
+  return { layer, setLayer, campaigns, competitors, layers, focus, campaignFocus };
 }
 
 function Section({ title, aside, children }: { title: string; aside?: React.ReactNode; children: React.ReactNode }) {
@@ -264,8 +266,7 @@ function CampaignRow({ campaign: c, id, focus }: { campaign: Campaign; id: strin
   );
 }
 
-function CompetitorsTab({ run, campaigns, focus }: { run: RunState; campaigns: Campaign[]; focus: MapFocus }) {
-  const competitors = run.events.flatMap((e) => (e.type === "competitor" ? [e.competitor] : []));
+function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState; competitors: Competitor[]; campaigns: Campaign[]; focus: MapFocus }) {
   const steps = run.events.flatMap((e) => (e.type === "step" ? [e.message] : []));
   const errors = run.events.flatMap((e) => (e.type === "error" ? [e.message] : []));
   const outcome = researchOutcome(run.events, run.agentDone || !!run.error);
@@ -276,11 +277,14 @@ function CompetitorsTab({ run, campaigns, focus }: { run: RunState; campaigns: C
         {competitors.length === 0 ? (
           !run.agentDone && !run.error ? <Pending>Finding competitors…</Pending> : <p className="text-sm text-muted-foreground">No source-supported competitor matches are available from this run.</p>
         ) : (
-          <ul className="flex flex-col gap-1.5 text-sm">
+          <ul className="flex flex-col text-sm">
             {competitors.map((c) => (
-              <li key={c.name}>
-                {c.sourceUrl ? <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="font-semibold underline underline-offset-2">{c.name}</a> : <span className="font-semibold">{c.name}</span>}{" "}
-                <span className="text-muted-foreground">— {c.reason}</span>
+              <li key={c.name} className="flex items-start gap-3 border-b border-border py-2.5 last:border-0">
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  {c.sourceUrl ? <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="w-fit font-semibold underline underline-offset-2">{c.name}</a> : <span className="font-semibold">{c.name}</span>}
+                  <span className="text-muted-foreground">{c.reason}</span>
+                </span>
+                <CompetitorLogo name={c.name} website={c.website} />
               </li>
             ))}
           </ul>
@@ -320,6 +324,7 @@ export function ResultsList({
   run,
   layers,
   campaigns,
+  competitors,
   layer,
   focus,
   campaignFocus,
@@ -327,6 +332,7 @@ export function ResultsList({
   run: RunState;
   layers: TractLayers | null;
   campaigns: Campaign[];
+  competitors: Competitor[];
   layer: LayerId;
   focus: MapFocus;
   campaignFocus: MapFocus;
@@ -342,7 +348,7 @@ export function ResultsList({
       )}
       {layer === "gap" && <GapTab run={run} layers={layers} focus={focus} />}
       {layer === "fit" && <CustomersTab run={run} layers={layers} />}
-      {layer === "competition" && <CompetitorsTab run={run} campaigns={campaigns} focus={campaignFocus} />}
+      {layer === "competition" && <CompetitorsTab run={run} competitors={competitors} campaigns={campaigns} focus={campaignFocus} />}
     </div>
   );
 }

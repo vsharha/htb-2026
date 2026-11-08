@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { jsonSchema, stepCountIs, tool, ToolLoopAgent, type ToolSet, type ModelMessage } from "ai";
 
+import { siteHost } from "@/lib/brand";
 import type { AgentEvent, Brief, Campaign, Competitor, ResearchSummary } from "@/lib/contract";
 import { getCompetitorAI } from "@/lib/server/ai";
 import { getCampaignLocation, campaignAffectsHeatmap } from "@/lib/campaign-location";
@@ -35,10 +36,10 @@ type Finding = {
   endsOn: string | null;
 };
 
-const competitorSchema = jsonSchema<Required<Competitor>>({
+const competitorSchema = jsonSchema<Omit<Competitor, "website"> & { website: string }>({
   type: "object", additionalProperties: false,
-  properties: { name: { type: "string" }, reason: { type: "string" }, sourceUrl: { type: "string" } },
-  required: ["name", "reason", "sourceUrl"],
+  properties: { name: { type: "string" }, reason: { type: "string" }, sourceUrl: { type: "string" }, website: { type: "string" } },
+  required: ["name", "reason", "sourceUrl", "website"],
 });
 
 const campaignSchema = jsonSchema<Finding>({
@@ -83,7 +84,7 @@ export async function runCompetitorResearch(
   let discoveryTimedOut = false;
   const campaignSearches = new Map<string, number>();
   const reportCompetitor = tool({
-    description: "Report a verified direct competitor with a source found in this run. Search before reporting.",
+    description: "Report a verified direct competitor with a source found in this run, plus the competitor's own website so its logo can be shown. Search before reporting.",
     inputSchema: competitorSchema,
     execute: async (competitor) => {
       const url = confirmedSource(competitor.sourceUrl, sources);
@@ -95,7 +96,8 @@ export async function runCompetitorResearch(
       if (!key || !competitor.reason.trim()) return { accepted: false, reason: "A name and relevance reason are required." };
       if (competitors.has(key)) return { accepted: true, duplicate: true };
       if (competitors.size >= 3) return { accepted: false, reason: "Three competitors already reported. Research their campaigns." };
-      const verified = { ...competitor, sourceUrl: url };
+      const host = siteHost(competitor.website);
+      const verified = { ...competitor, sourceUrl: url, website: host && `https://${host}` };
       competitors.set(key, verified);
       emit({ type: "competitor", competitor: verified });
       return { accepted: true };
@@ -176,7 +178,7 @@ export async function runCompetitorResearch(
     emit({ type: "step", message: "Finding up to three direct competitors; campaign research has a separate budget for each" });
     const discovery = new ToolLoopAgent({
       ...common,
-      instructions: `${SYSTEM}\nThis phase only discovers direct competitors. Search once for up to three, report them with source-backed relevance, then call finishDiscovery. Do not repeatedly look up company homepages or research campaigns here.`,
+      instructions: `${SYSTEM}\nThis phase only discovers direct competitors. Search once for up to three, report them with source-backed relevance and their own website, then call finishDiscovery. Do not repeatedly look up company homepages or research campaigns here.`,
       tools: {
         ...research.tools,
         reportCompetitor,

@@ -6,10 +6,11 @@ import { setWorkerUrl, type ExpressionSpecification } from "maplibre-gl";
 import { useEffect, useMemo, useRef } from "react";
 import Map, { Layer, Marker, NavigationControl, Source, type MapRef } from "react-map-gl/maplibre";
 
+import { CompetitorLogo } from "@/components/competitor-logo";
 import { campaignId } from "@/components/use-audience-run";
 import type { MapFocus } from "@/components/use-map-focus";
 
-import type { Campaign, Placement } from "@/lib/contract";
+import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
 
@@ -37,6 +38,7 @@ export function TractMap({
   layers,
   layer,
   campaigns,
+  competitors,
   placements,
   focus,
   campaignFocus,
@@ -45,6 +47,7 @@ export function TractMap({
   layers: TractLayers | null;
   layer: LayerId;
   campaigns: Campaign[];
+  competitors: Competitor[];
   placements: Placement[] | null;
   focus: MapFocus;
   campaignFocus: MapFocus;
@@ -77,6 +80,7 @@ export function TractMap({
     [shapes, layers],
   );
 
+  const websitesByCompetitor: Record<string, string | null> = Object.fromEntries(competitors.map((c) => [c.name, c.website]));
   const campaignMarkers = campaigns.flatMap((campaign, i) => {
     const location = getCampaignLocation(campaign);
     return location ? [{ campaign, location, id: campaignId(campaign, i) }] : [];
@@ -115,13 +119,17 @@ export function TractMap({
                 onBlur={() => campaignFocus.hover(null)}
                 onClick={() => campaignFocus.select(id, "map")}
                 className={
-                  "flex size-6 cursor-pointer items-center justify-center rounded-full border-2 border-foreground shadow-sm transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
+                  "flex size-7 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-foreground shadow-sm transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
                   (counted ? "" : "border-dashed ") +
                   // A solid fill would hide the dashed border, so those markers only tint.
-                  (active ? (counted ? "scale-125 bg-foreground" : "scale-125 bg-foreground/25") : "bg-background/95")
+                  (active ? "scale-125 " + (counted ? "bg-foreground" : "bg-foreground/25") : "bg-background/95")
                 }
               >
-                {counted && <span className={"size-2 rounded-full " + (active ? "bg-background" : "bg-foreground")} />}
+                <CompetitorLogo
+                  name={campaign.competitor}
+                  website={websitesByCompetitor[campaign.competitor] ?? null}
+                  className="size-full rounded-full border-0 bg-transparent"
+                />
               </button>
             </Marker>
           );
