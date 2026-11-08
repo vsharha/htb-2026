@@ -88,10 +88,12 @@ export function useAudienceRun() {
         if (ctrl.signal.aborted) return;
         const campaigns = campaignsOf(events);
         const layers = computeLayers(shapes, fit, campaigns);
-        const placements = await findPlacements({
+        const found = await findPlacements({
           geoids: strongest(layers, recommendationLayer(campaigns), Object.keys(layers).length),
           monthlyBudget: brief.monthlyBudget,
         });
+        // Cheapest first, so the list order, the map numbers and the "lowest cost" tag agree.
+        const placements = [...found].sort((a, b) => a.costPerAudienceMember - b.costPerAudienceMember);
         update(() => ({ placements }));
       };
       await rankPlacements();

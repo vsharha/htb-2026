@@ -90,7 +90,7 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
   const chosen = focus.selected?.id === p.id;
   const active = focus.hovered === p.id || chosen;
   // Rows read like the tract rankings: a divider between each, no cards. The
-  // first placement is labelled the best match, and the picked one is shaded.
+  // list is sorted by cost, so the first placement is the lowest cost one and is tagged, and the picked one is shaded.
   const best = number === 1;
 
   // A click on the marker scrolls its row into view.
@@ -123,7 +123,7 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
           {number}
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          {best && <span className="w-fit bg-accent px-1.5 text-[11px] font-semibold tracking-wide text-accent-foreground uppercase">Best match</span>}
+          {best && <span className="w-fit bg-accent px-1.5 text-[11px] font-semibold tracking-wide text-accent-foreground uppercase">Lowest cost</span>}
           <span className="flex items-baseline justify-between gap-3 text-sm">
             <span className={best || chosen ? "font-semibold" : "font-medium"}>{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
             <span className="text-right">
@@ -146,6 +146,7 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
 function PlacementsSection({ run, focus, audienceOnly }: { run: RunState; focus: MapFocus; audienceOnly: boolean }) {
   return (
     <Section title="Placements to buy" aside={run.placements && `${run.placements.length} found`}>
+      <p className="text-xs text-muted-foreground">Sorted by estimated cost per customer, lowest first.</p>
       {audienceOnly && (
         <p className="text-xs text-muted-foreground">
           Chosen by audience fit. Competition coverage is unknown, so these are not confirmed gaps in competitors&rsquo; advertising.
