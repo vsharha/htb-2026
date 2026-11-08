@@ -99,6 +99,9 @@ write_files:
         }
         respond 401
       }
+      https://app.$domain {
+        reverse_proxy 127.0.0.1:3000
+      }
       EOF
       systemctl enable caddy
       systemctl restart caddy
