@@ -2,7 +2,7 @@
 
 ## What it is
 
-The audience heatmap shows a startup where in a city its target customers live, work and pass through, and where it can find evidence of competitors' outdoor advertising. A startup fills in a short form about its product, customer, budget and markets. It gets back a map of the city with audience fit, competition evidence, and placement recommendations. Recommendations use observed gaps when campaigns from the past 12 months have precise locations; otherwise they use audience fit and state that competition coverage is unknown. The run ends with specific placements to buy, such as LinkNYC kiosks and bus shelters, each with an estimated cost per audience member and a way to measure results. The demo city is New York.
+The audience heatmap shows a startup where in a city its target customers live, work and pass through, and where it can find evidence of competitors' outdoor advertising. A startup fills in a short form about its product, customer, budget and markets. It gets back a map of the city with audience fit, competition evidence, and placement recommendations. Recommendations use observed gaps when campaigns from the past 12 months have precise locations; otherwise they use audience fit and state that competition coverage is unknown. The run ends with specific placements to buy, such as LinkNYC kiosks and bus shelters, each with an estimated cost per audience member. The demo city is New York.
 
 It is for startups that want customers beyond Meta and Google but have no media agency and a limited budget.
 

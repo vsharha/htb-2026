@@ -287,7 +287,7 @@ function DemoSlide() {
       <div className="relative flex h-full flex-col px-24 pt-12 pb-24 text-foreground">
         <div className="flex items-baseline justify-between">
           <h2 className="font-heading text-[2.6rem] font-bold tracking-tight">Live demo</h2>
-          <p className="text-base text-muted-foreground">A budgeting app for people who share a flat</p>
+          <p className="text-base text-muted-foreground">A dating app for people looking for a serious relationship</p>
         </div>
         {/*
           The app is laid out at 1.4 times the frame's size and scaled back down,
@@ -303,8 +303,8 @@ function DemoSlide() {
         <SlideFooter number={4} />
       </div>
       <Notes>
-        Submit the empty form to run the sample brief: a fintech budgeting app for young professionals in tech who rent with
-        roommates, at $12 a month with a $3,000 monthly budget. Show the Customers tab first, then Competitors while the agent
+        Submit the empty form to run the sample brief: a dating app for people looking for a serious relationship, targeting
+        single professionals in their late twenties and thirties, at $30 a month with an $8,000 monthly budget. Show the Customers tab first, then Competitors while the agent
         searches. Gap opens on its own once a campaign has a precise location. Hover a placement to match it between map and
         list. Click outside the app before pressing the arrow keys, or they scroll the app instead of changing slides.
       </Notes>

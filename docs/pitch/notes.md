@@ -4,4 +4,4 @@ Internal notes for the demos and pitches: story, demo script, likely questions, 
 
 ## Likely questions
 
-**"If several fintechs use the tool, don't they crowd the same placements?"** Yes, if nothing stopped it, so the tool counts its own past recommendations in a category as crowded, alongside competitors' ads. A second fintech gets different placements from the first. There are many placements to spread clients across: reports put Revolut alone on 300+ jet bridges, and there are dozens of UK students' unions and thousands of sponsored newsletters. Gaps still close over time; the tool's job is to find the next one faster than people can by hand.
+**"If several startups use the tool, don't they crowd the same placements?"** Yes, identical briefs get identical placements today. Counting the tool's own past recommendations as crowding, alongside competitors' ads, is not built yet and is the next step. The New York data holds 2,244 LinkNYC kiosks and 3,312 bus shelters to spread clients across.

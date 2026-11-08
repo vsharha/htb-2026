@@ -20,7 +20,7 @@ Decided on 7 November 2026; the decisions are in [product.md](../product.md).
 2. Audience fit layer: each area of the city is scored by how many target customers live there, work there or pass through it.
 3. Competition layer: a browser agent finds the startup's competitors, then searches press, trade sites and social media for their outdoor campaigns in the city, such as "<competitor> subway ad" or "<competitor> billboard NYC", and places each find on the map. Where it finds nothing, competitors' stores and offices stand in.
 4. Gap layer: areas with high audience fit and low competition. This is the default view; the other two layers are toggles that explain it.
-5. Placements: specific placements a startup can buy inside the strongest gap areas, such as LinkNYC kiosks and bus shelters, each with an estimated cost per audience member and a way to measure it (a QR code, promo code or landing page). Budget filters out placements with minimum spends.
+5. Placements: specific placements a startup can buy inside the strongest gap areas, such as LinkNYC kiosks and bus shelters, each with an estimated cost per audience member. Budget filters out placements with minimum spends.
 
 An hourly view of the audience fit layer, using subway and taxi data by hour, is an open option, not a decision.
 
