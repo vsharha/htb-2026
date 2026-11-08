@@ -7,7 +7,7 @@ import { CITIES, type Brief } from "@/lib/contract";
 export const EXAMPLE_BRIEFS: { name: string; note: string; brief: Brief }[] = [
   {
     name: "Dating app",
-    note: "Five competitors, twenty ads, nine on the map. Also what the empty form submits.",
+    note: "Four competitors, twelve ads, five on the map, one recent enough for the Gap tab. Also what the empty form submits.",
     brief: {
       industry: "Consumer app",
       description: "a dating app for people looking for a serious relationship",
