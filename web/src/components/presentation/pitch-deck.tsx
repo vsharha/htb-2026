@@ -175,7 +175,7 @@ function ProblemSlide() {
       <SlideBody number={2}>
         <Eyebrow>The problem</Eyebrow>
         <h2 className="mt-6 max-w-[740px] font-heading text-[4.75rem] leading-[1] font-bold tracking-[-0.03em] text-balance">
-          Startups moving beyond Meta and Google buy street ads blind.
+          Marketing is hard. Your audiences are not equally distributed.
         </h2>
         <Image
           src="/images/sf-startup-image-funny.webp"
