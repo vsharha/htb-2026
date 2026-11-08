@@ -51,7 +51,12 @@ function BlankSelect({
   );
 }
 
-const INDUSTRY_OPTIONS = INDUSTRIES.map((i) => ({ value: i, label: i.toLowerCase() }));
+// Labels follow "in" in the sentence, so a few read differently from their values.
+const INDUSTRY_LABELS: Partial<Record<Industry, string>> = {
+  "Consumer app": "consumer apps",
+  Other: "another field",
+};
+const INDUSTRY_OPTIONS = INDUSTRIES.map((i) => ({ value: i, label: INDUSTRY_LABELS[i] ?? i.toLowerCase() }));
 const PER_OPTIONS = [
   { value: "month", label: "month" },
   { value: "purchase", label: "purchase" },
@@ -114,19 +119,17 @@ export function BriefForm({
   return (
     <form noValidate onSubmit={handleSubmit} className="group/form flex flex-col gap-16">
       <p className={cn(sentenceType, "leading-[1.55] text-balance")}>
-        We&rsquo;re a{" "}
-        <BlankSelect name="industry" label="Industry" options={INDUSTRY_OPTIONS} placeholder="pick an industry" required />{" "}
-        startup building{" "}
-        <label className="sr-only" htmlFor="description">What the startup builds, in one sentence</label>
+        Our company is{" "}
+        <label className="sr-only" htmlFor="description">What the company is, in a few words</label>
+        <input id="description" name="description" required placeholder="a budgeting app" className={cn(blank, "min-w-[12ch]")} />{" "}
+        in{" "}
         <span className="whitespace-nowrap">
-          <input id="description" name="description" required placeholder="a budgeting app for shared flats" className={cn(blank, "min-w-[12ch] max-w-[calc(100%-1ch)]")} />.
+          <BlankSelect name="industry" label="Industry" options={INDUSTRY_OPTIONS} placeholder="pick an industry" required />.
         </span>{" "}
-        Our customer is{" "}
-        <label className="sr-only" htmlFor="targetCustomer">Target customer, in one sentence</label>
-        <span className="whitespace-nowrap">
-          <input id="targetCustomer" name="targetCustomer" required placeholder="young professionals who rent with roommates" className={cn(blank, "min-w-[16ch] max-w-[calc(100%-1ch)]")} />.
-        </span>{" "}
-        They pay{" "}
+        We want to reach{" "}
+        <label className="sr-only" htmlFor="targetCustomer">The customers the company wants to reach</label>
+        <input id="targetCustomer" name="targetCustomer" required placeholder="young renters in tech" className={cn(blank, "min-w-[12ch]")} />{" "}
+        who would pay{" "}
         <label className="sr-only" htmlFor="pays">What a customer pays, in US dollars</label>
         <span className="whitespace-nowrap">
           $<input id="pays" name="pays" {...money} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="12" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />

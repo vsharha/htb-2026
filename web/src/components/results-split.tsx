@@ -11,12 +11,13 @@ import type { RunState } from "@/components/use-audience-run";
 import { CITIES, type Brief } from "@/lib/contract";
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 function BriefSummary({ brief }: { brief: Brief }) {
   const city = CITIES.find((c) => c.id === brief.city)?.name ?? brief.city;
   return (
     <>
-      A {brief.industry.toLowerCase()} startup building {brief.description}, for {brief.targetCustomer}.{" "}
+      {capitalize(brief.description)}, reaching {brief.targetCustomer}.{" "}
       {usd(brief.monthlyBudget)} a month on ads in {city}.
     </>
   );
