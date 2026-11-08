@@ -112,7 +112,7 @@ export function BriefForm({
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="group/form flex flex-col gap-10">
+    <form noValidate onSubmit={handleSubmit} className="group/form flex flex-col gap-16">
       <p className={cn(sentenceType, "leading-[1.55] text-balance")}>
         We&rsquo;re a{" "}
         <BlankSelect name="industry" label="Industry" options={INDUSTRY_OPTIONS} placeholder="pick an industry" required />{" "}
@@ -145,14 +145,6 @@ export function BriefForm({
           <BlankSelect name="city" label="City" options={CITY_OPTIONS} defaultValue={CITIES[0].id} />.
         </span>
       </p>
-
-      <ul aria-label="Boroughs mapped" className="flex flex-wrap gap-2">
-        {CITIES[0].areas.map((area) => (
-          <li key={area} className="rounded-full border-2 border-foreground/15 px-4 py-1.5 text-sm font-medium text-foreground/70">
-            {area}
-          </li>
-        ))}
-      </ul>
 
       <div className="flex flex-wrap items-center gap-4">
         <Button type="submit" disabled={busy} className="h-12 gap-2.5 rounded-full pr-5 pl-6 text-base">
