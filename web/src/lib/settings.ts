@@ -9,7 +9,7 @@ import type { LayerId } from "@/lib/gap";
 // one small store, read with useSettings().
 
 export type Corners = "rounded" | "sharp";
-export type PaletteId = "classic" | "teal" | "blue" | "purple" | "navy";
+export type PaletteId = "warm" | "classic" | "teal" | "blue" | "purple" | "navy";
 /** "fade" paints five percentile classes with the bottom half clear; "classic" is the earlier ramp that tints every tract by its score. */
 export type HeatStyle = "fade" | "classic";
 /** Competition depends only on distance to the nearest ad, so percentile classes would draw distance rings around the ads. */
@@ -28,9 +28,9 @@ export type Settings = {
   dark: boolean;
 };
 
-const DEFAULTS: Settings = { corners: "rounded", palette: "classic", heat: "fade", cost: true, mode: "system", dark: false };
+const DEFAULTS: Settings = { corners: "rounded", palette: "warm", heat: "fade", cost: true, mode: "system", dark: false };
 // Bumped when the default palette changed, so saved choices do not hide it.
-const STORAGE_KEY = "placewise-settings-3";
+const STORAGE_KEY = "placewise-settings-4";
 
 /** The heatmap's colours, which the map needs as plain values rather than CSS variables. */
 export type Heat = { mid: string; hot: string };
@@ -39,6 +39,8 @@ export type Heat = { mid: string; hot: string };
 export type PaletteTheme = {
   swatches: string[];
   heat: Heat;
+  /** The background glow's lightest blob; the other blobs use the heat variables. */
+  glow: string;
   /** The four filled map classes, from the 50th to 75th percentile up to the top 3%. */
   ramp: [string, string, string, string];
   /** Placement markers, and the colour of the selected one. */
@@ -58,12 +60,39 @@ export type Palette = {
   night: PaletteTheme;
 };
 
+const CLASSIC_NIGHT_VARS: Record<string, string> = {
+  "--background": "#14161B",
+  "--foreground": "#E7EAF0",
+  "--card": "#1B1E25",
+  "--card-foreground": "#E7EAF0",
+  "--popover": "#20242C",
+  "--popover-foreground": "#F1F3F7",
+  "--primary": "#E7EAF0",
+  "--primary-foreground": "#14161B",
+  "--secondary": "#242A34",
+  "--secondary-foreground": "#E7EAF0",
+  "--muted": "#242A34",
+  "--muted-foreground": "#A4ACBB",
+  "--accent": "#F4F6FA",
+  "--accent-foreground": "#14161B",
+  "--border": "#343B48",
+  "--input": "#3B4351",
+  "--ring": "#6E95EA",
+  "--heat-cool": "#10214A",
+  "--heat-mid": "#F2B134",
+  "--heat-hot": "#E0334F",
+};
+
 export const PALETTES: Record<PaletteId, Palette> = {
-  classic: {
-    label: "Classic",
+  // The background glow is built from exactly the map's four class colours.
+  // Light mode's heat variables are the :root defaults in globals.css, so the
+  // page paints this palette before the saved settings load.
+  warm: {
+    label: "Amber, red",
     light: {
-      swatches: ["#eceff3", "#c9cfd8", "#2b59c3", "#f2b134", "#e0334f"],
+      swatches: ["#eceff3", "#c9cfd8", "#f7d58e", "#f2b134", "#ec7a3f", "#e0334f"],
       heat: { mid: "#f2b134", hot: "#e0334f" },
+      glow: "#F7D58E",
       ramp: ["#F7D58E", "#F2B134", "#EC7A3F", "#E0334F"],
       accent: "#E0334F",
       accentDark: "#C9CFD8",
@@ -72,35 +101,40 @@ export const PALETTES: Record<PaletteId, Palette> = {
       vars: {},
     },
     night: {
-      swatches: ["#14161b", "#343b48", "#2b59c3", "#f2b134", "#e0334f"],
+      swatches: ["#14161b", "#343b48", "#f7d58e", "#f2b134", "#ec7a3f", "#e0334f"],
       heat: { mid: "#f2b134", hot: "#e0334f" },
+      glow: "#F7D58E",
       ramp: ["#F7D58E", "#F2B134", "#EC7A3F", "#E0334F"],
       accent: "#F4F6FA",
       accentDark: "#C9CFD8",
       ink3: "#8792A2",
       tab: "#E7EAF0",
-      vars: {
-        "--background": "#14161B",
-        "--foreground": "#E7EAF0",
-        "--card": "#1B1E25",
-        "--card-foreground": "#E7EAF0",
-        "--popover": "#20242C",
-        "--popover-foreground": "#F1F3F7",
-        "--primary": "#E7EAF0",
-        "--primary-foreground": "#14161B",
-        "--secondary": "#242A34",
-        "--secondary-foreground": "#E7EAF0",
-        "--muted": "#242A34",
-        "--muted-foreground": "#A4ACBB",
-        "--accent": "#F4F6FA",
-        "--accent-foreground": "#14161B",
-        "--border": "#343B48",
-        "--input": "#3B4351",
-        "--ring": "#6E95EA",
-        "--heat-cool": "#10214A",
-        "--heat-mid": "#F2B134",
-        "--heat-hot": "#E0334F",
-      },
+      vars: { ...CLASSIC_NIGHT_VARS, "--heat-cool": "#EC7A3F" },
+    },
+  },
+  classic: {
+    label: "Classic",
+    light: {
+      swatches: ["#eceff3", "#c9cfd8", "#2b59c3", "#f2b134", "#e0334f"],
+      heat: { mid: "#f2b134", hot: "#e0334f" },
+      glow: "#5B86E5",
+      ramp: ["#F7D58E", "#F2B134", "#EC7A3F", "#E0334F"],
+      accent: "#E0334F",
+      accentDark: "#C9CFD8",
+      ink3: "#8A929E",
+      tab: "#15171C",
+      vars: { "--heat-cool": "#2B59C3" },
+    },
+    night: {
+      swatches: ["#14161b", "#343b48", "#2b59c3", "#f2b134", "#e0334f"],
+      heat: { mid: "#f2b134", hot: "#e0334f" },
+      glow: "#5B86E5",
+      ramp: ["#F7D58E", "#F2B134", "#EC7A3F", "#E0334F"],
+      accent: "#F4F6FA",
+      accentDark: "#C9CFD8",
+      ink3: "#8792A2",
+      tab: "#E7EAF0",
+      vars: CLASSIC_NIGHT_VARS,
     },
   },
   // Ink, border and background tokens with a teal ramp and a coral accent:
@@ -111,6 +145,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     light: {
       swatches: ["#EEF6F5", "#BFE0DC", "#7FC2BA", "#2F8F86", "#0B5450", "#F2603D"],
       heat: { mid: "#7FC2BA", hot: "#2F8F86" },
+      glow: "#5B86E5",
       ramp: ["#BFE0DC", "#7FC2BA", "#2F8F86", "#0B5450"],
       accent: "#F2603D",
       accentDark: "#C9431F",
@@ -142,6 +177,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     night: {
       swatches: ["#0c1614", "#263632", "#7fc2ba", "#2f8f86", "#f2603d"],
       heat: { mid: "#4FB3A8", hot: "#BFE0DC" },
+      glow: "#5B86E5",
       ramp: ["#2F8F86", "#5CBFB4", "#8FD8D0", "#C6EDE8"],
       accent: "#F2603D",
       accentDark: "#FF8163",
@@ -176,6 +212,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     light: {
       swatches: ["#EEF2F8", "#BCCBE3", "#7895C4", "#33589B", "#14264D", "#C6F432"],
       heat: { mid: "#7895C4", hot: "#33589B" },
+      glow: "#5B86E5",
       ramp: ["#BCCBE3", "#7895C4", "#33589B", "#14264D"],
       accent: "#C6F432",
       accentDark: "#8DB515",
@@ -207,6 +244,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     night: {
       swatches: ["#0b1220", "#24344f", "#7895c4", "#33589b", "#c6f432"],
       heat: { mid: "#7895C4", hot: "#D6E6FB" },
+      glow: "#5B86E5",
       ramp: ["#33589B", "#6288C6", "#9CBDE8", "#D6E6FB"],
       accent: "#C6F432",
       accentDark: "#DCFF74",
@@ -241,6 +279,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     light: {
       swatches: ["#F2F0FB", "#CFC8F0", "#9D8FDD", "#6650C2", "#33228A", "#F2A516"],
       heat: { mid: "#9D8FDD", hot: "#6650C2" },
+      glow: "#5B86E5",
       ramp: ["#CFC8F0", "#9D8FDD", "#6650C2", "#33228A"],
       accent: "#F2A516",
       accentDark: "#C07F00",
@@ -272,6 +311,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     night: {
       swatches: ["#100d1b", "#2e2748", "#9d8fdd", "#6650c2", "#f2a516"],
       heat: { mid: "#9D8FDD", hot: "#E3DDF8" },
+      glow: "#5B86E5",
       ramp: ["#5A48A8", "#8372D2", "#B3A6E8", "#E3DDF8"],
       accent: "#F2A516",
       accentDark: "#FFC24D",
@@ -303,7 +343,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
   },
   // The heat colours darken from light to dark rather than changing hue alone,
   // so a reader who cannot tell the hues apart still ranks the tracts. That is
-  // what the four themes above lack: their lightness peaks at heat-mid, which
+  // what the five themes above lack: their lightness peaks at heat-mid, which
   // leaves heat-cool and heat-hot equally bright. Night mode keeps the same
   // idea with the lightness running the other way, since a dark map needs the
   // hot tracts to be the bright ones.
@@ -313,6 +353,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     light: {
       swatches: ["#F7FBFF", "#C7E9B4", "#41B6C4", "#1D91C0", "#08306B", "#FEB24C"],
       heat: { mid: "#41B6C4", hot: "#08306B" },
+      glow: "#5B86E5",
       ramp: ["#C7E9B4", "#41B6C4", "#1D91C0", "#08306B"],
       accent: "#FEB24C",
       accentDark: "#D98A1E",
@@ -344,6 +385,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
     night: {
       swatches: ["#08101c", "#20334a", "#41b6c4", "#1d91c0", "#feb24c"],
       heat: { mid: "#41B6C4", hot: "#D9F6F8" },
+      glow: "#5B86E5",
       ramp: ["#1D6B75", "#41B6C4", "#8FE0E6", "#D9F6F8"],
       accent: "#FEB24C",
       accentDark: "#FFD08A",
@@ -418,6 +460,7 @@ function apply(settings: Settings) {
     root.style.setProperty("--accent-dark", theme.accentDark);
     root.style.setProperty("--ink-3", theme.ink3);
     root.style.setProperty("--tab-active", theme.tab);
+    root.style.setProperty("--heat-glow", theme.glow);
   });
 }
 

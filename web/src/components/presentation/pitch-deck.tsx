@@ -135,7 +135,7 @@ function SlideGlow() {
   return (
     <div aria-hidden className="absolute inset-0 overflow-hidden bg-heat-cool">
       <div className="heat-glow-spin absolute inset-0">
-        <div className="heat-glow-drift absolute -top-[20%] -right-[10%] size-[760px] rounded-full bg-[#5b86e5] blur-[120px]" style={drift("-560px", "300px", 8)} />
+        <div className="heat-glow-drift absolute -top-[20%] -right-[10%] size-[760px] rounded-full bg-heat-glow blur-[120px]" style={drift("-560px", "300px", 8)} />
         <div className="heat-glow-drift absolute -bottom-[25%] -left-[15%] size-[820px] rounded-full bg-heat-hot blur-[140px]" style={drift("620px", "-260px", 10)} />
         <div className="heat-glow-drift absolute -right-[20%] -bottom-[30%] size-[820px] rounded-full bg-heat-mid blur-[140px]" style={drift("-480px", "-360px", 7)} />
       </div>
