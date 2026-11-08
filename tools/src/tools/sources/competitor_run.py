@@ -8,8 +8,8 @@ from urllib.request import Request, urlopen
 OUTPUT = Path(__file__).resolve().parents[4] / "data/competitors/sample-run.json"
 BRIEF = {
     "industry": "Consumer app",
-    "description": "a dating app for people looking for a serious relationship",
-    "targetCustomer": "single professionals in their late twenties and thirties living in Manhattan and Brooklyn",
+    "description": "a dating app for serious relationships",
+    "targetCustomer": "single professionals in their 20s and 30s",
     "customerPays": {"amount": 30, "per": "month"},
     "monthlyBudget": 8000,
     "city": "new-york",

@@ -2,8 +2,8 @@
   "recordedAt": "2026-11-08T08:34:48.261Z",
   "brief": {
     "industry": "Consumer app",
-    "description": "a dating app for people looking for a serious relationship",
-    "targetCustomer": "single professionals in their late twenties and thirties living in Manhattan and Brooklyn",
+    "description": "a dating app for serious relationships",
+    "targetCustomer": "single professionals in their 20s and 30s",
     "customerPays": {
       "amount": 30,
       "per": "month"
