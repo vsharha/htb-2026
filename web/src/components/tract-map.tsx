@@ -13,7 +13,7 @@ import type { MapFocus } from "@/components/use-map-focus";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
-import { tractLabel } from "@/lib/tracts";
+import { tractCode, tractName } from "@/lib/tracts";
 
 // MapLibre looks for its worker next to its own module, where the bundler
 // leaves nothing. This hands the bundler the worker file to emit and serve.
@@ -212,7 +212,8 @@ export function TractMap({
           style={{ zIndex: 5 }}
         >
           <div className="font-sans text-xs leading-tight text-foreground">
-            <p className="font-medium">{tractLabel(hoveredTract.geoid)}</p>
+            <p className="font-medium">{tractName(hoveredTract.geoid)}</p>
+            <p className="text-[10px] text-muted-foreground/70">{tractCode(hoveredTract.geoid)}</p>
             <p className="mt-0.5 text-muted-foreground">
               {TRACT_VALUE[layer].label}{" "}
               <span className="font-mono tabular-nums text-foreground">{TRACT_VALUE[layer].format(hoveredTract.value)}</span>

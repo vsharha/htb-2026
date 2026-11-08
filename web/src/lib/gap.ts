@@ -11,7 +11,7 @@ export type TractShapes = {
   type: "FeatureCollection";
   features: {
     type: "Feature";
-    properties: { geoid: string; borough: string };
+    properties: { geoid: string; borough: string; neighborhood?: string };
     geometry:
       | { type: "Polygon"; coordinates: Position[][] }
       | { type: "MultiPolygon"; coordinates: Position[][][] };

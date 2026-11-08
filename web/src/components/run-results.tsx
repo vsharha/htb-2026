@@ -10,7 +10,7 @@ import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { computeLayers, recommendationLayer, strongest, type LayerId, type TractLayers } from "@/lib/gap";
 import { researchOutcome } from "@/lib/research-outcome";
-import { tractLabel } from "@/lib/tracts";
+import { tractCode, tractName } from "@/lib/tracts";
 
 /** The heatmap's colour for a score from 0 to 1. */
 export function heatColor(score: number) {
@@ -74,7 +74,10 @@ function TractRanking({ layers, layer, value }: { layers: TractLayers; layer: La
       {strongest(layers, layer, TOP_TRACTS).map((geoid) => (
         <li key={geoid} className="flex items-center gap-3 border-b border-border py-2 text-sm last:border-0">
           <span className="size-3 shrink-0 rounded-full" style={{ background: heatColor(layers[geoid][layer]) }} />
-          <span className="flex-1">{tractLabel(geoid)}</span>
+          <span className="flex-1">
+            {tractName(geoid)}
+            <span className="ml-2 text-[11px] text-muted-foreground/70">{tractCode(geoid)}</span>
+          </span>
           <span className="font-mono text-xs tabular-nums text-muted-foreground">{value(layers[geoid][layer])}</span>
         </li>
       ))}
@@ -124,7 +127,10 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
             </span>
           </span>
           <span className="flex items-baseline justify-between gap-3 text-xs text-muted-foreground">
-            <span>{p.address} · {tractLabel(p.geoid)}</span>
+            <span>
+              {p.address} · {tractName(p.geoid)}
+              <span className="ml-1.5 text-[10px] opacity-60">{tractCode(p.geoid)}</span>
+            </span>
             <span className="shrink-0">{p.measurement}</span>
           </span>
         </span>

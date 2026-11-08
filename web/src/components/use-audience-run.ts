@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { findPlacements, runCompetitorAgent, scoreAudience } from "@/lib/api";
 import type { AgentEvent, AudienceFit, Brief, Campaign, Competitor, Placement } from "@/lib/contract";
+import { registerNeighborhoods } from "@/lib/tracts";
 import { computeLayers, recommendationLayer, strongest, type TractShapes } from "@/lib/gap";
 
 export type RunState = {
@@ -28,9 +29,11 @@ let shapesRequest: Promise<TractShapes> | null = null;
 
 /** The tract shapes, fetched once per page load. */
 function loadShapes() {
-  shapesRequest ??= fetch("/api/tracts").then((r) => {
+  shapesRequest ??= fetch("/api/tracts").then(async (r) => {
     if (!r.ok) throw new Error(`Could not load the tract shapes (HTTP ${r.status})`);
-    return r.json();
+    const shapes: TractShapes = await r.json();
+    registerNeighborhoods(shapes);
+    return shapes;
   });
   return shapesRequest;
 }
