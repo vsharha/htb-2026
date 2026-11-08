@@ -187,7 +187,14 @@ function ProblemSlide() {
           alt="Map of the San Francisco Bay Area covered in colourful location pins"
           width={640}
           height={671}
-          className="absolute top-20 right-24 w-[340px] rounded-2xl border border-border"
+          className="absolute top-16 right-60 w-[260px] rounded-2xl border border-border"
+        />
+        <Image
+          src="/images/nyc-startup-map.png"
+          alt="Map of Manhattan and north Brooklyn with startup logos pinned across it, clustered in Midtown"
+          width={800}
+          height={935}
+          className="absolute top-32 right-16 w-[270px] rounded-2xl border border-border"
         />
         <p className="mt-36 text-[1.9rem] leading-snug text-muted-foreground">
           <span className="font-bold text-heat-hot">5,556</span> street ad spots in New York. Which ones reach your
@@ -379,6 +386,9 @@ function NextStepsSlide() {
     <Slide padding="0px">
       <SlideBody number={5}>
         <Eyebrow>Next steps</Eyebrow>
+        <h2 className="mt-6 max-w-[1050px] font-heading text-[4.75rem] leading-[1] font-bold tracking-[-0.03em] text-balance">
+          Take it beyond New York.
+        </h2>
         <ul className="mt-14 list-disc space-y-5 pl-10 text-[2.4rem] leading-snug marker:text-muted-foreground">
           {nextSteps.map((step) => (
             <li key={step}>{step}</li>
