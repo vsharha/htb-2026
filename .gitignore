@@ -3,3 +3,13 @@
 .DS_Store
 data/raw/
 .playwright-mcp/
+
+# Vultr deployment: the API key, the OpenTofu state (it holds the endpoint's
+# bearer token) and the downloaded providers stay local. The lock file is not
+# committed because it was generated from a local provider mirror, so its
+# checksums differ from the registry's; a normal `tofu init` regenerates it.
+infra/vultr/api-key
+infra/vultr/.terraform/
+infra/vultr/.terraform.lock.hcl
+infra/vultr/*.tfstate
+infra/vultr/*.tfstate.*
