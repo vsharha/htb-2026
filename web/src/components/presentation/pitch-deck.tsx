@@ -184,12 +184,10 @@ function ProblemSlide() {
           height={671}
           className="absolute top-20 right-24 w-[340px] rounded-2xl border border-border"
         />
-        <div className="mt-auto flex items-end gap-16">
-          <p className="font-heading text-[8rem] leading-[0.85] font-bold tracking-[-0.04em] text-heat-hot">5,556</p>
-          <p className="max-w-[640px] pb-2 text-[1.9rem] leading-snug text-muted-foreground">
-            street ad spots in New York. Which ones reach your customers?
-          </p>
-        </div>
+        <p className="mt-auto text-[1.9rem] leading-snug text-muted-foreground">
+          <span className="font-bold text-heat-hot">5,556</span> street ad spots in New York. Which ones reach your
+          customers?
+        </p>
       </SlideBody>
       <Notes>
         A media agency would tell you where to advertise offline, but early startups don&rsquo;t have one. Prices for
