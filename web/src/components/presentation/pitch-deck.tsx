@@ -184,7 +184,7 @@ function ProblemSlide() {
           height={671}
           className="absolute top-20 right-24 w-[340px] rounded-2xl border border-border"
         />
-        <p className="mt-auto text-[1.9rem] leading-snug text-muted-foreground">
+        <p className="mt-36 text-[1.9rem] leading-snug text-muted-foreground">
           <span className="font-bold text-heat-hot">5,556</span> street ad spots in New York. Which ones reach your
           customers?
         </p>
