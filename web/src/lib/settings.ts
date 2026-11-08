@@ -10,9 +10,9 @@ export type Corners = "rounded" | "sharp";
 export type PaletteId = "default" | "blue" | "purple" | "teal";
 /** "fade" keeps the weakest 65% of tracts nearly clear; "classic" is the earlier ramp that tints every tract by its score. */
 export type HeatStyle = "fade" | "classic";
-export type Settings = { corners: Corners; palette: PaletteId; heat: HeatStyle };
+export type Settings = { corners: Corners; palette: PaletteId; heat: HeatStyle; cost: boolean };
 
-const DEFAULTS: Settings = { corners: "rounded", palette: "default", heat: "fade" };
+const DEFAULTS: Settings = { corners: "rounded", palette: "default", heat: "fade", cost: true };
 const STORAGE_KEY = "placewise-settings";
 
 /** The heatmap's colours, which the map needs as plain values rather than CSS variables. */
@@ -133,6 +133,7 @@ function load() {
       corners: saved.corners === "sharp" ? "sharp" : "rounded",
       palette: saved.palette in PALETTES ? saved.palette : "default",
       heat: saved.heat === "classic" ? "classic" : "fade",
+      cost: saved.cost !== false,
     };
   } catch {
     current = DEFAULTS;

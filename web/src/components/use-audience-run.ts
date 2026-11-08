@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { findPlacements, runCompetitorAgent, scoreAudience } from "@/lib/api";
 import type { AgentEvent, AudienceFit, Brief, Campaign, Competitor, Placement } from "@/lib/contract";
+import { useSettings } from "@/lib/settings";
 import { registerNeighborhoods } from "@/lib/tracts";
 import { computeLayers, recommendationLayer, strongest, type TractShapes } from "@/lib/gap";
 
@@ -92,9 +93,7 @@ export function useAudienceRun() {
           geoids: strongest(layers, recommendationLayer(campaigns), Object.keys(layers).length),
           monthlyBudget: brief.monthlyBudget,
         });
-        // Cheapest first, so the list order, the map numbers and the "lowest cost" tag agree.
-        const placements = [...found].sort((a, b) => a.costPerAudienceMember - b.costPerAudienceMember);
-        update(() => ({ placements }));
+        update(() => ({ placements: found }));
       };
       await rankPlacements();
       await agent;
@@ -106,5 +105,17 @@ export function useAudienceRun() {
     }
   }, []);
 
-  return { run, start };
+  // The experimental cost estimate orders the list cheapest first, so the list,
+  // the map numbers and the "lowest cost" tag agree; without it the order stays
+  // by area.
+  const { cost } = useSettings();
+  const ordered = useMemo(
+    () =>
+      run?.placements && cost
+        ? { ...run, placements: [...run.placements].sort((a, b) => a.costPerAudienceMember - b.costPerAudienceMember) }
+        : run,
+    [run, cost],
+  );
+
+  return { run: ordered, start };
 }

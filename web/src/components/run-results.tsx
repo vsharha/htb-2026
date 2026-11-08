@@ -10,6 +10,7 @@ import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { computeLayers, recommendationLayer, strongest, type LayerId, type TractLayers } from "@/lib/gap";
 import { researchOutcome } from "@/lib/research-outcome";
+import { useSettings } from "@/lib/settings";
 import { tractCode, tractName } from "@/lib/tracts";
 
 /** The heatmap's colour for a score from 0 to 1. */
@@ -91,7 +92,8 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
   const active = focus.hovered === p.id || chosen;
   // Rows read like the tract rankings: a divider between each, no cards. The
   // list is sorted by cost, so the first placement is the lowest cost one and is tagged, and the picked one is shaded.
-  const best = number === 1;
+  const { cost } = useSettings();
+  const best = cost && number === 1;
 
   // A click on the marker scrolls its row into view.
   const selected = focus.selected;
@@ -126,10 +128,12 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
           {best && <span className="w-fit bg-accent px-1.5 text-[11px] font-semibold tracking-wide text-accent-foreground uppercase">Lowest cost</span>}
           <span className="flex items-baseline justify-between gap-3 text-sm">
             <span className={best || chosen ? "font-semibold" : "font-medium"}>{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
-            <span className="text-right">
-              <span className="font-mono tabular-nums">${p.costPerAudienceMember.toFixed(3)}</span>
-              <span className="text-xs text-muted-foreground"> / customer</span>
-            </span>
+            {cost && (
+              <span className="text-right">
+                <span className="font-mono tabular-nums">${p.costPerAudienceMember.toFixed(3)}</span>
+                <span className="text-xs text-muted-foreground"> / customer</span>
+              </span>
+            )}
           </span>
           <span className="flex items-baseline justify-between gap-3 text-xs text-muted-foreground">
             <span>
@@ -144,9 +148,10 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
 }
 
 function PlacementsSection({ run, focus, audienceOnly }: { run: RunState; focus: MapFocus; audienceOnly: boolean }) {
+  const { cost } = useSettings();
   return (
     <Section title="Placements to buy" aside={run.placements && `${run.placements.length} found`}>
-      <p className="text-xs text-muted-foreground">Sorted by estimated cost per customer, lowest first.</p>
+      {cost && <p className="text-xs text-muted-foreground">Sorted by estimated cost per customer, lowest first.</p>}
       {audienceOnly && (
         <p className="text-xs text-muted-foreground">
           Chosen by audience fit. Competition coverage is unknown, so these are not confirmed gaps in competitors&rsquo; advertising.

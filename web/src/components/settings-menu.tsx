@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  */
 export function SettingsMenu() {
   const [open, setOpen] = useState(false);
-  const { corners, palette, heat } = useSettings();
+  const { corners, palette, heat, cost } = useSettings();
 
   return (
     <div className="fixed right-5 bottom-5 z-50 flex flex-col items-end gap-2">
@@ -49,6 +49,21 @@ export function SettingsMenu() {
               Fade weak tracts
               <span className="block text-xs text-muted-foreground">
                 On: only the strongest third of tracts glow. Off: the earlier ramp, where every tract is tinted by its score.
+              </span>
+            </span>
+          </label>
+
+          <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
+              checked={cost}
+              onChange={(e) => updateSettings({ cost: e.target.checked })}
+              className="mt-0.5 size-4 accent-foreground"
+            />
+            <span>
+              Cost estimate
+              <span className="block text-xs text-muted-foreground">
+                Shows an invented price per customer on each placement, sorts by it and tags the lowest. Off: no prices, listed by area.
               </span>
             </span>
           </label>
