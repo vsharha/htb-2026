@@ -1,0 +1,5 @@
+in the customers view, can we add hover on boxes to see their values
+
+---
+
+why are you installing chromium you dont need it
