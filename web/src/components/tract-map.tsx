@@ -10,7 +10,7 @@ import type { PlacementFocus } from "@/components/use-placement-focus";
 
 import type { Campaign, Placement } from "@/lib/contract";
 import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
-import type { LayerId, TractLayers, TractShapes } from "@/lib/gap";
+import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
 
 // MapLibre looks for its worker next to its own module, where the bundler
 // leaves nothing. This hands the bundler the worker file to emit and serve.
@@ -74,6 +74,9 @@ export function TractMap({
   });
   const popupCampaign = selectedCampaign && campaigns.includes(selectedCampaign) ? selectedCampaign : null;
   const popupLocation = popupCampaign && getCampaignLocation(popupCampaign);
+  const audienceOnly = recommendationLayer(campaigns) === "fit";
+  const paintLayer = layer === "gap" && audienceOnly ? "fit" : layer;
+  const showTracts = layer !== "competition" || !audienceOnly;
 
   return (
     <Map
@@ -87,8 +90,8 @@ export function TractMap({
     >
       <NavigationControl position="top-right" showCompass={false} />
       <Source id="tracts" type="geojson" data={tracts}>
-        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer) }} />
-        <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.3, "line-opacity": 0.6 }} />
+        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(paintLayer), "fill-opacity": showTracts ? 1 : 0 }} />
+        <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.3, "line-opacity": showTracts ? 0.6 : 0 }} />
       </Source>
       {layer !== "fit" && campaignMarkers.map(({ campaign, location, id }) => (
         <Marker key={id} longitude={location.longitude} latitude={location.latitude} anchor="center" style={{ zIndex: selectedCampaign === campaign ? 5 : 3 }}>
@@ -117,7 +120,7 @@ export function TractMap({
           </div>
         </Popup>
       )}
-      {/* Placements come from the gap, so the customers view leaves them out. */}
+      {/* The recommendations tab keeps placement numbers separate from audience traits. */}
       {layer !== "fit" &&
         placements?.map((p, i) => {
           const active = focus.hovered === p.id || focus.selected?.id === p.id;

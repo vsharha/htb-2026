@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { LAYERS } from "@/components/layer-tabs";
 import type { PlacementFocus } from "@/components/use-placement-focus";
 import type { Campaign, Placement } from "@/lib/contract";
-import type { LayerId, TractLayers, TractShapes } from "@/lib/gap";
+import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
 import { cn } from "@/lib/utils";
 
 // MapLibre needs the browser's WebGL, so the map is never rendered on the server.
@@ -40,7 +40,8 @@ export function MapPanel({
   /** Sizes the map; the panel fills whatever box this gives it. */
   className?: string;
 }) {
-  const current = LAYERS.find((l) => l.id === layer)!;
+  const audienceOnly = recommendationLayer(campaigns) === "fit";
+  const current = LAYERS.find((l) => l.id === (layer === "gap" && audienceOnly ? "fit" : layer))!;
 
   return (
     <section className={cn("relative overflow-hidden", className)}>
@@ -51,14 +52,21 @@ export function MapPanel({
       )}
 
       <div className="pointer-events-none absolute bottom-9 left-3 w-52 rounded-xl bg-background/95 p-3 shadow-sm sm:bottom-4 sm:left-4 sm:w-56">
-        <div
-          className="h-2 rounded-full"
-          style={{ background: "linear-gradient(to right, var(--heat-cool), var(--heat-mid), var(--heat-hot))" }}
-        />
-        <div className="mt-1.5 flex justify-between gap-3 text-xs text-muted-foreground">
-          <span>{current.low}</span>
-          <span className="text-right">{current.high}</span>
-        </div>
+        {layer === "competition" && audienceOnly ? (
+          <p className="text-xs text-muted-foreground">Current competition coverage unknown</p>
+        ) : (
+          <>
+            <div
+              className="h-2 rounded-full"
+              style={{ background: "linear-gradient(to right, var(--heat-cool), var(--heat-mid), var(--heat-hot))" }}
+            />
+            <div className="mt-1.5 flex justify-between gap-3 text-xs text-muted-foreground">
+              <span>{current.low}</span>
+              <span className="text-right">{current.high}</span>
+            </div>
+          </>
+        )}
+        {layer === "gap" && audienceOnly && <p className="mt-2 text-xs text-muted-foreground">Audience fit only. Competition coverage unknown.</p>}
         {layer !== "fit" && (
           <ul className="mt-3 flex flex-col gap-1.5 text-xs">
             <li className="flex items-center gap-2">

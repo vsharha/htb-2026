@@ -101,12 +101,22 @@ export type Campaign = {
   locationNote?: string;
 };
 
+export type ResearchSummary = {
+  status: "complete" | "partial" | "failed" | "timed-out";
+  searches: number;
+  sources: number;
+  rejectedSources: number;
+  competitorsSearched: string[];
+  competitorsCompleted: string[];
+};
+
 /** One message streamed by the competitor-campaign agent's Route Handler. */
 export type AgentEvent =
   | { type: "step"; message: string }
   | { type: "competitor"; competitor: Competitor }
   | { type: "campaign"; campaign: Campaign }
   | { type: "recording"; recordedAt: string }
+  | { type: "research"; summary: ResearchSummary }
   | { type: "done" }
   | { type: "error"; message: string };
 

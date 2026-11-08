@@ -1,0 +1,133 @@
+import assert from "node:assert/strict";
+import { registerHooks } from "node:module";
+import test from "node:test";
+import { MockLanguageModelV4 } from "ai/test";
+
+registerHooks({ resolve(specifier, context, nextResolve) {
+  if (specifier === "server-only") return { url: "data:text/javascript,", shortCircuit: true };
+  if (specifier.startsWith("@/")) return nextResolve(new URL(`../src/${specifier.slice(2)}.ts`, import.meta.url).href, context);
+  if (specifier.startsWith(".") && !/\.[a-z]+$/.test(specifier) && context.parentURL?.includes("/src/")) return nextResolve(new URL(`${specifier}.ts`, context.parentURL).href, context);
+  return nextResolve(specifier, context);
+} });
+const { runCompetitorResearch } = await import("../src/lib/server/competitor-agent.ts");
+const { getCompetitorAI } = await import("../src/lib/server/ai.ts");
+const { researchOutcome } = await import("../src/lib/research-outcome.ts");
+const { recommendationLayer } = await import("../src/lib/gap.ts");
+
+const brief = { industry: "Fintech", description: "a shared budgeting app", targetCustomer: "roommates", city: "new-york" };
+const competitors = ["Alpha", "Beta", "Gamma"];
+const url = (name) => `https://agency.example/${name.toLowerCase()}`;
+const finding = (name) => ({ competitor: name, title: "NYC subway campaign", kind: "subway", sourceUrl: url(name), evidence: "A source-supported NYC subway campaign.", stationName: null, location: null, startsOn: null, endsOn: null });
+
+function adapter({ fail, timeout, unfinished, rejectSource = false, empty = false } = {}) {
+  const steps = new Map();
+  const model = new MockLanguageModelV4({ doStream: async (options) => {
+    const discovery = options.tools.some((tool) => tool.name === "finishDiscovery");
+    const prompt = options.prompt.find((message) => message.role === "user").content.map((part) => part.text ?? "").join("");
+    const name = discovery ? "discovery" : competitors.find((candidate) => prompt.includes(`"name":"${candidate}"`));
+    assert.ok(name, "Every campaign phase must be assigned a competitor");
+    const step = steps.get(name) ?? 0;
+    steps.set(name, step + 1);
+    if (!discovery) {
+      assert.match(prompt, /billboard bus shelter LinkNYC/);
+      assert.match(prompt, /site:outfront.com/);
+      assert.match(prompt, /site:intersection.com/);
+    }
+    if (!discovery && step < 2) assert.deepEqual(options.toolChoice, { type: "tool", toolName: "web_search" });
+    if (name === fail) throw new Error("Search provider unavailable");
+    if (name === timeout) throw new DOMException("Search deadline reached", "TimeoutError");
+    let toolName, input, result;
+    if (discovery && step === 0 || !discovery && step < 2) {
+      toolName = "web_search";
+      input = { query: `${name} NYC campaign ${step}` };
+      result = { sources: (discovery ? competitors : [name]).map((candidate) => ({ type: "url", url: url(candidate) })), action: { type: "search", query: input.query } };
+    } else if (discovery && step <= 3) {
+      toolName = "reportCompetitor";
+      input = { name: competitors[step - 1], reason: "Same customers", sourceUrl: url(competitors[step - 1]) };
+    } else if (discovery) {
+      toolName = "finishDiscovery";
+      input = {};
+    } else if (!empty && (step === 2 || rejectSource && step === 3 || name === unfinished)) {
+      toolName = "reportCampaign";
+      input = finding(name);
+      if (rejectSource && step === 2) input.sourceUrl = "https://unseen.example/campaign";
+    } else {
+      toolName = "finishResearch";
+      input = {};
+    }
+    const toolCallId = `${name}-${step}`;
+    const parts = [{ type: "stream-start", warnings: [] }, { type: "tool-call", toolCallId, toolName, input: JSON.stringify(input), ...(result ? { providerExecuted: true } : {}) }];
+    if (result) parts.push({ type: "tool-result", toolCallId, toolName, result });
+    parts.push({ type: "finish", finishReason: { unified: "tool-calls" }, usage: { inputTokens: { total: 1 }, outputTokens: { total: 1 } } });
+    return { stream: new ReadableStream({ start(controller) { for (const part of parts) controller.enqueue(part); controller.close(); } }) };
+  } });
+  return { ...getCompetitorAI(), configured: true, model };
+}
+
+async function research(options) {
+  const events = [];
+  const complete = await runCompetitorResearch(brief, new AbortController().signal, (event) => events.push(event), adapter(options));
+  return { complete, events, summary: events.findLast((event) => event.type === "research").summary };
+}
+
+test("each competitor receives both search passes and can report undated, unmapped campaigns", async () => {
+  const { complete, events, summary } = await research();
+  assert.equal(complete, true);
+  assert.deepEqual(summary.competitorsSearched.sort(), competitors);
+  assert.deepEqual(summary.competitorsCompleted.sort(), competitors);
+  assert.equal(summary.searches, 7);
+  assert.equal(summary.status, "complete");
+  assert.equal(events.filter((event) => event.type === "campaign").length, 3);
+  const outcome = researchOutcome(events, true);
+  assert.equal(outcome.unmapped, 3);
+  assert.equal(outcome.unknownDates, 3);
+  assert.equal(outcome.qualifying, 0);
+});
+
+test("failed and timed-out competitors do not discard other competitors' findings", async (context) => {
+  const logged = context.mock.method(console, "error", () => {});
+  for (const options of [{ fail: "Beta" }, { timeout: "Beta" }]) {
+    const { complete, events, summary } = await research(options);
+    assert.equal(complete, false);
+    assert.deepEqual(summary.competitorsCompleted.sort(), ["Alpha", "Gamma"]);
+    assert.deepEqual(events.filter((event) => event.type === "campaign").map((event) => event.campaign.competitor).sort(), ["Alpha", "Gamma"]);
+    assert.equal(summary.status, options.timeout ? "timed-out" : "partial");
+  }
+  assert.equal(logged.mock.callCount(), 2);
+});
+
+test("a competitor exhausting its step budget cannot consume another competitor's search budget", async () => {
+  const { complete, summary } = await research({ unfinished: "Beta" });
+  assert.equal(complete, false);
+  assert.equal(summary.status, "partial");
+  assert.deepEqual(summary.competitorsSearched.sort(), competitors);
+  assert.deepEqual(summary.competitorsCompleted.sort(), ["Alpha", "Gamma"]);
+});
+
+test("unseen source URLs are counted and never accepted as campaign evidence", async () => {
+  const { events, summary } = await research({ rejectSource: true });
+  assert.equal(summary.rejectedSources, 3);
+  assert.equal(events.filter((event) => event.type === "campaign").length, 3);
+  assert.ok(events.filter((event) => event.type === "campaign").every((event) => event.campaign.sourceUrl.startsWith("https://agency.example/")));
+});
+
+test("completed empty searches differ from failure, partial research and timeouts", async () => {
+  const { events } = await research({ empty: true });
+  assert.equal(researchOutcome(events, true).label, "Search completed");
+  assert.match(researchOutcome(events, true).empty, /completed searches/);
+  for (const [status, label] of [["failed", "Research failed"], ["partial", "Research incomplete"], ["timed-out", "Research timed out"]]) {
+    const outcome = researchOutcome([{ type: "research", summary: { status } }], true);
+    assert.equal(outcome.label, label);
+    assert.doesNotMatch(outcome.empty, /completed searches/);
+  }
+  assert.equal(researchOutcome([...events, { type: "error", message: "Disconnected" }], true).label, "Research incomplete");
+});
+
+test("recommendations use audience fit unless current, precisely located campaign evidence exists", () => {
+  const campaign = { ...finding("Alpha"), coverage: "unknown", station: null, mapLocation: { latitude: 40.75, longitude: -73.98, precision: "area" } };
+  assert.equal(recommendationLayer([]), "fit");
+  assert.equal(recommendationLayer([campaign]), "fit");
+  assert.equal(recommendationLayer([{ ...campaign, coverage: "current" }]), "fit");
+  assert.equal(recommendationLayer([{ ...campaign, coverage: "historical", mapLocation: { ...campaign.mapLocation, precision: "address" } }]), "fit");
+  assert.equal(recommendationLayer([{ ...campaign, coverage: "current", mapLocation: { ...campaign.mapLocation, precision: "address" } }]), "gap");
+});

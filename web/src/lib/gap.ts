@@ -23,6 +23,10 @@ export type LayerId = "gap" | "fit" | "competition";
 /** Per tract, each layer's value from 0 to 1. */
 export type TractLayers = Record<string, Record<LayerId, number>>;
 
+export function recommendationLayer(campaigns: Campaign[]): "gap" | "fit" {
+  return campaigns.some(campaignAffectsHeatmap) ? "gap" : "fit";
+}
+
 /** A campaign's reach falls to about a third at this distance from its matched location. */
 const CAMPAIGN_REACH_KM = 1;
 

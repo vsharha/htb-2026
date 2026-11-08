@@ -19,7 +19,7 @@ type ResearchEvent = {
   output?: unknown;
 };
 
-type ResearchObservation = { urls: string[]; message?: string };
+type ResearchObservation = { urls: string[]; message?: string; searched?: boolean };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -37,7 +37,7 @@ function readOpenAIResearchEvent(event: ResearchEvent): ResearchObservation {
   if (action.type === "search") {
     const queries = Array.isArray(action.queries) ? action.queries.filter((query): query is string => typeof query === "string") : [];
     const query = queries.join("; ") || (typeof action.query === "string" ? action.query : "New York outdoor campaigns");
-    return { urls, message: `Searching: ${query}` };
+    return { urls, message: `Searching: ${query}`, searched: true };
   }
   if (action.type === "openPage" && typeof action.url === "string") {
     try {

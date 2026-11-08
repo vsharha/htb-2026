@@ -6,7 +6,8 @@ import { campaignsOf, type RunState } from "@/components/use-audience-run";
 import { usePlacementFocus, type PlacementFocus } from "@/components/use-placement-focus";
 import type { Campaign, Placement } from "@/lib/contract";
 import { getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
-import { computeLayers, strongest, type LayerId, type TractLayers } from "@/lib/gap";
+import { computeLayers, recommendationLayer, strongest, type LayerId, type TractLayers } from "@/lib/gap";
+import { researchOutcome } from "@/lib/research-outcome";
 import { tractLabel } from "@/lib/tracts";
 
 /** The heatmap's colour for a score from 0 to 1. */
@@ -115,23 +116,27 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
 }
 
 function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | null; focus: PlacementFocus }) {
+  const ranking = recommendationLayer(campaignsOf(run.events));
+  const audienceOnly = ranking === "fit";
   return (
     <>
-      <Section title="Biggest gaps">
+      <Section title={audienceOnly ? "Best audience locations" : "Biggest observed gaps"}>
         {!layers ? (
           <Pending>Scoring 2,324 census tracts…</Pending>
         ) : (
-          <TractRanking layers={layers} layer="gap" value={(s) => s.toFixed(2)} />
+          <TractRanking layers={layers} layer={ranking} value={(s) => s.toFixed(2)} />
         )}
-        {layers && !run.agentDone && <Pending>Updating as competitors&rsquo; ads are found…</Pending>}
+        {layers && !run.agentDone && !run.error && <Pending>{audienceOnly ? "Researching competitors; placements currently follow audience fit…" : "Updating as more competitors’ ads are found…"}</Pending>}
         <p className="text-xs text-muted-foreground">
-          Campaign markers include approximate locations and unknown dates. Only current campaigns matched to a station or street address affect the heatmap. Missing evidence means unknown coverage.
+          {audienceOnly
+            ? "Competition coverage unknown. These placements follow audience fit; they are not confirmed gaps in competitors’ advertising."
+            : "Ranked against the current campaigns we could locate, not a complete inventory. Missing evidence means unknown coverage."}
         </p>
       </Section>
 
       <Section title="Placements to buy" aside={run.placements && `${run.placements.length} found`}>
         {!run.placements ? (
-          <Pending>Finding kiosks and bus shelters in the biggest gaps…</Pending>
+          <Pending>{audienceOnly ? "Finding kiosks and bus shelters near your audience…" : "Finding kiosks and bus shelters in the observed gaps…"}</Pending>
         ) : run.placements.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No kiosks or bus shelters in these areas fit your budget. Raise the budget to include bus shelters.
@@ -200,13 +205,13 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
   const competitors = run.events.flatMap((e) => (e.type === "competitor" ? [e.competitor] : []));
   const steps = run.events.flatMap((e) => (e.type === "step" ? [e.message] : []));
   const errors = run.events.flatMap((e) => (e.type === "error" ? [e.message] : []));
-  const unplaced = campaigns.filter((c) => !getCampaignLocation(c)).length;
+  const outcome = researchOutcome(run.events, run.agentDone || !!run.error);
 
   return (
     <>
       <Section title="Competitors" aside={`${competitors.length} found`}>
-        {competitors.length === 0 && !run.agentDone ? (
-          <Pending>Finding competitors…</Pending>
+        {competitors.length === 0 ? (
+          !run.agentDone && !run.error ? <Pending>Finding competitors…</Pending> : <p className="text-sm text-muted-foreground">No source-supported competitor matches are available from this run.</p>
         ) : (
           <ul className="flex flex-col gap-1.5 text-sm">
             {competitors.map((c) => (
@@ -220,6 +225,12 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
       </Section>
 
       <Section title="Their ads" aside={`${campaigns.length} found`}>
+        <div className="flex flex-col gap-1 text-xs text-muted-foreground" role="status">
+          <p className="font-medium text-foreground">{outcome.label}</p>
+          {outcome.summary && <p>{outcome.summary.competitorsSearched.length} of {competitors.length} competitors searched; {outcome.summary.competitorsCompleted.length} completed. {outcome.summary.searches} searches; {outcome.summary.sources} source URLs found.</p>}
+          {!!outcome.summary?.rejectedSources && <p>{outcome.summary.rejectedSources} {outcome.summary.rejectedSources === 1 ? "finding rejected" : "findings rejected"} because the source URL was absent from this research.</p>}
+          {campaigns.length > 0 && <p>{outcome.qualifying} campaigns have current dates and precise locations; {outcome.historical} historical; {outcome.unknownDates} with current dates unconfirmed.</p>}
+        </div>
         <ul className="flex flex-col gap-2.5 text-sm" aria-live="polite">
           {campaigns.map((c, i) => {
             const location = getCampaignLocation(c);
@@ -240,13 +251,14 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
             </li>;
           })}
         </ul>
-        {unplaced > 0 && (
+        {outcome.unmapped > 0 && (
           <p className="text-xs text-muted-foreground">
-            {unplaced === 1 ? "1 ad isn’t on the map" : `${unplaced} ads aren’t on the map`}: no reliable location match.
+            {outcome.unmapped === 1 ? "1 ad isn’t on the map" : `${outcome.unmapped} ads aren’t on the map`}: no reliable location match.
           </p>
         )}
         {!run.agentDone && !run.error && <Pending>{steps.at(-1) ?? "Searching…"}</Pending>}
-        {run.agentDone && campaigns.length === 0 && <p className="text-sm text-muted-foreground">No outdoor campaigns could be verified. This does not establish that competitors are absent.</p>}
+        {(run.agentDone || run.error) && campaigns.length === 0 && <p className="text-sm text-muted-foreground">{outcome.empty}</p>}
+        {campaigns.length > 0 && outcome.qualifying === 0 && <p className="text-sm text-muted-foreground">Campaign evidence was found, but none establishes current coverage at a precise location. Placement recommendations use audience fit.</p>}
         {errors.map((m) => (
           <p key={m} className="text-sm text-heat-hot">{m}</p>
         ))}

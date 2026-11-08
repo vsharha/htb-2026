@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 
 import { findPlacements, runCompetitorAgent, scoreAudience } from "@/lib/api";
 import type { AgentEvent, AudienceFit, Brief, Campaign, Placement } from "@/lib/contract";
-import { computeLayers, strongest, type TractShapes } from "@/lib/gap";
+import { computeLayers, recommendationLayer, strongest, type TractShapes } from "@/lib/gap";
 
 export type RunState = {
   shapes: TractShapes | null;
@@ -74,9 +74,10 @@ export function useAudienceRun() {
 
       const rankPlacements = async () => {
         if (ctrl.signal.aborted) return;
-        const layers = computeLayers(shapes, fit, campaignsOf(events));
+        const campaigns = campaignsOf(events);
+        const layers = computeLayers(shapes, fit, campaigns);
         const placements = await findPlacements({
-          geoids: strongest(layers, "gap", Object.keys(layers).length),
+          geoids: strongest(layers, recommendationLayer(campaigns), Object.keys(layers).length),
           monthlyBudget: brief.monthlyBudget,
         });
         update(() => ({ placements }));

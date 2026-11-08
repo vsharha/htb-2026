@@ -13,7 +13,7 @@ export const LAYERS: { id: LayerId; label: string; low: string; high: string }[]
 ];
 
 /** Picks the layer the map shows and the results column explains. */
-export function LayerTabs({ layer, onChange }: { layer: LayerId; onChange: (layer: LayerId) => void }) {
+export function LayerTabs({ layer, onChange, audienceOnly = false }: { layer: LayerId; onChange: (layer: LayerId) => void; audienceOnly?: boolean }) {
   const items = useRef(new Map<LayerId, HTMLElement>());
   const [pill, setPill] = useState<{ left: number; width: number } | null>(null);
 
@@ -59,7 +59,7 @@ export function LayerTabs({ layer, onChange }: { layer: LayerId; onChange: (laye
           // (the toggle's hover and pressed greys) would flash over the pill.
           className="relative h-8 flex-1 rounded-full! bg-transparent px-2 text-sm text-foreground/60 transition-[color] duration-300 hover:bg-transparent hover:text-foreground aria-pressed:bg-transparent aria-pressed:text-background aria-pressed:hover:text-background motion-reduce:transition-none"
         >
-          {l.label}
+          {l.id === "gap" && audienceOnly ? "Locations" : l.label}
         </ToggleGroupItem>
       ))}
     </ToggleGroup>
