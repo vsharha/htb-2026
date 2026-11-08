@@ -126,7 +126,7 @@
 @keyframes results-expand {
   from {
     transform: translateY(100dvh);
-    border-radius: 2.5rem 2.5rem 0 0;
+    border-radius: var(--radius) var(--radius) 0 0;
   }
   to {
     transform: translateY(0);

@@ -40,9 +40,9 @@ function BlankSelect({
       <SelectTrigger aria-label={label} className={cn(blank, trigger)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className={cn(sentenceType, "w-auto min-w-(--anchor-width) rounded-2xl p-1.5 shadow-xl ring-foreground/10")}>
+      <SelectContent className={cn(sentenceType, "w-auto min-w-(--anchor-width) rounded-lg p-1.5 shadow-xl ring-foreground/10")}>
         {options.map((o) => (
-          <SelectItem key={o.value} value={o.value} disabled={o.disabled} className="rounded-xl py-[0.15em] pr-[1.4em] pl-[0.35em] text-[1em] leading-[1.4] [&_svg]:size-[0.5em] [&>span:last-child]:right-[0.4em] [&>span:last-child]:size-auto">
+          <SelectItem key={o.value} value={o.value} disabled={o.disabled} className="rounded-lg py-[0.15em] pr-[1.4em] pl-[0.35em] text-[1em] leading-[1.4] [&_svg]:size-[0.5em] [&>span:last-child]:right-[0.4em] [&>span:last-child]:size-auto">
             {o.label}
           </SelectItem>
         ))}

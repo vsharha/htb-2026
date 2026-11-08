@@ -110,7 +110,7 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
         onBlur={() => focus.hover(null)}
         onClick={() => focus.select(p.id, "list")}
         className={
-          "-mx-2 flex w-[calc(100%+1rem)] cursor-pointer gap-3 px-2 py-2.5 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
+          "-mx-2 flex w-[calc(100%+1rem)] cursor-pointer gap-3 rounded-lg px-2 py-2.5 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
           (chosen ? "bg-foreground/10" : active ? "bg-foreground/5" : "")
         }
       >
@@ -260,7 +260,7 @@ function CampaignRow({ campaign: c, id, focus }: { campaign: Campaign; id: strin
       ref={row}
       onMouseEnter={location ? () => focus.hover(id) : undefined}
       onMouseLeave={location ? () => focus.hover(null) : undefined}
-      className={"-mr-2 border-l-4 border-heat-hot py-1 pr-2 pl-3 transition-colors " + (active ? "bg-foreground/5" : "")}
+      className={"-mr-2 rounded-r-lg border-l-4 border-heat-hot py-1 pr-2 pl-3 transition-colors " + (active ? "bg-foreground/5" : "")}
     >
       <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
         {c.competitor}: {c.title}
