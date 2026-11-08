@@ -1,0 +1,1 @@
+when double clicking on the placements to buy, it should scroll you back up to the graphic map
