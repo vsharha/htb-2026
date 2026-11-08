@@ -5,6 +5,7 @@ import { useState } from "react";
 import { BriefForm } from "@/components/brief-form";
 import { HeatGlow } from "@/components/heat-glow";
 import { ResultsSplit } from "@/components/results-split";
+import { SettingsMenu } from "@/components/settings-menu";
 import { SiteHeader } from "@/components/site-header";
 import { useAudienceRun } from "@/components/use-audience-run";
 import type { Brief } from "@/lib/contract";
@@ -79,6 +80,7 @@ export function AudienceRun() {
           />
         </main>
       )}
+      <SettingsMenu />
     </div>
   );
 }

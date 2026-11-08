@@ -123,6 +123,13 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* The settings menu's "Sharp corners" option: one rule makes every radius 1px. */
+html[data-corners="sharp"] *,
+html[data-corners="sharp"] *::before,
+html[data-corners="sharp"] *::after {
+  border-radius: 1px !important;
+}
+
 @keyframes results-expand {
   from {
     transform: translateY(100dvh);

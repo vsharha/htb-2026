@@ -13,6 +13,7 @@ import type { MapFocus } from "@/components/use-map-focus";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
+import { PALETTES, useSettings, type Heat } from "@/lib/settings";
 import { tractCode, tractName } from "@/lib/tracts";
 
 // MapLibre looks for its worker next to its own module, where the bundler
@@ -20,7 +21,7 @@ import { tractCode, tractName } from "@/lib/tracts";
 setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
 
 // MapLibre paints with plain colour values, not CSS variables, so these
-// repeat --heat-mid and --heat-hot from globals.css. The stops are quantiles of
+// take --heat-mid and --heat-hot from the chosen palette in lib/settings.ts. The stops are quantiles of
 // the layer's own values, not fixed scores: the bottom 65% of tracts stay
 // almost transparent and only the top third glows, amber at the 80th
 // percentile and red at the top. A layer whose values bunch up, such as
@@ -33,7 +34,13 @@ function quantile(sorted: number[], q: number) {
   return sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))];
 }
 
-function heatRamp(id: LayerId, layers: TractLayers | null): ExpressionSpecification {
+/** "#rrggbb" as "r, g, b" for an rgba() colour. */
+function rgb(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
+}
+
+function heatRamp(id: LayerId, layers: TractLayers | null, heat: Heat): ExpressionSpecification {
   const values = Object.values(layers ?? {}).map((t) => t[id]);
   // Before any scores arrive there is nothing to rank, so the map stays faded.
   const sorted = (values.length ? values : [0, 1]).sort((a, b) => a - b);
@@ -45,9 +52,9 @@ function heatRamp(id: LayerId, layers: TractLayers | null): ExpressionSpecificat
   }
   return [
     "interpolate", ["linear"], ["get", id],
-    stops[0], "rgba(242, 177, 52, 0.03)",
-    stops[1], "rgba(242, 177, 52, 0.5)",
-    stops[2], "rgba(224, 51, 79, 0.85)",
+    stops[0], `rgba(${rgb(heat.mid)}, 0.03)`,
+    stops[1], `rgba(${rgb(heat.mid)}, 0.5)`,
+    stops[2], `rgba(${rgb(heat.hot)}, 0.85)`,
   ];
 }
 
@@ -80,6 +87,7 @@ export function TractMap({
   focus: MapFocus;
   campaignFocus: MapFocus;
 }) {
+  const { palette } = useSettings();
   const map = useRef<MapRef>(null);
 
   // A click on a placement or campaign row brings its marker into view.
@@ -142,7 +150,7 @@ export function TractMap({
     >
       <NavigationControl position="top-right" showCompass={false} />
       <Source id="tracts" type="geojson" data={tracts}>
-        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer, layers), "fill-opacity": showTracts ? 1 : 0 }} />
+        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer, layers, PALETTES[palette].heat), "fill-opacity": showTracts ? 1 : 0 }} />
         <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.3, "line-opacity": showTracts ? 0.6 : 0 }} />
       </Source>
       {layer !== "fit" &&

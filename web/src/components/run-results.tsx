@@ -111,7 +111,7 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
         onClick={() => focus.select(p.id, "list")}
         className={
           "-mx-2 flex w-[calc(100%+1rem)] cursor-pointer gap-3 rounded-lg px-2 py-2.5 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
-          (chosen ? "bg-foreground/10" : active ? "bg-foreground/5" : "")
+          (chosen ? "bg-accent" : active ? "bg-foreground/5" : "")
         }
       >
         <span
@@ -123,7 +123,7 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
           {number}
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          {best && <span className="text-[11px] font-semibold tracking-wide text-heat-hot uppercase">Best match</span>}
+          {best && <span className="w-fit bg-accent px-1.5 text-[11px] font-semibold tracking-wide text-accent-foreground uppercase">Best match</span>}
           <span className="flex items-baseline justify-between gap-3 text-sm">
             <span className={best || chosen ? "font-semibold" : "font-medium"}>{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
             <span className="text-right">
