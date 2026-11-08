@@ -14,7 +14,7 @@ import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
 import { clusterByDistance, worldPixel } from "@/lib/cluster";
-import { PALETTES, useSettings, type HeatStyle, type Palette } from "@/lib/settings";
+import { paletteTheme, useSettings, type HeatStyle, type PaletteTheme } from "@/lib/settings";
 import { tractCode, tractName } from "@/lib/tracts";
 
 // MapLibre looks for its worker next to its own module, where the bundler
@@ -43,7 +43,7 @@ function rgb(hex: string) {
   return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
 }
 
-function heatRamp(id: LayerId, layers: TractLayers | null, palette: Palette, style: HeatStyle): ExpressionSpecification {
+function heatRamp(id: LayerId, layers: TractLayers | null, palette: PaletteTheme, style: HeatStyle): ExpressionSpecification {
   if (style === "classic") {
     // The earlier ramp: fixed score stops, so every tract is tinted by its score.
     return [
@@ -71,8 +71,9 @@ function heatRamp(id: LayerId, layers: TractLayers | null, palette: Palette, sty
   ];
 }
 
-/** CARTO's light basemap: streets and water in greys, so the tract colours carry the map. */
-const BASEMAP = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+/** CARTO's basemaps: light in day mode, and the matching dark one at night, so the tract colours stay in front. */
+const LIGHT_BASEMAP = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+const DARK_BASEMAP = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
 /** The value a hovered tract shows, labelled the way its tab's ranking labels it. */
 const TRACT_VALUE: Record<LayerId, { label: string; format: (value: number) => string }> = {
@@ -125,7 +126,7 @@ export function TractMap({
   focus: MapFocus;
   campaignFocus: MapFocus;
 }) {
-  const { palette, heat: heatStyle } = useSettings();
+  const { palette, heat: heatStyle, dark } = useSettings();
   const map = useRef<MapRef>(null);
   const [zoom, setZoom] = useState(10.2);
 
@@ -202,7 +203,7 @@ export function TractMap({
       initialViewState={{ longitude: -73.94, latitude: 40.71, zoom: 10.2 }}
       minZoom={9}
       maxBounds={[-74.6, 40.35, -73.4, 41.1]}
-      mapStyle={BASEMAP}
+      mapStyle={dark ? DARK_BASEMAP : LIGHT_BASEMAP}
       style={{ width: "100%", height: "100%" }}
       attributionControl={{ compact: true }}
       onMove={(event) => setZoom(Math.round(event.viewState.zoom * 20) / 20)}
@@ -222,7 +223,7 @@ export function TractMap({
     >
       <NavigationControl position="top-right" showCompass={false} />
       <Source id="tracts" type="geojson" data={tracts}>
-        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer, layers, PALETTES[palette], heatStyle), "fill-opacity": showTracts ? (heatStyle === "classic" ? 1 : CLASS_OPACITY) : 0 }} />
+        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer, layers, paletteTheme(palette, dark), heatStyle), "fill-opacity": showTracts ? (heatStyle === "classic" ? 1 : CLASS_OPACITY) : 0 }} />
         <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.5, "line-opacity": showTracts ? 1 : 0 }} />
       </Source>
       {layer !== "fit" &&

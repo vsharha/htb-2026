@@ -3,16 +3,17 @@
 import { Settings as SettingsIcon } from "lucide-react";
 import { useState } from "react";
 
-import { PALETTES, updateSettings, useSettings, type PaletteId } from "@/lib/settings";
+import { PALETTES, paletteTheme, updateSettings, useSettings, type PaletteId } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 
 /**
- * A gear button that opens the experimental interface settings: sharp corners
- * and the colour palette. Both are saved in the browser and apply everywhere.
+ * A gear button that opens the experimental interface settings: night mode,
+ * sharp corners and the colour palette. All are saved in the browser and apply
+ * everywhere.
  */
 export function SettingsMenu() {
   const [open, setOpen] = useState(false);
-  const { corners, palette, heat, cost } = useSettings();
+  const { corners, palette, heat, cost, mode, dark } = useSettings();
 
   return (
     <div className="fixed right-5 bottom-5 z-50 flex flex-col items-end gap-2">
@@ -28,9 +29,33 @@ export function SettingsMenu() {
           <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-sm">
             <input
               type="checkbox"
+              checked={dark}
+              onChange={(e) => updateSettings({ mode: e.target.checked ? "dark" : "light" })}
+              className="mt-0.5 size-4 accent-[var(--tab-active)]"
+            />
+            <span>
+              Night mode
+              <span className="block text-xs text-muted-foreground">
+                {mode === "system" ? "Following the system setting." : "Chosen for this browser."}
+              </span>
+            </span>
+          </label>
+          {mode !== "system" && (
+            <button
+              type="button"
+              onClick={() => updateSettings({ mode: "system" })}
+              className="mt-1 cursor-pointer text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+            >
+              Follow the system setting again
+            </button>
+          )}
+
+          <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
               checked={corners === "sharp"}
               onChange={(e) => updateSettings({ corners: e.target.checked ? "sharp" : "rounded" })}
-              className="mt-0.5 size-4 accent-foreground"
+              className="mt-0.5 size-4 accent-[var(--tab-active)]"
             />
             <span>
               Sharp corners
@@ -43,7 +68,7 @@ export function SettingsMenu() {
               type="checkbox"
               checked={heat === "fade"}
               onChange={(e) => updateSettings({ heat: e.target.checked ? "fade" : "classic" })}
-              className="mt-0.5 size-4 accent-foreground"
+              className="mt-0.5 size-4 accent-[var(--tab-active)]"
             />
             <span>
               Percentile classes
@@ -58,7 +83,7 @@ export function SettingsMenu() {
               type="checkbox"
               checked={cost}
               onChange={(e) => updateSettings({ cost: e.target.checked })}
-              className="mt-0.5 size-4 accent-foreground"
+              className="mt-0.5 size-4 accent-[var(--tab-active)]"
             />
             <span>
               Cost estimate
@@ -85,7 +110,7 @@ export function SettingsMenu() {
                       name="palette"
                       checked={palette === id}
                       onChange={() => updateSettings({ palette: id })}
-                      className="size-4 accent-foreground"
+                      className="size-4 accent-[var(--tab-active)]"
                     />
                     <span>
                       {PALETTES[id].label}
@@ -93,7 +118,7 @@ export function SettingsMenu() {
                     </span>
                   </span>
                   <span aria-hidden className="flex">
-                    {PALETTES[id].swatches.map((c) => (
+                    {paletteTheme(id, dark).swatches.map((c) => (
                       <span key={c} className="size-4 border border-foreground/10 first:rounded-l-sm last:rounded-r-sm" style={{ background: c }} />
                     ))}
                   </span>

@@ -5,6 +5,7 @@ import { Deck, Notes, Slide } from "spectacle";
 
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/wordmark";
+import { useSettings } from "@/lib/settings";
 
 /**
  * Spectacle's theme points at the app's CSS variables rather than copying
@@ -43,18 +44,9 @@ function SlideFooter({ number }: { number: number }) {
   );
 }
 
-/** The app's dark tokens live on `.dark`, so the deck sets it from the system preference. */
-function useSystemColorScheme() {
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-color-scheme: dark)");
-    const apply = () => document.documentElement.classList.toggle("dark", query.matches);
-    apply();
-    query.addEventListener("change", apply);
-    return () => {
-      query.removeEventListener("change", apply);
-      document.documentElement.classList.remove("dark");
-    };
-  }, []);
+/** Loading the app's settings applies the saved palette and night mode, so the deck follows the app's tokens. */
+function useAppTheme() {
+  useSettings();
 }
 
 function searchParam(name: string) {
@@ -317,7 +309,7 @@ function NextStepsSlide() {
 }
 
 export function PitchDeck() {
-  useSystemColorScheme();
+  useAppTheme();
   const exporting = useExportMode();
 
   return (
