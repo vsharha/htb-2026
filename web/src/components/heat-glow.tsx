@@ -13,16 +13,24 @@ function drift(x: string, y: string, seconds: number): CSSProperties {
 const HURRY = 12;
 
 /**
- * The heatmap image, blurred and faded into the page background, as an
- * alternative to the glow. The image is a small tile, so the blur hides its
- * enlargement; the scale keeps the blur from fading out at the edges.
+ * The heatmap image, heavily blurred and saturated, faded into the page
+ * background and spinning like the glow. The image is a small tile, so the
+ * blur hides its enlargement. A rotating rectangle would uncover the corners,
+ * so the spinning layer is a square centred on the backdrop and at least as
+ * wide as its diagonal; `size` is that square's side as a CSS length.
  */
-export function FadedHeatmap({ className }: { className: string }) {
+export function FadedHeatmap({ className, size }: { className: string; size: string }) {
   return (
     <div aria-hidden className={`${className} overflow-hidden bg-background`}>
       <div
-        className="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-[6px]"
-        style={{ backgroundImage: "url(/images/heatmap.png)" }}
+        className="heat-glow-spin absolute top-1/2 left-1/2 bg-cover bg-center opacity-90 blur-[28px] contrast-[1.15] saturate-[2.4]"
+        style={{
+          width: size,
+          height: size,
+          marginTop: `calc(${size} / -2)`,
+          marginLeft: `calc(${size} / -2)`,
+          backgroundImage: "url(/images/heatmap.png)",
+        }}
       />
     </div>
   );
@@ -46,7 +54,7 @@ export function HeatGlow({ hurrying = false }: { hurrying?: boolean }) {
     }
   }, [hurrying]);
 
-  if (backdrop === "image") return <FadedHeatmap className="pointer-events-none fixed inset-0 -z-10" />;
+  if (backdrop === "image") return <FadedHeatmap className="pointer-events-none fixed inset-0 -z-10" size="150vmax" />;
 
   return (
     <div ref={root} aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-heat-cool">
