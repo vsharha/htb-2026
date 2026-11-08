@@ -39,6 +39,28 @@ tofu destroy
 Changing `user_data` replaces the instance, because Vultr only runs it at first
 boot.
 
+## Deploying the web app on the same instance
+
+The stack creates the VM; the app is a Next.js build in a Node container sharing
+the host network, so it reaches Ollama on `127.0.0.1:11434` and Caddy proxies to
+it on port 3000 as `app.<ip>.sslip.io`.
+
+```sh
+tar --exclude='web/node_modules' --exclude='web/.next' --exclude='web/.env.local' \
+  -czf /tmp/placewise.tgz web data
+scp /tmp/placewise.tgz root@<ip>:/tmp/
+ssh root@<ip> 'mkdir -p /srv/placewise && tar xzf /tmp/placewise.tgz -C /srv/placewise'
+ssh root@<ip> 'docker run --rm -v /srv/placewise:/repo -w /repo/web node:22-bookworm \
+  bash -lc "corepack enable && corepack prepare pnpm@10.32.1 --activate && pnpm install --frozen-lockfile && pnpm build"'
+ssh root@<ip> 'docker run -d --name placewise-web --restart unless-stopped --network host \
+  -v /srv/placewise:/repo -w /repo/web -e NODE_ENV=production \
+  -e SYSTEMONE_BASE_URL=http://127.0.0.1:11434 node:22-bookworm \
+  bash -lc "corepack enable && corepack prepare pnpm@10.32.1 --activate && pnpm start"'
+```
+
+Redeploying is the same sequence without the container name conflict: remove
+`placewise-web` first.
+
 ## Plans
 
 `plan` defaults to `vhp-12c-24gb-amd`, a 12-vCPU, 24 GB CPU instance at
