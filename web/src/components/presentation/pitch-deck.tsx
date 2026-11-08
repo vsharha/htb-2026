@@ -379,7 +379,7 @@ function DemoSlide() {
   );
 }
 
-const nextSteps = ["More cities", "Live pricing data", "Consider competitor stores"];
+const nextSteps = ["More cities", "Live pricing data", "Competitor stores and offices"];
 
 function NextStepsSlide() {
   return (
