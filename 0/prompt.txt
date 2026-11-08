@@ -1,0 +1,13 @@
+can we add that when doing competitiors we pull their logo
+
+---
+
+for hte compeittors layer, can we add logos on the right side for the competitors, and if there are any on the map adding them there as well
+
+---
+
+so why are you installing playwright and chromium
+
+---
+
+yes, but dont push just yet

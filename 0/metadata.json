@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.13.1",
+  "checkpoint_id": "01M6W8KWAJ45BTETY9E8T8R10R",
+  "session_id": "ses_e477fa0c4ffePZCgbcIh6igmYg",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-08T00:23:31.644837427Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "save_step_count": 2,
+  "files_touched": [
+    "data/competitors/sample-run.json",
+    "web/src/components/competitor-logo.tsx",
+    "web/src/components/map-panel.tsx",
+    "web/src/components/results-split.tsx",
+    "web/src/components/run-results.tsx",
+    "web/src/components/tract-map.tsx",
+    "web/src/components/use-audience-run.ts",
+    "web/src/lib/brand.ts",
+    "web/src/lib/contract.ts",
+    "web/src/lib/server/competitor-agent.ts"
+  ],
+  "agent": "OpenCode",
+  "model": "deepseek-v4.1-flash",
+  "turn_id": "cdd1ffe3b692",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 94971,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 3397888,
+    "output_tokens": 14117,
+    "api_call_count": 75
+  },
+  "redaction": {
+    "replacements": 82,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 82,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 3
+  }
+}
