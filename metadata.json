@@ -3,7 +3,7 @@
   "checkpoint_id": "01M6XBP6WYCYSD0Y20T1QZJN4N",
   "strategy": "manual-commit",
   "branch": "vultr2",
-  "checkpoints_count": 4,
+  "checkpoints_count": 5,
   "files_touched": [
     "web/src/components/tract-map.tsx"
   ],
@@ -28,6 +28,13 @@
       "compact_transcript": "/2/transcript.jsonl",
       "content_hash": "/2/content_hash.txt",
       "prompt": "/2/prompt.txt"
+    },
+    {
+      "metadata": "/3/metadata.json",
+      "transcript": "/3/full.jsonl",
+      "compact_transcript": "/3/transcript.jsonl",
+      "content_hash": "/3/content_hash.txt",
+      "prompt": "/3/prompt.txt"
     }
   ],
   "token_usage": {
@@ -38,13 +45,13 @@
     "api_call_count": 10
   },
   "redaction": {
-    "replacements": 208,
+    "replacements": 214,
     "layers": {
       "betterleaks": 0,
       "connection_string": 0,
       "credential_key": 0,
-      "credential_value": 76,
-      "credentialed_uri": 0,
+      "credential_value": 80,
+      "credentialed_uri": 2,
       "entropy": 162,
       "key_context": 0,
       "provider_token": 0,
