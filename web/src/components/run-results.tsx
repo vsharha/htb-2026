@@ -272,7 +272,7 @@ function CustomersTab({ run, layers, focus, placements }: { run: RunState; layer
   );
 }
 
-function CampaignRow({ campaign: c, id, focus }: { campaign: Campaign; id: string; focus: MapFocus }) {
+function CampaignRow({ campaign: c, id, website, focus }: { campaign: Campaign; id: string; website: string | null; focus: MapFocus }) {
   const row = useRef<HTMLLIElement>(null);
   const location = getCampaignLocation(c);
   const active = !!location && (focus.hovered === id || focus.selected?.id === id);
@@ -290,36 +290,41 @@ function CampaignRow({ campaign: c, id, focus }: { campaign: Campaign; id: strin
       onMouseLeave={location ? () => focus.hover(null) : undefined}
       className={"-mr-2 rounded-r-lg border-l-4 border-heat-hot py-1 pr-2 pl-3 transition-colors " + (active ? "bg-foreground/5" : "")}
     >
-      <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
-        {c.competitor}: {c.title}
-      </a>
-      <div className="text-xs text-muted-foreground">
-        {location ? LOCATION_PRECISION_LABELS[location.precision] : "Location not resolved"} · {c.kind}
+      <div className="flex gap-2.5">
+        <CompetitorLogo name={c.competitor} website={website} className="mt-0.5 size-7" />
+        <div className="min-w-0 flex-1">
+          <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
+            {c.competitor}: {c.title}
+          </a>
+          <div className="text-xs text-muted-foreground">
+            {location ? LOCATION_PRECISION_LABELS[location.precision] : "Location not resolved"} · {c.kind}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {c.coverage === "current" ? "Confirmed current dates" : c.coverage === "historical" ? "Historical campaign" : "Current coverage unknown"}
+            {(c.startsOn || c.endsOn) && `: ${c.startsOn ?? "unknown start"} to ${c.endsOn ?? "unknown end"}`}
+          </p>
+          {location ? (
+            <button
+              type="button"
+              onFocus={() => focus.hover(id)}
+              onBlur={() => focus.hover(null)}
+              onClick={() => focus.select(id, "list")}
+              className="flex cursor-pointer items-center gap-1 text-left text-xs text-muted-foreground underline-offset-2 outline-none hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              <MapPin className="size-3 shrink-0" aria-hidden />
+              {location.label}
+              <span className="sr-only">: show on map</span>
+            </button>
+          ) : (
+            <>
+              {c.location && <p className="text-xs text-muted-foreground">{c.location}</p>}
+              <p className="text-xs text-muted-foreground">{c.locationNote ?? "The source does not identify a specific location we can map."}</p>
+            </>
+          )}
+          {c.evidence && <p className="mt-1 text-xs text-muted-foreground">{c.evidence}</p>}
+          {location && <p className="mt-1 text-[10px] text-muted-foreground">Location: {location.attribution}</p>}
+        </div>
       </div>
-      <p className="text-xs text-muted-foreground">
-        {c.coverage === "current" ? "Confirmed current dates" : c.coverage === "historical" ? "Historical campaign" : "Current coverage unknown"}
-        {(c.startsOn || c.endsOn) && `: ${c.startsOn ?? "unknown start"} to ${c.endsOn ?? "unknown end"}`}
-      </p>
-      {location ? (
-        <button
-          type="button"
-          onFocus={() => focus.hover(id)}
-          onBlur={() => focus.hover(null)}
-          onClick={() => focus.select(id, "list")}
-          className="flex cursor-pointer items-center gap-1 text-left text-xs text-muted-foreground underline-offset-2 outline-none hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          <MapPin className="size-3 shrink-0" aria-hidden />
-          {location.label}
-          <span className="sr-only">: show on map</span>
-        </button>
-      ) : (
-        <>
-          {c.location && <p className="text-xs text-muted-foreground">{c.location}</p>}
-          <p className="text-xs text-muted-foreground">{c.locationNote ?? "The source does not identify a specific location we can map."}</p>
-        </>
-      )}
-      {c.evidence && <p className="mt-1 text-xs text-muted-foreground">{c.evidence}</p>}
-      {location && <p className="mt-1 text-[10px] text-muted-foreground">Location: {location.attribution}</p>}
     </li>
   );
 }
@@ -329,6 +334,7 @@ function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState;
   const errors = run.events.flatMap((e) => (e.type === "error" ? [e.message] : []));
   const outcome = researchOutcome(run.events, run.agentDone || !!run.error);
   const researching = !run.agentDone && !run.error;
+  const websites = Object.fromEntries(competitors.map((c) => [c.name, c.website]));
 
   return (
     <>
@@ -359,7 +365,7 @@ function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState;
         </div>
         <ul className="flex flex-col gap-2.5 text-sm" aria-live="polite">
           {campaigns.map((c, i) => (
-            <CampaignRow key={campaignId(c, i)} campaign={c} id={campaignId(c, i)} focus={focus} />
+            <CampaignRow key={campaignId(c, i)} campaign={c} id={campaignId(c, i)} website={websites[c.competitor] ?? null} focus={focus} />
           ))}
         </ul>
         {outcome.unmapped > 0 && (
