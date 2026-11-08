@@ -10,6 +10,9 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-heading: var(--font-display);
+  --color-ink-3: var(--ink-3);
+  --color-accent-dark: var(--accent-dark);
+  --color-tab: var(--tab-active);
   --color-heat-cool: var(--heat-cool);
   --color-heat-mid: var(--heat-mid);
   --color-heat-hot: var(--heat-hot);

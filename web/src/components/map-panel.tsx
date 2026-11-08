@@ -6,12 +6,17 @@ import { LAYERS } from "@/components/layer-tabs";
 import type { MapFocus } from "@/components/use-map-focus";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
-import { useSettings } from "@/lib/settings";
+import { PALETTES, useSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 
-// The legend bar draws the same ramp as the map for each heat style.
-const FADE_LEGEND =
-  "linear-gradient(to right, transparent 0%, color-mix(in oklch, var(--heat-mid) 3%, transparent) 40%, color-mix(in oklch, var(--heat-mid) 50%, transparent) 65%, color-mix(in oklch, var(--heat-hot) 85%, transparent))";
+/** What the colour measures on each layer. */
+const LEGEND_TITLE: Record<LayerId, string> = {
+  fit: "Est. target customers per tract",
+  competition: "Competitor ad coverage per tract",
+  gap: "Uncovered target customers per tract",
+};
+
+// With the classic ramp the legend bar is a gradient like the map.
 const CLASSIC_LEGEND =
   "linear-gradient(to right, color-mix(in oklch, var(--heat-mid) 10%, transparent), color-mix(in oklch, var(--heat-mid) 45%, transparent), color-mix(in oklch, var(--heat-hot) 75%, transparent))";
 
@@ -53,7 +58,8 @@ export function MapPanel({
 }) {
   const audienceOnly = recommendationLayer(campaigns) === "fit";
   const current = LAYERS.find((l) => l.id === layer)!;
-  const { heat: heatStyle } = useSettings();
+  const { heat: heatStyle, palette } = useSettings();
+  const ramp = PALETTES[palette].ramp;
   const showCampaigns = layer !== "fit";
   // Placements show on every layer that lists them; Customers lists them only without a Gap tab.
   const showPlacements = showCampaigns || audienceOnly;
@@ -71,10 +77,18 @@ export function MapPanel({
           <p className="text-xs text-muted-foreground">Current competition coverage unknown</p>
         ) : (
           <>
-            <div
-              className="h-2 rounded-full"
-              style={{ background: heatStyle === "classic" ? CLASSIC_LEGEND : FADE_LEGEND }}
-            />
+            <p className="mb-1.5 text-xs text-muted-foreground">{LEGEND_TITLE[layer]}</p>
+            {heatStyle === "classic" ? (
+              <div className="h-2 rounded-full" style={{ background: CLASSIC_LEGEND }} />
+            ) : (
+              // The first segment is the half of tracts that are not painted.
+              <div className="flex h-2 gap-px overflow-hidden rounded-full">
+                <span className="flex-[2] border border-border bg-background" />
+                {ramp.map((color) => (
+                  <span key={color} className="flex-1" style={{ background: color, opacity: 0.85 }} />
+                ))}
+              </div>
+            )}
             <div className="mt-1.5 flex justify-between gap-3 text-xs text-muted-foreground">
               <span>{current.low}</span>
               <span className="text-right">{current.high}</span>
@@ -96,7 +110,7 @@ export function MapPanel({
               </>
             )}
             <li className="flex items-center gap-2">
-              <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground bg-background font-mono text-[9px] font-semibold">
+              <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-white bg-accent font-mono text-[9px] font-bold text-accent-foreground shadow-sm">
                 1
               </span>
               Placement to buy

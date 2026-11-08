@@ -15,7 +15,7 @@ const neighborhoods = new Map<string, string>();
 
 export function registerNeighborhoods(shapes: TractShapes) {
   for (const { properties } of shapes.features) {
-    if (properties.neighborhood) neighborhoods.set(properties.geoid, properties.neighborhood);
+    if (properties.neighborhood) neighborhoods.set(properties.geoid, properties.neighborhood.replace(/(\p{L})-(\p{L})/gu, "$1–$2"));
   }
 }
 

@@ -8,22 +8,16 @@ import { campaignId, campaignsOf, competitorsOf, type RunState } from "@/compone
 import { useMapFocus, type MapFocus } from "@/components/use-map-focus";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
-import { computeLayers, recommendationLayer, strongest, type LayerId, type TractLayers } from "@/lib/gap";
+import { computeLayers, recommendationLayer, type LayerId, type TractLayers } from "@/lib/gap";
 import { researchOutcome } from "@/lib/research-outcome";
 import { useSettings } from "@/lib/settings";
 import { tractCode, tractName } from "@/lib/tracts";
 
-/** The heatmap's colour for a score from 0 to 1. */
-export function heatColor(score: number) {
-  return score < 0.5
-    ? `color-mix(in oklch, var(--heat-mid) ${score * 200}%, var(--heat-cool))`
-    : `color-mix(in oklch, var(--heat-hot) ${(score - 0.5) * 200}%, var(--heat-mid))`;
-}
-
 const MEASURE_LABEL = { lives: "lives", works: "works", passes: "passes through" } as const;
 
-/** How many tracts each tab ranks. */
-const TOP_TRACTS = 5;
+/** How many neighbourhoods each tab ranks, and the share of tracts counted as the top. */
+const TOP_NEIGHBORHOODS = 5;
+const TOP_TIER = 0.97;
 
 /** The selected layer, the campaigns found so far, the map layers they produce and the focused placement and campaign. */
 export function useRunView(run: RunState) {
@@ -91,20 +85,40 @@ function Pending({ children }: { children: React.ReactNode }) {
   return <p className="animate-pulse text-sm text-muted-foreground">{children}</p>;
 }
 
-function TractRanking({ layers, layer, value }: { layers: TractLayers; layer: LayerId; value: (score: number) => string }) {
+/**
+ * The neighbourhoods holding the most tracts in the top 3% on a layer, with
+ * how many each holds. Grouping by neighbourhood reads as places a marketer
+ * knows, where a list of tracts reads as codes.
+ */
+function NeighborhoodRanking({ layers, layer }: { layers: TractLayers; layer: LayerId }) {
+  const groups = useMemo(() => {
+    const entries = Object.entries(layers);
+    const sorted = entries.map(([, v]) => v[layer]).sort((a, b) => a - b);
+    const cut = sorted[Math.min(sorted.length - 1, Math.floor(TOP_TIER * sorted.length))];
+    const byName = new Map<string, { count: number; best: number }>();
+    for (const [geoid, values] of entries) {
+      if (values[layer] < cut || values[layer] <= 0) continue;
+      const name = tractName(geoid);
+      const group = byName.get(name) ?? { count: 0, best: 0 };
+      byName.set(name, { count: group.count + 1, best: Math.max(group.best, values[layer]) });
+    }
+    return [...byName.entries()]
+      .sort((a, b) => b[1].count - a[1].count || b[1].best - a[1].best)
+      .slice(0, TOP_NEIGHBORHOODS);
+  }, [layers, layer]);
+
   return (
-    <ol className="flex flex-col">
-      {strongest(layers, layer, TOP_TRACTS).map((geoid) => (
-        <li key={geoid} className="flex items-center gap-3 border-b border-border py-2 text-sm last:border-0">
-          <span className="size-3 shrink-0 rounded-full" style={{ background: heatColor(layers[geoid][layer]) }} />
-          <span className="flex-1">
-            {tractName(geoid)}
-            <span className="ml-2 text-[11px] text-muted-foreground/70">{tractCode(geoid)}</span>
-          </span>
-          <span className="w-16 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">{value(layers[geoid][layer])}</span>
-        </li>
-      ))}
-    </ol>
+    <>
+      <ol className="flex flex-col">
+        {groups.map(([name, { count }]) => (
+          <li key={name} className="border-b border-border py-2 text-sm text-foreground last:border-0">
+            {name}
+            <span className="text-muted-foreground"> · {count} {count === 1 ? "tract" : "tracts"}</span>
+          </li>
+        ))}
+      </ol>
+      <p className="text-xs text-ink-3">Neighbourhoods with the most tracts in the top 3%.</p>
+    </>
   );
 }
 
@@ -134,14 +148,14 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
         onBlur={() => focus.hover(null)}
         onClick={() => focus.select(p.id, "list")}
         className={
-          "-mx-2 flex w-[calc(100%+1rem)] cursor-pointer gap-3 rounded-lg px-2 py-2.5 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
-          (chosen ? "bg-accent" : active ? "bg-foreground/5" : "")
+          "-mx-2 flex w-[calc(100%+1rem)] cursor-pointer gap-3 rounded-r-lg border-l-[3px] px-2 py-2.5 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
+          (chosen ? "border-accent bg-accent/10" : active ? "border-transparent bg-foreground/5" : "border-transparent")
         }
       >
         <span
           className={
-            "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-foreground font-mono text-[10px] font-semibold tabular-nums " +
-            (active ? "bg-foreground text-background" : "bg-background")
+            "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold tabular-nums text-accent-foreground " +
+            (chosen ? "bg-accent-dark" : "bg-accent")
           }
         >
           {number}
@@ -152,11 +166,11 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
             <span className="min-w-0">
               <span className={best || chosen ? "font-semibold" : "font-medium"}>{p.address}</span>
               <span className="text-muted-foreground"> · {tractName(p.geoid)}</span>
-              <span className="ml-1.5 text-[10px] text-muted-foreground opacity-60">{tractCode(p.geoid)}</span>
+              <span className="ml-1.5 text-[10px] text-ink-3">{tractCode(p.geoid)}</span>
             </span>
             {cost && (
               <span className="shrink-0 text-right">
-                <span className="font-mono tabular-nums">${p.costPerAudienceMember.toFixed(3)}</span>
+                <span className="font-mono tabular-nums text-foreground">${p.costPerAudienceMember.toFixed(3)}</span>
                 <span className="text-xs text-muted-foreground"> / customer</span>
               </span>
             )}
@@ -205,7 +219,7 @@ function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | n
         {!layers ? (
           <Pending>Scoring 2,324 census tracts…</Pending>
         ) : (
-          <TractRanking layers={layers} layer="gap" value={(s) => s.toFixed(2)} />
+          <NeighborhoodRanking layers={layers} layer="gap" />
         )}
         {layers && !run.agentDone && !run.error && <Pending>Updating as more competitors&rsquo; ads are found…</Pending>}
         <p className="text-xs text-muted-foreground">
@@ -229,7 +243,7 @@ function CustomersTab({ run, layers, focus, placements }: { run: RunState; layer
         {!layers ? (
           <Pending>Scoring 2,324 census tracts…</Pending>
         ) : (
-          <TractRanking layers={layers} layer="fit" value={(s) => `top ${Math.max((1 - s) * 100, 0.1).toFixed(1)}%`} />
+          <NeighborhoodRanking layers={layers} layer="fit" />
         )}
       </Section>
 
@@ -259,7 +273,7 @@ function CustomersTab({ run, layers, focus, placements }: { run: RunState; layer
                 </div>
                 <div className="h-1.5 rounded-full bg-foreground/10">
                   <div
-                    className={"h-full rounded-full " + (w.weight < 0 ? "bg-heat-cool" : "bg-foreground")}
+                    className={"h-full rounded-full " + (w.weight < 0 ? "bg-ink-3" : "bg-foreground")}
                     style={{ width: `${Math.abs(w.weight) * 100}%` }}
                   />
                 </div>
@@ -288,7 +302,7 @@ function CampaignRow({ campaign: c, id, website, focus }: { campaign: Campaign; 
       ref={row}
       onMouseEnter={location ? () => focus.hover(id) : undefined}
       onMouseLeave={location ? () => focus.hover(null) : undefined}
-      className={"-mr-2 rounded-r-lg border-l-4 border-heat-hot py-1 pr-2 pl-3 transition-colors " + (active ? "bg-foreground/5" : "")}
+      className={"-mr-2 rounded-r-lg border-l-4 border-ink-3 py-1 pr-2 pl-3 transition-colors " + (active ? "bg-foreground/5" : "")}
     >
       <div className="flex gap-2.5">
         <CompetitorLogo name={c.competitor} website={website} className="mt-0.5 size-7" />
@@ -377,7 +391,7 @@ function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState;
         {(run.agentDone || run.error) && campaigns.length === 0 && <p className="text-sm text-muted-foreground">{outcome.empty}</p>}
         {campaigns.length > 0 && outcome.qualifying === 0 && <p className="text-sm text-muted-foreground">Campaign evidence was found, but none establishes current coverage at a precise location. Placement recommendations use audience fit.</p>}
         {errors.map((m) => (
-          <p key={m} className="text-sm text-heat-hot">{m}</p>
+          <p key={m} className="text-sm text-destructive">{m}</p>
         ))}
       </Section>
     </>
@@ -409,7 +423,7 @@ export function ResultsList({
     <div className="flex flex-col gap-8">
       {recording?.type === "recording" && <p className="text-sm text-muted-foreground">Showing recorded research from {recording.recordedAt.slice(0, 10)} because live research could not finish.</p>}
       {run.error && (
-        <p role="alert" className="border-l-4 border-heat-hot pl-4 text-sm text-heat-hot">
+        <p role="alert" className="border-l-4 border-destructive pl-4 text-sm text-destructive">
           The run stopped: {run.error}
         </p>
       )}

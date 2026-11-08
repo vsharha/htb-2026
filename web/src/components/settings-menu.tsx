@@ -46,9 +46,9 @@ export function SettingsMenu() {
               className="mt-0.5 size-4 accent-foreground"
             />
             <span>
-              Fade weak tracts
+              Percentile classes
               <span className="block text-xs text-muted-foreground">
-                On: only the strongest third of tracts glow. Off: the earlier ramp, where every tract is tinted by its score.
+                On: four classes by percentile, with the bottom half unpainted. Off: the earlier ramp, where every tract is tinted by its score.
               </span>
             </span>
           </label>

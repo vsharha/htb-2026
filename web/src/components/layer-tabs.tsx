@@ -44,7 +44,7 @@ export function LayerTabs({ layer, onChange, showGap }: { layer: LayerId; onChan
       {pill && (
         <span
           aria-hidden
-          className="absolute inset-y-1 rounded-full bg-foreground transition-[left,width] duration-300 ease-out motion-reduce:transition-none"
+          className="absolute inset-y-1 rounded-full bg-tab transition-[left,width] duration-300 ease-out motion-reduce:transition-none"
           style={{ left: pill.left, width: pill.width }}
         />
       )}

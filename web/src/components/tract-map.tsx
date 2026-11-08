@@ -4,7 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { setWorkerUrl, type ExpressionSpecification } from "maplibre-gl";
 import { useEffect, useMemo, useRef, useState } from "react";
-import Map, { Layer, Marker, NavigationControl, Popup, Source, type MapRef } from "react-map-gl/maplibre";
+import Map, { Layer, Marker, NavigationControl, Popup, Source, useMap, type MapRef } from "react-map-gl/maplibre";
 
 import { CompetitorLogo } from "@/components/competitor-logo";
 import { campaignId } from "@/components/use-audience-run";
@@ -13,22 +13,25 @@ import type { MapFocus } from "@/components/use-map-focus";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
-import { PALETTES, useSettings, type Heat, type HeatStyle } from "@/lib/settings";
+import { clusterByDistance, worldPixel } from "@/lib/cluster";
+import { PALETTES, useSettings, type HeatStyle, type Palette } from "@/lib/settings";
 import { tractCode, tractName } from "@/lib/tracts";
 
 // MapLibre looks for its worker next to its own module, where the bundler
 // leaves nothing. This hands the bundler the worker file to emit and serve.
 setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
 
-// MapLibre paints with plain colour values, not CSS variables, so these
-// take --heat-mid and --heat-hot from the chosen palette in lib/settings.ts. The stops are quantiles of
-// the layer's own values, not fixed scores: the bottom 65% of tracts stay
-// almost transparent and only the top third glows, amber at the 80th
-// percentile and red at the top. A layer whose values bunch up, such as
+// MapLibre paints with plain colour values, not CSS variables, so the fill
+// colours come from the chosen palette in lib/settings.ts. The classes are
+// percentiles of the layer's own values: below the 50th nothing is painted,
+// then four classes up to the top 3%. A layer whose values bunch up, such as
 // competition with few ads, would otherwise colour the whole city. The legend
-// in map-panel.tsx draws the same ramp.
-const FADE_BELOW = 0.65;
-const GLOW_AT = 0.8;
+// in map-panel.tsx draws the same classes.
+const CLASS_PERCENTILES = [0.5, 0.75, 0.9, 0.97];
+const CLASS_OPACITY = 0.85;
+
+/** Placement markers closer than this many pixels are merged into one. */
+const CLUSTER_PX = 26;
 
 function quantile(sorted: number[], q: number) {
   return sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))];
@@ -40,30 +43,31 @@ function rgb(hex: string) {
   return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
 }
 
-function heatRamp(id: LayerId, layers: TractLayers | null, heat: Heat, style: HeatStyle): ExpressionSpecification {
+function heatRamp(id: LayerId, layers: TractLayers | null, palette: Palette, style: HeatStyle): ExpressionSpecification {
   if (style === "classic") {
     // The earlier ramp: fixed score stops, so every tract is tinted by its score.
     return [
       "interpolate", ["linear"], ["get", id],
-      0, `rgba(${rgb(heat.mid)}, 0.1)`,
-      0.5, `rgba(${rgb(heat.mid)}, 0.45)`,
-      1, `rgba(${rgb(heat.hot)}, 0.75)`,
+      0, `rgba(${rgb(palette.heat.mid)}, 0.1)`,
+      0.5, `rgba(${rgb(palette.heat.mid)}, 0.45)`,
+      1, `rgba(${rgb(palette.heat.hot)}, 0.75)`,
     ];
   }
   const values = Object.values(layers ?? {}).map((t) => t[id]);
-  // Before any scores arrive there is nothing to rank, so the map stays faded.
+  // Before any scores arrive there is nothing to rank, so nothing is painted.
   const sorted = (values.length ? values : [0, 1]).sort((a, b) => a - b);
-  // Interpolation stops must strictly rise, and a bunched layer repeats values.
-  const stops: number[] = [];
-  for (const q of [FADE_BELOW, GLOW_AT, 1]) {
-    const v = quantile(sorted, q === 1 ? 0.999999 : q);
-    stops.push(stops.length && v <= stops[stops.length - 1] ? stops[stops.length - 1] + 1e-6 : v);
+  // Step stops must strictly rise, and a bunched layer repeats values.
+  const breaks: number[] = [];
+  for (const q of CLASS_PERCENTILES) {
+    const v = quantile(sorted, q);
+    breaks.push(breaks.length && v <= breaks[breaks.length - 1] ? breaks[breaks.length - 1] + 1e-6 : v);
   }
   return [
-    "interpolate", ["linear"], ["get", id],
-    stops[0], `rgba(${rgb(heat.mid)}, 0.03)`,
-    stops[1], `rgba(${rgb(heat.mid)}, 0.5)`,
-    stops[2], `rgba(${rgb(heat.hot)}, 0.85)`,
+    "step", ["get", id], "rgba(0, 0, 0, 0)",
+    breaks[0], palette.ramp[0],
+    breaks[1], palette.ramp[1],
+    breaks[2], palette.ramp[2],
+    breaks[3], palette.ramp[3],
   ];
 }
 
@@ -76,6 +80,31 @@ const TRACT_VALUE: Record<LayerId, { label: string; format: (value: number) => s
   competition: { label: "Competition", format: (value) => value.toFixed(2) },
   gap: { label: "Gap", format: (value) => value.toFixed(2) },
 };
+
+function boundsOf(sites: Placement[]): [[number, number], [number, number]] {
+  const lngs = sites.map((p) => p.longitude);
+  const lats = sites.map((p) => p.latitude);
+  return [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]];
+}
+
+/** Several placements that overlap at this zoom; clicking it zooms to fit them. */
+function ClusterMarker({ sites }: { sites: Placement[] }) {
+  const { current } = useMap();
+  const longitude = sites.reduce((sum, p) => sum + p.longitude, 0) / sites.length;
+  const latitude = sites.reduce((sum, p) => sum + p.latitude, 0) / sites.length;
+  return (
+    <Marker longitude={longitude} latitude={latitude} anchor="center" style={{ zIndex: 1 }}>
+      <button
+        type="button"
+        aria-label={`${sites.length} placements close together, zoom in`}
+        onClick={() => current?.fitBounds(boundsOf(sites), { padding: 80, maxZoom: 17, duration: 600 })}
+        className="flex size-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-accent font-mono text-xs font-bold text-accent-foreground tabular-nums shadow-sm ring-4 ring-accent/30 outline-none focus-visible:ring-ring/50"
+      >
+        {sites.length}
+      </button>
+    </Marker>
+  );
+}
 
 export function TractMap({
   shapes,
@@ -98,6 +127,20 @@ export function TractMap({
 }) {
   const { palette, heat: heatStyle } = useSettings();
   const map = useRef<MapRef>(null);
+  const [zoom, setZoom] = useState(10.2);
+
+  // When a run's placements first arrive the map frames them, so they are in
+  // view without panning. The next run frames its own.
+  const framed = useRef(false);
+  useEffect(() => {
+    if (!placements?.length) {
+      framed.current = false;
+      return;
+    }
+    if (framed.current || !map.current) return;
+    framed.current = true;
+    map.current.fitBounds(boundsOf(placements), { padding: 60, maxZoom: 15, duration: 800 });
+  }, [placements]);
 
   // A click on a placement or campaign row brings its marker into view.
   const selected = focus.selected;
@@ -129,6 +172,21 @@ export function TractMap({
     [shapes, layers],
   );
 
+  // Placement markers that would overlap at this zoom merge into one numbered
+  // by how many it holds. The selected one always stays on its own so it is
+  // never hidden inside a group.
+  const placementGroups = useMemo(() => {
+    const points = (placements ?? []).map((placement, i) => ({
+      ...worldPixel(placement.longitude, placement.latitude, zoom),
+      id: placement.id,
+      placement,
+      number: i + 1,
+    }));
+    const pinned = points.filter((pt) => pt.id === focus.selected?.id);
+    const rest = points.filter((pt) => pt.id !== focus.selected?.id);
+    return [...clusterByDistance(rest, CLUSTER_PX), ...pinned.map((pt) => [pt])];
+  }, [placements, zoom, focus.selected?.id]);
+
   const websitesByCompetitor: Record<string, string | null> = Object.fromEntries(competitors.map((c) => [c.name, c.website]));
   const campaignMarkers = campaigns.flatMap((campaign, i) => {
     const location = getCampaignLocation(campaign);
@@ -147,6 +205,7 @@ export function TractMap({
       mapStyle={BASEMAP}
       style={{ width: "100%", height: "100%" }}
       attributionControl={{ compact: true }}
+      onMove={(event) => setZoom(Math.round(event.viewState.zoom * 20) / 20)}
       onMouseMove={(event) => {
         // Mouse moves can arrive before the style has loaded and the layer has been added.
         const geoid = showTracts && map.current?.getLayer("tract-fill")
@@ -163,8 +222,8 @@ export function TractMap({
     >
       <NavigationControl position="top-right" showCompass={false} />
       <Source id="tracts" type="geojson" data={tracts}>
-        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer, layers, PALETTES[palette].heat, heatStyle), "fill-opacity": showTracts ? 1 : 0 }} />
-        <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.3, "line-opacity": showTracts ? 0.6 : 0 }} />
+        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer, layers, PALETTES[palette], heatStyle), "fill-opacity": showTracts ? (heatStyle === "classic" ? 1 : CLASS_OPACITY) : 0 }} />
+        <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.5, "line-opacity": showTracts ? 1 : 0 }} />
       </Source>
       {layer !== "fit" &&
         campaignMarkers.map(({ campaign, location, id }) => {
@@ -198,24 +257,29 @@ export function TractMap({
         })}
       {/* With a Gap tab, the Customers layer keeps placement numbers separate from audience traits. */}
       {(layer !== "fit" || audienceOnly) &&
-        placements?.map((p, i) => {
-          const active = focus.hovered === p.id || focus.selected?.id === p.id;
+        placementGroups.map((group) => {
+          if (group.length > 1) {
+            return <ClusterMarker key={`cluster-${group.map((m) => m.id).join("|")}`} sites={group.map((m) => m.placement)} />;
+          }
+          const { placement: p, number } = group[0];
+          const selected = focus.selected?.id === p.id;
+          const hovered = focus.hovered === p.id;
           return (
-            <Marker key={p.id} longitude={p.longitude} latitude={p.latitude} anchor="center" style={{ zIndex: active ? 2 : 1 }}>
+            <Marker key={p.id} longitude={p.longitude} latitude={p.latitude} anchor="center" style={{ zIndex: selected ? 3 : hovered ? 2 : 1 }}>
               <button
                 type="button"
-                aria-label={`Placement ${i + 1}: ${p.address}`}
+                aria-label={`Placement ${number}: ${p.address}`}
                 onMouseEnter={() => focus.hover(p.id)}
                 onMouseLeave={() => focus.hover(null)}
                 onFocus={() => focus.hover(p.id)}
                 onBlur={() => focus.hover(null)}
                 onClick={() => focus.select(p.id, "map")}
                 className={
-                  "flex size-6 cursor-pointer items-center justify-center rounded-full border-2 border-foreground font-mono text-[11px] font-semibold tabular-nums shadow-sm transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
-                  (active ? "scale-125 bg-foreground text-background" : "bg-background text-foreground")
+                  "flex cursor-pointer items-center justify-center rounded-full border-2 border-white font-mono font-bold tabular-nums text-accent-foreground shadow-sm transition-[width,height,background-color] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
+                  (selected ? "size-[30px] bg-accent-dark text-sm" : "size-6 text-xs " + (hovered ? "bg-accent-dark" : "bg-accent"))
                 }
               >
-                {i + 1}
+                {number}
               </button>
             </Marker>
           );
@@ -234,7 +298,7 @@ export function TractMap({
         >
           <div className="font-sans text-xs leading-tight text-foreground">
             <p className="font-medium">{tractName(hoveredTract.geoid)}</p>
-            <p className="text-[10px] text-muted-foreground/70">{tractCode(hoveredTract.geoid)}</p>
+            <p className="text-[10px] text-ink-3">{tractCode(hoveredTract.geoid)}</p>
             <p className="mt-0.5 text-muted-foreground">
               {TRACT_VALUE[layer].label}{" "}
               <span className="font-mono tabular-nums text-foreground">{TRACT_VALUE[layer].format(hoveredTract.value)}</span>

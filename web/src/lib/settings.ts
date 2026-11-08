@@ -7,24 +7,80 @@ import { useSyncExternalStore } from "react";
 // one small store, read with useSettings().
 
 export type Corners = "rounded" | "sharp";
-export type PaletteId = "default" | "blue" | "purple" | "teal" | "navy";
-/** "fade" keeps the weakest 65% of tracts nearly clear; "classic" is the earlier ramp that tints every tract by its score. */
+export type PaletteId = "default" | "classic" | "blue" | "purple" | "navy";
+/** "fade" paints five percentile classes with the bottom half clear; "classic" is the earlier ramp that tints every tract by its score. */
 export type HeatStyle = "fade" | "classic";
 export type Settings = { corners: Corners; palette: PaletteId; heat: HeatStyle; cost: boolean };
 
 const DEFAULTS: Settings = { corners: "rounded", palette: "default", heat: "fade", cost: true };
-const STORAGE_KEY = "placewise-settings";
+// Bumped when the default palette changed, so saved choices do not hide it.
+const STORAGE_KEY = "placewise-settings-2";
 
 /** The heatmap's colours, which the map needs as plain values rather than CSS variables. */
 export type Heat = { mid: string; hot: string };
 
-export type Palette = { label: string; note?: string; swatches: string[]; heat: Heat; vars: Record<string, string> };
+export type Palette = {
+  label: string;
+  note?: string;
+  swatches: string[];
+  heat: Heat;
+  /** The four filled map classes, from the 50th to 75th percentile up to the top 3%. */
+  ramp: [string, string, string, string];
+  /** Placement markers, and the darker colour of the selected one. */
+  accent: string;
+  accentDark: string;
+  /** The faintest text, for small codes. */
+  ink3: string;
+  /** The active layer tab. */
+  tab: string;
+  vars: Record<string, string>;
+};
 
 export const PALETTES: Record<PaletteId, Palette> = {
+  // Ink, border and background tokens with a teal ramp and a coral accent:
+  // sidebar text is ink, and teal appears only in the map fill, the active
+  // layer tab and the legend bar.
   default: {
     label: "Default",
+    swatches: ["#EEF6F5", "#BFE0DC", "#7FC2BA", "#2F8F86", "#0B5450", "#F2603D"],
+    heat: { mid: "#7FC2BA", hot: "#2F8F86" },
+    ramp: ["#BFE0DC", "#7FC2BA", "#2F8F86", "#0B5450"],
+    accent: "#F2603D",
+    accentDark: "#C9431F",
+    ink3: "#8A9694",
+    tab: "#0B5450",
+    vars: {
+      "--background": "#FAFAF8",
+      "--foreground": "#12211F",
+      "--card": "#FFFFFF",
+      "--card-foreground": "#12211F",
+      "--popover": "#FFFFFF",
+      "--popover-foreground": "#12211F",
+      "--primary": "#12211F",
+      "--primary-foreground": "#FAFAF8",
+      "--secondary": "#EEF6F5",
+      "--secondary-foreground": "#12211F",
+      "--muted": "#F1F3F2",
+      "--muted-foreground": "#5B6B69",
+      "--accent": "#F2603D",
+      "--accent-foreground": "#FFFFFF",
+      "--border": "#E3E8E7",
+      "--input": "#E3E8E7",
+      "--ring": "#5B6B69",
+      "--heat-cool": "#0B5450",
+      "--heat-mid": "#7FC2BA",
+      "--heat-hot": "#2F8F86",
+    },
+  },
+  classic: {
+    label: "Classic",
     swatches: ["#eceff3", "#c9cfd8", "#2b59c3", "#f2b134", "#e0334f"],
     heat: { mid: "#f2b134", hot: "#e0334f" },
+    ramp: ["#F7D58E", "#F2B134", "#EC7A3F", "#E0334F"],
+    accent: "#E0334F",
+    accentDark: "#A5192F",
+    ink3: "#8A929E",
+    tab: "#15171C",
     vars: {},
   },
   blue: {
@@ -32,6 +88,11 @@ export const PALETTES: Record<PaletteId, Palette> = {
     // #EEF2F8 #BCCBE3 #7895C4 #33589B #14264D, accent #C6F432
     swatches: ["#EEF2F8", "#BCCBE3", "#7895C4", "#33589B", "#14264D", "#C6F432"],
     heat: { mid: "#7895C4", hot: "#33589B" },
+    ramp: ["#BCCBE3", "#7895C4", "#33589B", "#14264D"],
+    accent: "#C6F432",
+    accentDark: "#8DB515",
+    ink3: "#7895C4",
+    tab: "#14264D",
     vars: {
       "--background": "#EEF2F8",
       "--foreground": "#14264D",
@@ -60,6 +121,11 @@ export const PALETTES: Record<PaletteId, Palette> = {
     // #F2F0FB #CFC8F0 #9D8FDD #6650C2 #33228A, accent #F2A516
     swatches: ["#F2F0FB", "#CFC8F0", "#9D8FDD", "#6650C2", "#33228A", "#F2A516"],
     heat: { mid: "#9D8FDD", hot: "#6650C2" },
+    ramp: ["#CFC8F0", "#9D8FDD", "#6650C2", "#33228A"],
+    accent: "#F2A516",
+    accentDark: "#C07F00",
+    ink3: "#9D8FDD",
+    tab: "#33228A",
     vars: {
       "--background": "#F2F0FB",
       "--foreground": "#33228A",
@@ -83,34 +149,6 @@ export const PALETTES: Record<PaletteId, Palette> = {
       "--heat-hot": "#6650C2",
     },
   },
-  teal: {
-    label: "Teal, coral",
-    // #EEF6F5 #BFE0DC #7FC2BA #2F8F86 #0B5450, accent #F2603D
-    swatches: ["#EEF6F5", "#BFE0DC", "#7FC2BA", "#2F8F86", "#0B5450", "#F2603D"],
-    heat: { mid: "#7FC2BA", hot: "#2F8F86" },
-    vars: {
-      "--background": "#EEF6F5",
-      "--foreground": "#0B5450",
-      "--card": "#FFFFFF",
-      "--card-foreground": "#0B5450",
-      "--popover": "#FFFFFF",
-      "--popover-foreground": "#0B5450",
-      "--primary": "#0B5450",
-      "--primary-foreground": "#EEF6F5",
-      "--secondary": "#BFE0DC",
-      "--secondary-foreground": "#0B5450",
-      "--muted": "color-mix(in oklab, #BFE0DC 35%, #EEF6F5)",
-      "--muted-foreground": "#2F8F86",
-      "--accent": "#F2603D",
-      "--accent-foreground": "#FFFFFF",
-      "--border": "#BFE0DC",
-      "--input": "#BFE0DC",
-      "--ring": "#2F8F86",
-      "--heat-cool": "#0B5450",
-      "--heat-mid": "#7FC2BA",
-      "--heat-hot": "#2F8F86",
-    },
-  },
   // The heat colours darken from light to dark rather than changing hue alone,
   // so a reader who cannot tell the hues apart still ranks the tracts. That is
   // what the four themes above lack: their lightness peaks at heat-mid, which
@@ -121,6 +159,11 @@ export const PALETTES: Record<PaletteId, Palette> = {
     // #F7FBFF #C7E9B4 #41B6C4 #1D91C0 #08306B, accent #FEB24C
     swatches: ["#F7FBFF", "#C7E9B4", "#41B6C4", "#1D91C0", "#08306B", "#FEB24C"],
     heat: { mid: "#41B6C4", hot: "#08306B" },
+    ramp: ["#C7E9B4", "#41B6C4", "#1D91C0", "#08306B"],
+    accent: "#FEB24C",
+    accentDark: "#D98A1E",
+    ink3: "#2C6EA8",
+    tab: "#08306B",
     vars: {
       "--background": "#F7FBFF",
       "--foreground": "#08306B",
@@ -156,7 +199,11 @@ function apply(settings: Settings) {
   for (const { vars } of Object.values(PALETTES)) {
     for (const name of Object.keys(vars)) root.style.removeProperty(name);
   }
-  for (const [name, value] of Object.entries(PALETTES[settings.palette].vars)) root.style.setProperty(name, value);
+  const palette = PALETTES[settings.palette];
+  for (const [name, value] of Object.entries(palette.vars)) root.style.setProperty(name, value);
+  root.style.setProperty("--accent-dark", palette.accentDark);
+  root.style.setProperty("--ink-3", palette.ink3);
+  root.style.setProperty("--tab-active", palette.tab);
 }
 
 function load() {
