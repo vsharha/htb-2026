@@ -1,0 +1,113 @@
+#cloud-config
+package_update: true
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - debian-archive-keyring
+  - debian-keyring
+  - gnupg
+  - pciutils
+
+write_files:
+  - path: /opt/decision-model/gpu-driver.sh
+    permissions: "0755"
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      # GPU plans boot without the NVIDIA driver. Install it once, then reboot;
+      # the decision-model unit is enabled before this runs, so it resumes on boot.
+      if lspci -nn | grep -qi nvidia; then
+        if ! nvidia-smi >/dev/null 2>&1; then
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -y
+          apt-get install -y ubuntu-drivers-common
+          ubuntu-drivers install --gpgpu || true
+          if [ -f /var/lib/decision-model/rebooted ]; then
+            echo "NVIDIA driver is still unavailable; the model runs on CPU" >&2
+          else
+            mkdir -p /var/lib/decision-model
+            touch /var/lib/decision-model/rebooted
+            reboot
+          fi
+        fi
+      fi
+
+  - path: /opt/decision-model/setup.sh
+    permissions: "0755"
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      export DEBIAN_FRONTEND=noninteractive
+
+      if ! command -v ollama >/dev/null 2>&1; then
+        curl -fsSL https://ollama.com/install.sh | sh
+      fi
+
+      mkdir -p /etc/systemd/system/ollama.service.d
+      cat > /etc/systemd/system/ollama.service.d/override.conf <<'EOF'
+      [Service]
+      Environment="OLLAMA_HOST=127.0.0.1:11434"
+      Environment="OLLAMA_KEEP_ALIVE=24h"
+      EOF
+      systemctl daemon-reload
+      systemctl enable --now ollama
+
+      # The first pull downloads several gigabytes, so retry rather than fail once.
+      for attempt in $(seq 1 30); do
+        if ollama pull ${model}; then
+          break
+        fi
+        sleep 20
+      done
+
+      if ! command -v caddy >/dev/null 2>&1; then
+        curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/gpg.key \
+          | gpg --batch --yes --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+        curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt \
+          > /etc/apt/sources.list.d/caddy-stable.list
+        apt-get update -y
+        apt-get install -y caddy
+      fi
+
+      # Ollama serves no authentication, so Caddy terminates TLS on a hostname
+      # that resolves to this instance and requires the bearer token.
+      domain="$(curl -fsS https://api.ipify.org).sslip.io"
+      cat > /etc/caddy/Caddyfile <<EOF
+      {
+        email ${email}
+      }
+      https://$domain {
+        @authed header Authorization "Bearer ${token}"
+        handle @authed {
+          reverse_proxy 127.0.0.1:11434
+        }
+        respond 401
+      }
+      EOF
+      systemctl enable caddy
+      systemctl restart caddy
+
+      ollama ps || true
+
+  - path: /etc/systemd/system/decision-model.service
+    content: |
+      [Unit]
+      Description=Self-hosted System One decision model
+      Wants=network-online.target
+      After=network-online.target ollama.service
+      StartLimitIntervalSec=0
+
+      [Service]
+      Type=oneshot
+      ExecStart=/opt/decision-model/setup.sh
+      TimeoutStartSec=0
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  - systemctl daemon-reload
+  - systemctl enable decision-model.service
+  - bash /opt/decision-model/gpu-driver.sh
+  - systemctl start decision-model.service

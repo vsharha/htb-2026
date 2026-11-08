@@ -9,7 +9,8 @@ type ModelId = `openai:${string}` | `gateway:${string}`;
 export const AI_MODELS = {
   competitor: "openai:gpt-5.6-luna",
   audience: "gateway:typesafe-ai/jev",
-} as const satisfies { competitor: ModelId; audience: `gateway:${string}` };
+  systemOne: "clef-flash",
+} as const satisfies { competitor: ModelId; audience: `gateway:${string}`; systemOne: string };
 
 type ResearchEvent = {
   type: string;
@@ -75,6 +76,21 @@ export function getCompetitorAI(modelId: ModelId = AI_MODELS.competitor) {
 
 export function getAudienceModel() {
   return providers.decisionModel(AI_MODELS.audience);
+}
+
+/**
+ * The self-hosted System One endpoint, when SYSTEMONE_BASE_URL names one.
+ * It speaks the same /v1/systemone protocol as Jev, so it is called over
+ * fetch rather than through the AI SDK. Null means use Jev instead.
+ */
+export function getSystemOneConfig() {
+  const base = process.env.SYSTEMONE_BASE_URL?.replace(/\/+$/, "");
+  if (!base) return null;
+  return {
+    url: base.endsWith("/v1/systemone") ? base : `${base}/v1/systemone`,
+    model: process.env.SYSTEMONE_MODEL ?? AI_MODELS.systemOne,
+    token: process.env.SYSTEMONE_API_TOKEN,
+  };
 }
 
 export function hasAudienceCredentials() {

@@ -7,7 +7,7 @@ registerHooks({ resolve(specifier, context, nextResolve) {
   if (specifier === "server-only") return { url: "data:text/javascript,", shortCircuit: true };
   return nextResolve(specifier, context);
 } });
-const { AI_MODELS, getCompetitorAI, getAudienceModel, hasAudienceCredentials } = await import("../src/lib/server/ai.ts");
+const { AI_MODELS, getCompetitorAI, getAudienceModel, getSystemOneConfig, hasAudienceCredentials } = await import("../src/lib/server/ai.ts");
 
 function withEnvironment(values, run) {
   const previous = Object.fromEntries(Object.keys(values).map((name) => [name, process.env[name]]));
@@ -39,6 +39,22 @@ test("switching an OpenAI model keeps the compatible hosted search setup", () =>
   assert.equal(research.tools.web_search.id, "openai.web_search");
   assert.equal(research.providerOptions.openai.store, false);
   assert.throws(() => getCompetitorAI("gateway:openai/gpt-5.6-luna"), /no search adapter/);
+});
+
+test("the self-hosted endpoint is configured from the environment and defaults its model", () => {
+  withEnvironment({ SYSTEMONE_BASE_URL: undefined, SYSTEMONE_MODEL: undefined, SYSTEMONE_API_TOKEN: undefined }, () => {
+    assert.equal(getSystemOneConfig(), null);
+    withEnvironment({ SYSTEMONE_BASE_URL: "https://192.0.2.10.sslip.io/", SYSTEMONE_API_TOKEN: "test-placeholder" }, () => {
+      assert.deepEqual(getSystemOneConfig(), {
+        url: "https://192.0.2.10.sslip.io/v1/systemone",
+        model: "clef-flash",
+        token: "test-placeholder",
+      });
+    });
+    withEnvironment({ SYSTEMONE_BASE_URL: "http://127.0.0.1:11434/v1/systemone", SYSTEMONE_MODEL: "tev1:4b" }, () => {
+      assert.deepEqual(getSystemOneConfig(), { url: "http://127.0.0.1:11434/v1/systemone", model: "tev1:4b", token: undefined });
+    });
+  });
 });
 
 test("credentials are checked separately for research and audience scoring", () => {
