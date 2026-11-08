@@ -3,7 +3,7 @@
   "checkpoint_id": "01M6X5RJVJTG4WPFEN3J5VB60X",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 5,
+  "checkpoints_count": 13,
   "files_touched": [
     "web/src/components/map-panel.tsx",
     "web/src/components/presentation/pitch-deck.tsx",
@@ -39,6 +39,13 @@
       "compact_transcript": "/3/transcript.jsonl",
       "content_hash": "/3/content_hash.txt",
       "prompt": "/3/prompt.txt"
+    },
+    {
+      "metadata": "/4/metadata.json",
+      "transcript": "/4/full.jsonl",
+      "compact_transcript": "/4/transcript.jsonl",
+      "content_hash": "/4/content_hash.txt",
+      "prompt": "/4/prompt.txt"
     }
   ],
   "token_usage": {
@@ -49,14 +56,14 @@
     "api_call_count": 69
   },
   "redaction": {
-    "replacements": 28,
+    "replacements": 124,
     "layers": {
       "betterleaks": 0,
       "connection_string": 0,
       "credential_key": 0,
-      "credential_value": 4,
+      "credential_value": 8,
       "credentialed_uri": 2,
-      "entropy": 22,
+      "entropy": 114,
       "key_context": 0,
       "provider_token": 0,
       "shell_stdin": 0

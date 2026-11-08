@@ -1,0 +1,41 @@
+can we add that when doing competitiors we pull their logo
+
+---
+
+for hte compeittors layer, can we add logos on the right side for the competitors, and if there are any on the map adding them there as well
+
+---
+
+so why are you installing playwright and chromium
+
+---
+
+yes, but dont push just yet
+
+---
+
+is the api token set for hte llm
+
+---
+
+is there any way we could get ad locations for the competitors
+
+---
+
+so what did you add in the last oen
+
+---
+
+summarise what you did
+
+---
+
+we still have things uncommited
+
+---
+
+lets look at merge conflicts
+
+---
+
+ok just to check, dont push for now while solving the merge conflits
