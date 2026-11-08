@@ -3,8 +3,11 @@
   "checkpoint_id": "01M6X3CJMQY6M25R7SC2NE81ZT",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 1,
-  "files_touched": null,
+  "checkpoints_count": 9,
+  "files_touched": [
+    "data/competitors/sample-run.json",
+    "web/src/lib/server/competitor-agent.ts"
+  ],
   "sessions": [
     {
       "metadata": "/0/metadata.json",
@@ -12,6 +15,13 @@
       "compact_transcript": "/0/transcript.jsonl",
       "content_hash": "/0/content_hash.txt",
       "prompt": "/0/prompt.txt"
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "compact_transcript": "/1/transcript.jsonl",
+      "content_hash": "/1/content_hash.txt",
+      "prompt": "/1/prompt.txt"
     }
   ],
   "token_usage": {
@@ -22,14 +32,14 @@
     "api_call_count": 51
   },
   "redaction": {
-    "replacements": 6,
+    "replacements": 102,
     "layers": {
       "betterleaks": 0,
       "connection_string": 0,
       "credential_key": 0,
-      "credential_value": 4,
+      "credential_value": 8,
       "credentialed_uri": 2,
-      "entropy": 0,
+      "entropy": 92,
       "key_context": 0,
       "provider_token": 0,
       "shell_stdin": 0
