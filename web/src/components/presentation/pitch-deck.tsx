@@ -268,7 +268,7 @@ function HowItWorksSlide() {
       <SlideBody number={3}>
         <Eyebrow>How it works</Eyebrow>
         <h2 className="mt-6 max-w-[1000px] font-heading text-[3.75rem] leading-[1.02] font-bold tracking-[-0.03em] text-balance">
-          One prompt about your customer becomes a list of places to advertise.
+          One brief about your customer becomes a list of places to advertise.
         </h2>
         <div className="mt-14">
           <PipelineDiagram />
