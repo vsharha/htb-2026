@@ -45,6 +45,11 @@ The stack creates the VM; the app is a Next.js build in a Node container sharing
 the host network, so it reaches Ollama on `127.0.0.1:11434` and Caddy proxies to
 it on port 3000 as `app.<ip>.sslip.io`.
 
+Credentials live in `/srv/placewise/.env` on the host, mode 600, and are passed
+with `--env-file` so they never appear in a command line. It holds
+`SYSTEMONE_BASE_URL=http://127.0.0.1:11434`, `SYSTEMONE_MODEL=tev1:4b`,
+`OPENAI_API_KEY` and `GEOAPIFY_API_KEY`.
+
 ```sh
 tar --exclude='web/node_modules' --exclude='web/.next' --exclude='web/.env.local' \
   -czf /tmp/placewise.tgz web data
@@ -53,8 +58,7 @@ ssh root@<ip> 'mkdir -p /srv/placewise && tar xzf /tmp/placewise.tgz -C /srv/pla
 ssh root@<ip> 'docker run --rm -v /srv/placewise:/repo -w /repo/web node:22-bookworm \
   bash -lc "corepack enable && corepack prepare pnpm@10.32.1 --activate && pnpm install --frozen-lockfile && pnpm build"'
 ssh root@<ip> 'docker run -d --name placewise-web --restart unless-stopped --network host \
-  -v /srv/placewise:/repo -w /repo/web -e NODE_ENV=production \
-  -e SYSTEMONE_BASE_URL=http://127.0.0.1:11434 node:22-bookworm \
+  -v /srv/placewise:/repo -w /repo/web --env-file /srv/placewise/.env node:22-bookworm \
   bash -lc "corepack enable && corepack prepare pnpm@10.32.1 --activate && pnpm start"'
 ```
 
