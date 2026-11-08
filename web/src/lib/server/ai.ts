@@ -65,7 +65,7 @@ export function getCompetitorAI(modelId: ModelId = AI_MODELS.competitor) {
   return {
     model: providers.languageModel(modelId),
     tools: { web_search: openai.tools.webSearch({ searchContextSize: "high" }) },
-    providerOptions: { openai: { reasoningEffort: "low", store: false, parallelToolCalls: false, maxToolCalls: 6 } },
+    providerOptions: { openai: { reasoningEffort: "low", store: false, parallelToolCalls: true, maxToolCalls: 8 } },
     configured: Boolean(process.env.OPENAI_API_KEY),
     missingCredentialsMessage: "Competitor search needs OPENAI_API_KEY in web/.env.local. Competition coverage is unknown.",
     readEvent: readOpenAIResearchEvent,

@@ -28,22 +28,22 @@ function adapter({ fail, timeout, unfinished, rejectSource = false, empty = fals
     assert.ok(name, "Every campaign phase must be assigned a competitor");
     const step = steps.get(name) ?? 0;
     steps.set(name, step + 1);
-    if (!discovery) {
-      assert.match(prompt, /billboard bus shelter LinkNYC/);
+    if (discovery) assert.match(prompt, /Do not search with the broad industry label alone/);
+    else {
+      assert.match(prompt, /station domination/);
       assert.match(prompt, /site:outfront.com/);
-      assert.match(prompt, /site:intersection.com/);
     }
-    if (!discovery && step < 2) assert.deepEqual(options.toolChoice, { type: "tool", toolName: "web_search" });
+    if (step === 0) assert.deepEqual(options.toolChoice, { type: "tool", toolName: "web_search" });
     if (name === fail) throw new Error("Search provider unavailable");
     if (name === timeout) throw new DOMException("Search deadline reached", "TimeoutError");
     let toolName, input, result;
-    if (discovery && step === 0 || !discovery && step < 2) {
+    if (step < 2) {
       toolName = "web_search";
       input = { query: `${name} NYC campaign ${step}` };
       result = { sources: (discovery ? competitors : [name]).map((candidate) => ({ type: "url", url: url(candidate) })), action: { type: "search", query: input.query } };
-    } else if (discovery && step <= 3) {
+    } else if (discovery && step <= 4) {
       toolName = "reportCompetitor";
-      input = { name: competitors[step - 1], reason: "Same customers", sourceUrl: url(competitors[step - 1]) };
+      input = { name: competitors[step - 2], reason: "Same customers", sourceUrl: url(competitors[step - 2]) };
     } else if (discovery) {
       toolName = "finishDiscovery";
       input = {};
@@ -70,12 +70,12 @@ async function research(options) {
   return { complete, events, summary: events.findLast((event) => event.type === "research").summary };
 }
 
-test("each competitor receives both search passes and can report undated, unmapped campaigns", async () => {
+test("each competitor gets its own placement search and can report undated, unmapped campaigns", async () => {
   const { complete, events, summary } = await research();
   assert.equal(complete, true);
   assert.deepEqual(summary.competitorsSearched.sort(), competitors);
   assert.deepEqual(summary.competitorsCompleted.sort(), competitors);
-  assert.equal(summary.searches, 7);
+  assert.equal(summary.searches, 8);
   assert.equal(summary.status, "complete");
   assert.equal(events.filter((event) => event.type === "campaign").length, 3);
   const outcome = researchOutcome(events, true);
