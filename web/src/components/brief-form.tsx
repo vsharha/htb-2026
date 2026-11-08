@@ -124,7 +124,7 @@ export function BriefForm({
         <input id="description" name="description" required placeholder="a budgeting app" className={cn(blank, "min-w-[12ch]")} />{" "}
         in{" "}
         <span className="whitespace-nowrap">
-          <BlankSelect name="industry" label="Industry" options={INDUSTRY_OPTIONS} placeholder="pick an industry" required />.
+          <BlankSelect name="industry" label="Industry" options={INDUSTRY_OPTIONS} placeholder="fintech" required />.
         </span>{" "}
         We want to reach{" "}
         <label className="sr-only" htmlFor="targetCustomer">The customers the company wants to reach</label>
