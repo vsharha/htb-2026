@@ -149,19 +149,20 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           {best && <span className="w-fit bg-accent px-1.5 text-[11px] font-semibold tracking-wide text-accent-foreground uppercase">Lowest cost</span>}
           <span className="flex items-baseline justify-between gap-3 text-sm">
-            <span className={best || chosen ? "font-semibold" : "font-medium"}>{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
+            <span className="min-w-0">
+              <span className={best || chosen ? "font-semibold" : "font-medium"}>{p.address}</span>
+              <span className="text-muted-foreground"> · {tractName(p.geoid)}</span>
+              <span className="ml-1.5 text-[10px] text-muted-foreground opacity-60">{tractCode(p.geoid)}</span>
+            </span>
             {cost && (
-              <span className="text-right">
+              <span className="shrink-0 text-right">
                 <span className="font-mono tabular-nums">${p.costPerAudienceMember.toFixed(3)}</span>
                 <span className="text-xs text-muted-foreground"> / customer</span>
               </span>
             )}
           </span>
           <span className="flex items-baseline justify-between gap-3 text-xs text-muted-foreground">
-            <span>
-              {p.address} · {tractName(p.geoid)}
-              <span className="ml-1.5 text-[10px] opacity-60">{tractCode(p.geoid)}</span>
-            </span>
+            <span>{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
           </span>
         </span>
       </button>
