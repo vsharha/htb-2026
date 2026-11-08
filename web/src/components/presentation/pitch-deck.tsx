@@ -6,6 +6,7 @@ import { Deck, Notes, Slide } from "spectacle";
 
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/wordmark";
+import { FadedHeatmap } from "@/components/heat-glow";
 import { useSettings } from "@/lib/settings";
 
 /**
@@ -132,6 +133,8 @@ function drift(x: string, y: string, seconds: number): CSSProperties {
 
 /** The form page's heat glow, sized to the slide instead of the viewport. */
 function SlideGlow() {
+  const { backdrop } = useSettings();
+  if (backdrop === "image") return <FadedHeatmap className="absolute inset-0" />;
   return (
     <div aria-hidden className="absolute inset-0 overflow-hidden bg-heat-cool">
       <div className="heat-glow-spin absolute inset-0">

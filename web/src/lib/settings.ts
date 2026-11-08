@@ -18,17 +18,20 @@ export function layerHeatStyle(layer: LayerId, style: HeatStyle): HeatStyle {
 }
 /** "system" follows the operating system's preference; the other two are a choice made in the settings menu. */
 export type Mode = "system" | "light" | "dark";
+/** The page backdrop on the form page and the title slide: the drifting heat glow, or a faded heatmap image. */
+export type Backdrop = "glow" | "image";
 export type Settings = {
   corners: Corners;
   palette: PaletteId;
   heat: HeatStyle;
   cost: boolean;
+  backdrop: Backdrop;
   mode: Mode;
   /** The mode in effect: mode itself, or the system preference while mode is "system". */
   dark: boolean;
 };
 
-const DEFAULTS: Settings = { corners: "rounded", palette: "warm", heat: "fade", cost: true, mode: "light", dark: false };
+const DEFAULTS: Settings = { corners: "rounded", palette: "warm", heat: "fade", cost: true, backdrop: "glow", mode: "light", dark: false };
 // Bumped when the default palette changed, so saved choices do not hide it.
 const STORAGE_KEY = "placewise-settings-4";
 
@@ -481,6 +484,7 @@ function load() {
       palette: saved.palette in PALETTES ? saved.palette : DEFAULTS.palette,
       heat: saved.heat === "classic" ? "classic" : "fade",
       cost: saved.cost !== false,
+      backdrop: saved.backdrop === "image" ? "image" : "glow",
       mode,
       dark: resolveDark(mode),
     };
@@ -501,8 +505,8 @@ export function updateSettings(patch: Partial<Omit<Settings, "dark">>) {
   load();
   const mode = patch.mode ?? current.mode;
   current = { ...current, ...patch, mode, dark: resolveDark(mode) };
-  const { corners, palette, heat, cost } = current;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ corners, palette, heat, cost, mode }));
+  const { corners, palette, heat, cost, backdrop } = current;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ corners, palette, heat, cost, backdrop, mode }));
   apply(current);
   listeners.forEach((l) => l());
 }

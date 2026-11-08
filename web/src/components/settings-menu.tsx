@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
  */
 export function SettingsMenu() {
   const [open, setOpen] = useState(false);
-  const { corners, palette, heat, cost, dark } = useSettings();
+  const { corners, palette, heat, cost, backdrop, dark } = useSettings();
 
   return (
     <div className="fixed right-5 bottom-5 z-50 flex flex-col items-end gap-2">
@@ -71,6 +71,21 @@ export function SettingsMenu() {
               Cost estimate
               <span className="block text-xs text-muted-foreground">
                 Shows an invented price per customer on each placement, sorts by it and tags the lowest. Off: no prices, listed by area.
+              </span>
+            </span>
+          </label>
+
+          <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
+              checked={backdrop === "image"}
+              onChange={(e) => updateSettings({ backdrop: e.target.checked ? "image" : "glow" })}
+              className="mt-0.5 size-4 accent-[var(--tab-active)]"
+            />
+            <span>
+              Heatmap image background
+              <span className="block text-xs text-muted-foreground">
+                Replaces the drifting colour glow on the form page and the title slide with a faded heatmap image.
               </span>
             </span>
           </label>

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, type CSSProperties } from "react";
 
+import { useSettings } from "@/lib/settings";
+
 /** How far and how slowly a blob drifts; each differs so the blobs never move in step. */
 function drift(x: string, y: string, seconds: number): CSSProperties {
   return { "--drift-x": x, "--drift-y": y, "--drift-duration": `${seconds}s` } as CSSProperties;
@@ -9,6 +11,22 @@ function drift(x: string, y: string, seconds: number): CSSProperties {
 
 /** How much faster the glow moves while the results slide in. */
 const HURRY = 12;
+
+/**
+ * The heatmap image, blurred and faded into the page background, as an
+ * alternative to the glow. The image is a small tile, so the blur hides its
+ * enlargement; the scale keeps the blur from fading out at the edges.
+ */
+export function FadedHeatmap({ className }: { className: string }) {
+  return (
+    <div aria-hidden className={`${className} overflow-hidden bg-background`}>
+      <div
+        className="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-[6px]"
+        style={{ backgroundImage: "url(/images/heatmap.png)" }}
+      />
+    </div>
+  );
+}
 
 /**
  * Full-page backdrop of blurred blobs in the palette's heat colours, with a
@@ -20,12 +38,15 @@ const HURRY = 12;
  * rate keeps their progress, so the speed-up does not jump.
  */
 export function HeatGlow({ hurrying = false }: { hurrying?: boolean }) {
+  const { backdrop } = useSettings();
   const root = useRef<HTMLDivElement>(null);
   useEffect(() => {
     for (const animation of root.current?.getAnimations({ subtree: true }) ?? []) {
       animation.updatePlaybackRate(hurrying ? HURRY : 1);
     }
   }, [hurrying]);
+
+  if (backdrop === "image") return <FadedHeatmap className="pointer-events-none fixed inset-0 -z-10" />;
 
   return (
     <div ref={root} aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-heat-cool">
