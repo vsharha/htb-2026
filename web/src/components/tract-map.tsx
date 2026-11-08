@@ -20,12 +20,15 @@ import { tractLabel } from "@/lib/tracts";
 setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
 
 // MapLibre paints with plain colour values, not CSS variables, so these
-// repeat --heat-cool, --heat-mid and --heat-hot from globals.css, with the
-// alpha rising from 0.15 to 0.75 so weak tracts let the basemap show through.
+// repeat --heat-mid and --heat-hot from globals.css, with the alpha rising
+// from 0.1 to 0.75 so weak tracts let the basemap show through. The low end is
+// a faint wash of --heat-mid rather than --heat-cool, because a pale blue tract
+// is hard to tell apart from the basemap's water. The legend in map-panel.tsx
+// draws the same ramp.
 function heatRamp(id: LayerId): ExpressionSpecification {
   return [
     "interpolate", ["linear"], ["get", id],
-    0, "rgba(43, 89, 195, 0.15)",
+    0, "rgba(242, 177, 52, 0.1)",
     0.5, "rgba(242, 177, 52, 0.45)",
     1, "rgba(224, 51, 79, 0.75)",
   ];
@@ -188,6 +191,8 @@ export function TractMap({
           closeOnClick={false}
           maxWidth="220px"
           className="pointer-events-none"
+          // Markers carry z-index 1 to 4, and the popup shares their container.
+          style={{ zIndex: 5 }}
         >
           <div className="font-sans text-xs leading-tight text-foreground">
             <p className="font-medium">{tractLabel(hoveredTract.geoid)}</p>

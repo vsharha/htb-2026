@@ -65,7 +65,7 @@ export function MapPanel({
           <>
             <div
               className="h-2 rounded-full"
-              style={{ background: "linear-gradient(to right, var(--heat-cool), var(--heat-mid), var(--heat-hot))" }}
+              style={{ background: "linear-gradient(to right, color-mix(in oklch, var(--heat-mid) 10%, transparent), color-mix(in oklch, var(--heat-mid) 45%, transparent), color-mix(in oklch, var(--heat-hot) 75%, transparent))" }}
             />
             <div className="mt-1.5 flex justify-between gap-3 text-xs text-muted-foreground">
               <span>{current.low}</span>
