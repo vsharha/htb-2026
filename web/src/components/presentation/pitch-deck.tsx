@@ -1,7 +1,8 @@
 "use client";
 
+import { Maximize, Minimize } from "lucide-react";
 import Image from "next/image";
-import { useEffect, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Deck, Notes, Slide } from "spectacle";
 
 import { Button } from "@/components/ui/button";
@@ -284,6 +285,72 @@ function HowItWorksSlide() {
   );
 }
 
+/**
+ * Full screen goes on the wrapper rather than the iframe so the button stays
+ * on top of the app. Hover has to land on the button's own corner box, because
+ * pointer events over the iframe never reach this document.
+ */
+function DemoFrame() {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+
+  useEffect(() => {
+    function syncFullscreen() {
+      const active = document.fullscreenElement === frameRef.current;
+      setFullscreen(active);
+      // Keys go to the app while it fills the screen, so the arrows can't change
+      // the slide behind it, and back to the deck afterwards.
+      if (active) iframeRef.current?.focus();
+      else iframeRef.current?.blur();
+    }
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
+
+  function toggleFullscreen() {
+    if (fullscreen) void document.exitFullscreen();
+    else void frameRef.current?.requestFullscreen();
+  }
+
+  const label = fullscreen ? "Exit full screen" : "Enter full screen";
+
+  return (
+    <div
+      ref={frameRef}
+      className={
+        fullscreen
+          ? "relative overflow-hidden bg-card"
+          : `${sheet} relative mt-6 flex-1 overflow-hidden rounded-2xl border border-border`
+      }
+    >
+      {/*
+        In the slide, the app is laid out at 1.4 times the frame's size and scaled
+        back down, so it gets a laptop-sized viewport inside the 1366-wide slide.
+      */}
+      <iframe
+        ref={iframeRef}
+        src="/"
+        title="Placewise app"
+        className={
+          fullscreen
+            ? "absolute inset-0 size-full"
+            : "absolute top-0 left-0 h-[140%] w-[140%] origin-top-left scale-[calc(1/1.4)]"
+        }
+      />
+      <div
+        className={`absolute top-0 right-0 z-10 p-3 print:hidden ${
+          fullscreen ? "opacity-0 transition-opacity focus-within:opacity-100 hover:opacity-100" : ""
+        }`}
+      >
+        <Button variant="outline" size="icon-lg" aria-label={label} title={label} onClick={toggleFullscreen}>
+          {fullscreen ? <Minimize /> : <Maximize />}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function DemoSlide() {
   return (
     <Slide padding="0px">
@@ -292,17 +359,7 @@ function DemoSlide() {
           <h2 className="font-heading text-[2.6rem] font-bold tracking-tight">Live demo</h2>
           <p className="text-base text-muted-foreground">A dating app for people looking for a serious relationship</p>
         </div>
-        {/*
-          The app is laid out at 1.4 times the frame's size and scaled back down,
-          so it gets a laptop-sized viewport inside the 1366-wide slide.
-        */}
-        <div className={`${sheet} relative mt-6 flex-1 overflow-hidden rounded-2xl border border-border`}>
-          <iframe
-            src="/"
-            title="Placewise app"
-            className="absolute top-0 left-0 h-[140%] w-[140%] origin-top-left scale-[calc(1/1.4)]"
-          />
-        </div>
+        <DemoFrame />
         <SlideFooter number={4} />
       </div>
       <Notes>
