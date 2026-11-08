@@ -16,7 +16,7 @@ Raised by Viktor on 7 November 2026 as a pivot from the ad channel mispricing fi
 
 Decided on 7 November 2026; the decisions are in [product.md](../product.md).
 
-1. Input: the onboarding form above. The target customer sentence becomes weights on census and trip data, such as age, income, industry and household type. Jev, a decision model, scores how strongly the sentence implies each attribute.
+1. Input: the onboarding form above. The target customer sentence becomes weights on census and trip data, such as age, income, industry and household type. A decision model, Clef-flash self-hosted on Vultr with Jev as the fallback, scores how strongly the sentence implies each attribute.
 2. Audience fit layer: each area of the city is scored by how many target customers live there, work there or pass through it.
 3. Competition layer: a browser agent finds the startup's competitors, then searches press, trade sites and social media for their outdoor campaigns in the city, such as "<competitor> subway ad" or "<competitor> billboard NYC", and places each find on the map. Where it finds nothing, competitors' stores and offices stand in.
 4. Gap layer: areas with high audience fit and low competition. This is the default view; the other two layers are toggles that explain it.
@@ -73,7 +73,7 @@ No search has been run yet. From memory: foot-traffic and audience-mapping produ
 
 - Gemini API: the competitor-campaign agent, if it runs on a Gemini model.
 - Tiger Data: hourly ridership and trip data are time series, which fits the hourly view if it is built.
-- Vultr: hosting the data processing or the demo.
+- Vultr: the audience decision model runs on Vultr Cloud Compute, created with OpenTofu in `infra/vultr/`.
 
 ## Open problems
 
