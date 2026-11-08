@@ -1,0 +1,9 @@
+how does the current platform work ? explain the arch what it does etc
+
+---
+
+on the competitors page can we add teh favicons to the their ads as well
+
+---
+
+we dont need playwright. on the competitor maps, how come there are ads listed in their ads, but they dont appear on the map
