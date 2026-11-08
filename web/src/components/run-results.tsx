@@ -33,9 +33,16 @@ export function useRunView(run: RunState) {
     () => (run.shapes && run.fit ? computeLayers(run.shapes, run.fit, campaigns) : null),
     [run.shapes, run.fit, campaigns],
   );
-  const focus = useMapFocus();
-  // Campaigns are listed only on the competition tab, so a click on a
-  // campaign marker opens that tab before its row can scroll into view.
+  // A marker's row exists only on the tab that lists it, so a click on a
+  // marker opens that tab before the row can scroll into view.
+  const placementMarks = useMapFocus();
+  const focus: MapFocus = {
+    ...placementMarks,
+    select: (id, from) => {
+      if (from === "map") setLayer(hasGap ? "gap" : "fit");
+      placementMarks.select(id, from);
+    },
+  };
   const campaignMarks = useMapFocus();
   const campaignFocus: MapFocus = {
     ...campaignMarks,
