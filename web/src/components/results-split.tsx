@@ -56,7 +56,8 @@ export function ResultsSplit({
         campaignFocus={campaignFocus}
         className="h-[55dvh] lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:h-full"
       />
-      <aside className="flex flex-col gap-6 px-5 py-6 sm:px-8 sm:py-8 lg:col-start-2 lg:min-h-0 lg:overflow-y-auto lg:pt-6">
+      {/* relative makes this column contain its screen-reader-only text; otherwise that text escapes the scroll area and stretches the page. */}
+      <aside className="relative flex flex-col gap-6 px-5 py-6 sm:px-8 sm:py-8 lg:col-start-2 lg:min-h-0 lg:overflow-y-auto lg:pt-6">
         <div className="flex items-start gap-3">
           <p className="flex-1 text-sm text-muted-foreground">
             <BriefSummary brief={brief} />
