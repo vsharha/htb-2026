@@ -89,8 +89,8 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
   const row = useRef<HTMLButtonElement>(null);
   const chosen = focus.selected?.id === p.id;
   const active = focus.hovered === p.id || chosen;
-  // The first placement is the best match, and the one picked on the map or in
-  // the list gets the strongest treatment. The rest stay flat rows.
+  // Rows read like the tract rankings: a divider between each, no cards. The
+  // first placement is labelled the best match, and the picked one is shaded.
   const best = number === 1;
 
   // A click on the marker scrolls its row into view.
@@ -100,7 +100,7 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
   }, [selected, p.id]);
 
   return (
-    <li className={best || chosen ? "py-1.5" : "border-b border-border last:border-0"}>
+    <li className="border-b border-border last:border-0">
       <button
         ref={row}
         type="button"
@@ -110,13 +110,8 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
         onBlur={() => focus.hover(null)}
         onClick={() => focus.select(p.id, "list")}
         className={
-          "-mx-2 flex w-[calc(100%+1rem)] cursor-pointer gap-3 px-2 text-left transition-all outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
-          (chosen
-            ? "rounded-xl bg-background px-3 py-3.5 shadow-md ring-2 ring-foreground"
-            : best
-              ? "rounded-xl bg-foreground/5 px-3 py-3.5 ring-1 ring-foreground/15"
-              : "rounded-lg py-2.5 ") +
-          (active && !chosen && !best ? "bg-foreground/5" : "")
+          "-mx-2 flex w-[calc(100%+1rem)] cursor-pointer gap-3 px-2 py-2.5 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
+          (chosen ? "bg-foreground/10" : active ? "bg-foreground/5" : "")
         }
       >
         <span
@@ -129,7 +124,7 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           {best && <span className="text-[11px] font-semibold tracking-wide text-heat-hot uppercase">Best match</span>}
-          <span className={"flex items-baseline justify-between gap-3 " + (best || chosen ? "text-base" : "text-sm")}>
+          <span className="flex items-baseline justify-between gap-3 text-sm">
             <span className={best || chosen ? "font-semibold" : "font-medium"}>{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
             <span className="text-right">
               <span className="font-mono tabular-nums">${p.costPerAudienceMember.toFixed(3)}</span>
@@ -265,7 +260,7 @@ function CampaignRow({ campaign: c, id, focus }: { campaign: Campaign; id: strin
       ref={row}
       onMouseEnter={location ? () => focus.hover(id) : undefined}
       onMouseLeave={location ? () => focus.hover(null) : undefined}
-      className={"-mr-2 rounded-r-lg border-l-4 border-heat-hot py-1 pr-2 pl-3 transition-colors " + (active ? "bg-foreground/5" : "")}
+      className={"-mr-2 border-l-4 border-heat-hot py-1 pr-2 pl-3 transition-colors " + (active ? "bg-foreground/5" : "")}
     >
       <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
         {c.competitor}: {c.title}
@@ -283,7 +278,7 @@ function CampaignRow({ campaign: c, id, focus }: { campaign: Campaign; id: strin
           onFocus={() => focus.hover(id)}
           onBlur={() => focus.hover(null)}
           onClick={() => focus.select(id, "list")}
-          className="flex cursor-pointer items-center gap-1 rounded text-left text-xs text-muted-foreground underline-offset-2 outline-none hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="flex cursor-pointer items-center gap-1 text-left text-xs text-muted-foreground underline-offset-2 outline-none hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <MapPin className="size-3 shrink-0" aria-hidden />
           {location.label}

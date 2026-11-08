@@ -58,7 +58,7 @@ export function MapPanel({
         <MapPlaceholder>Loading New York&rsquo;s census tracts…</MapPlaceholder>
       )}
 
-      <div className="pointer-events-none absolute bottom-9 left-3 w-52 rounded-xl bg-background/95 p-3 shadow-sm sm:bottom-4 sm:left-4 sm:w-56">
+      <div className="pointer-events-none absolute bottom-9 left-3 w-52 bg-background/95 p-3 shadow-sm sm:bottom-4 sm:left-4 sm:w-56">
         {layer === "competition" && audienceOnly ? (
           <p className="text-xs text-muted-foreground">Current competition coverage unknown</p>
         ) : (
