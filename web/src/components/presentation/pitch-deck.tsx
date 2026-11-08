@@ -10,6 +10,9 @@ import { useSettings } from "@/lib/settings";
 /**
  * Spectacle's theme points at the app's CSS variables rather than copying
  * their values, so the deck follows the light and dark tokens in globals.css.
+ *
+ * `backdropStyle` replaces Spectacle's default rather than merging with it, so
+ * it has to repeat the fixed full-window box that the slide scaling measures.
  */
 const theme = {
   colors: {
@@ -24,7 +27,14 @@ const theme = {
     text: "var(--font-sans), sans-serif",
     monospace: "var(--font-mono), monospace",
   },
-  backdropStyle: { background: "var(--background)" },
+  backdropStyle: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    background: "var(--background)",
+  },
 };
 
 const SLIDE_COUNT = 5;
