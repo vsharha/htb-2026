@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { Deck, Notes, Slide } from "spectacle";
 
@@ -173,9 +174,16 @@ function ProblemSlide() {
     <Slide padding="0px">
       <SlideBody number={2}>
         <Eyebrow>The problem</Eyebrow>
-        <h2 className="mt-6 max-w-[1050px] font-heading text-[4.75rem] leading-[1] font-bold tracking-[-0.03em] text-balance">
+        <h2 className="mt-6 max-w-[740px] font-heading text-[4.75rem] leading-[1] font-bold tracking-[-0.03em] text-balance">
           Startups moving beyond Meta and Google buy street ads blind.
         </h2>
+        <Image
+          src="/images/sf-startup-image-funny.webp"
+          alt="Map of the San Francisco Bay Area covered in colourful location pins"
+          width={640}
+          height={671}
+          className={`${sheet} absolute top-20 right-24 w-[340px] rounded-2xl`}
+        />
         <div className="mt-auto flex items-end gap-16">
           <p className="font-heading text-[8rem] leading-[0.85] font-bold tracking-[-0.04em] text-heat-hot">5,556</p>
           <p className="max-w-[640px] pb-2 text-[1.9rem] leading-snug text-muted-foreground">
