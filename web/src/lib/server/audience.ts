@@ -1,19 +1,20 @@
 "use server";
 
-// Scores the target customer against the tract columns with Jev, TypeSafe
-// AI's decision model, through Vercel AI Gateway, then combines the real tract
-// numbers in code. Jev sees the brief and the 21 column descriptions, never a
-// tract: one request asks one score question per column.
+// Scores the target customer against the tract columns with a decision model,
+// then combines the real tract numbers in code. The model sees the brief and
+// the 21 column descriptions, never a tract: one request asks one score
+// question per column. A self-hosted System One endpoint, when configured,
+// takes the call; Jev through AI Gateway does it otherwise.
 
 import { experimental_decide as decide } from "ai";
 
 import type { AudienceFit, Brief, ColumnWeight } from "@/lib/contract";
-import { getAudienceModel, hasAudienceCredentials } from "@/lib/server/ai";
+import { getAudienceModel, getSystemOneConfig, hasAudienceCredentials } from "@/lib/server/ai";
 import { keywordWeights } from "@/lib/stand-in/keyword-weights";
 import { readAnalysisCsv, readAnalysisJson } from "@/lib/stand-in/data-files";
 import type { TractColumn } from "@/lib/tract-columns";
 
-const TIMEOUT_MS = 20_000;
+const TIMEOUT_MS = 45_000;
 
 /**
  * The answer levels for every column, from against to for. A column can count
@@ -33,22 +34,27 @@ const LEVELS = [
 /**
  * The answer as a weight from -1 to 1. With per-level probabilities this is
  * the expected level, so a split between "for" and "strongly for" lands
- * between them; otherwise it is the single level Jev chose.
+ * between them; otherwise it is the single level the model chose.
  */
-function toWeight(answer: { score: number; probabilities?: Record<string, number> }) {
-  const top = LEVELS.length - 1;
-  let level = answer.score;
-  const entries = Object.entries(answer.probabilities ?? {})
-    .map(([key, p]) => [Number(key), p] as const)
-    .filter(([i, p]) => Number.isInteger(i) && i >= 0 && i <= top && Number.isFinite(p));
-  const total = entries.reduce((sum, [, p]) => sum + p, 0);
-  if (total > 0) level = entries.reduce((sum, [i, p]) => sum + i * p, 0) / total;
+function toWeight(answer: unknown, top: number): number {
+  if (!answer || typeof answer !== "object") throw new Error("decision model returned no answer");
+  const a = answer as { score?: unknown; probabilities?: unknown };
+  let level = typeof a.score === "number" && Number.isFinite(a.score) ? a.score : null;
+  if (a.probabilities && typeof a.probabilities === "object") {
+    const entries = Object.entries(a.probabilities as Record<string, unknown>)
+      .map(([key, p]) => [Number(key), typeof p === "number" ? p : Number.NaN] as const)
+      .filter(([i, p]) => Number.isInteger(i) && i >= 0 && i <= top && Number.isFinite(p));
+    const total = entries.reduce((sum, [, p]) => sum + p, 0);
+    if (total > 0) level = entries.reduce((sum, [i, p]) => sum + i * p, 0) / total;
+  }
+  if (level === null) throw new Error("decision model returned no score or probabilities");
+  level = Math.max(0, Math.min(top, level));
   return Number(Math.max(-1, Math.min(1, (level / top) * 2 - 1)).toFixed(2));
 }
 
-async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnWeight[]> {
-  const result = await decide({
-    model: getAudienceModel(),
+/** The questions and state both decision-model paths send. */
+function request(columns: TractColumn[], brief: Brief) {
+  return {
     state: {
       "target customer": brief.targetCustomer,
       startup: brief.description,
@@ -64,14 +70,82 @@ async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnW
         },
       ]),
     ),
+  };
+}
+
+function answersToWeights(columns: TractColumn[], answers: Record<string, unknown>): ColumnWeight[] {
+  const top = LEVELS.length - 1;
+  return columns.map((c) => ({
+    column: c.name,
+    description: c.description,
+    measures: c.measures,
+    weight: toWeight(answers[c.name], top),
+  }));
+}
+
+async function systemOneWeights(
+  columns: TractColumn[],
+  brief: Brief,
+  config: NonNullable<ReturnType<typeof getSystemOneConfig>>,
+): Promise<ColumnWeight[]> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (config.token) headers.Authorization = `Bearer ${config.token}`;
+
+  const response = await fetch(config.url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ model: config.model, ...request(columns, brief) }),
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`decision model ${response.status}${text ? `: ${text.slice(0, 200)}` : ""}`);
+  }
+
+  const body = (await response.json()) as { answers?: unknown; result?: { answers?: unknown } };
+  const answers = body.answers ?? body.result?.answers;
+  if (!answers || typeof answers !== "object") throw new Error("decision model returned no answers");
+  return answersToWeights(columns, answers as Record<string, unknown>);
+}
+
+async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnWeight[]> {
+  const result = await decide({
+    model: getAudienceModel(),
+    ...request(columns, brief),
     abortSignal: AbortSignal.timeout(TIMEOUT_MS),
   });
 
-  return columns.map((c) => {
+  const answers: Record<string, unknown> = {};
+  for (const c of columns) {
     const answer = result.answers[c.name];
     if (answer?.type !== "score") throw new Error(`Jev returned no score for "${c.name}".`);
-    return { column: c.name, description: c.description, measures: c.measures, weight: toWeight(answer) };
-  });
+    answers[c.name] = answer;
+  }
+  return answersToWeights(columns, answers);
+}
+
+async function weightsFor(columns: TractColumn[], brief: Brief): Promise<Pick<AudienceFit, "weights" | "source">> {
+  const systemOne = getSystemOneConfig();
+  if (systemOne) {
+    try {
+      return { weights: await systemOneWeights(columns, brief, systemOne), source: "systemone" };
+    } catch (error) {
+      console.error("The self-hosted decision model failed; trying Jev instead.", error);
+    }
+  }
+
+  if (hasAudienceCredentials()) {
+    try {
+      return { weights: await jevWeights(columns, brief), source: "jev" };
+    } catch (error) {
+      console.error("Jev failed; weighting the audience by keywords instead.", error);
+    }
+  } else if (!systemOne) {
+    console.warn("No decision model endpoint or gateway credentials; weighting the audience by keywords instead.");
+  }
+
+  return { weights: keywordWeights(columns, brief.targetCustomer), source: "keywords" };
 }
 
 export async function scoreAudience(brief: Brief): Promise<AudienceFit> {
@@ -80,25 +154,7 @@ export async function scoreAudience(brief: Brief): Promise<AudienceFit> {
     readAnalysisCsv("nyc_tracts.csv"),
   ]);
 
-  // Without gateway credentials, or if Jev fails, the keyword stand-in keeps
-  // the page working, and `source` tells the page which one it got. Locally the
-  // credential is AI_GATEWAY_API_KEY; on a Vercel deployment the AI SDK uses
-  // the project's OIDC token when no key is set.
-  let weights: ColumnWeight[];
-  let source: AudienceFit["source"] = "jev";
-  if (!hasAudienceCredentials()) {
-    console.warn("No AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN; weighting the audience by keywords instead of Jev.");
-    weights = keywordWeights(columns, brief.targetCustomer);
-    source = "keywords";
-  } else {
-    try {
-      weights = await jevWeights(columns, brief);
-    } catch (error) {
-      console.error("Jev failed; weighting the audience by keywords instead.", error);
-      weights = keywordWeights(columns, brief.targetCustomer);
-      source = "keywords";
-    }
-  }
+  const { weights, source } = await weightsFor(columns, brief);
 
   const markets = new Set<string>(brief.markets);
   const raw: [string, number][] = [];
