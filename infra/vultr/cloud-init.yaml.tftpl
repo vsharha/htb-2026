@@ -40,25 +40,43 @@ write_files:
       set -euo pipefail
       export DEBIAN_FRONTEND=noninteractive
 
-      if ! command -v ollama >/dev/null 2>&1; then
-        curl -fsSL https://ollama.com/install.sh | sh
+      # The Ubuntu image ships ufw active with only SSH allowed, which blocks
+      # the HTTP challenge and HTTPS.
+      ufw allow 22/tcp
+      ufw allow 80/tcp
+      ufw allow 443/tcp
+      ufw --force enable
+
+      # GitHub's release CDN is unreliable from Vultr, so the official image
+      # from Docker Hub is used instead of Ollama's install script.
+      if ! command -v docker >/dev/null 2>&1; then
+        apt-get update -y
+        apt-get install -y docker.io
+        systemctl enable --now docker
       fi
 
-      mkdir -p /etc/systemd/system/ollama.service.d
-      cat > /etc/systemd/system/ollama.service.d/override.conf <<'EOF'
-      [Service]
-      Environment="OLLAMA_HOST=127.0.0.1:11434"
-      Environment="OLLAMA_KEEP_ALIVE=24h"
-      EOF
-      systemctl daemon-reload
-      systemctl enable --now ollama
-
-      # The first pull downloads several gigabytes, so retry rather than fail once.
       for attempt in $(seq 1 30); do
-        if ollama pull ${model}; then
+        if docker pull ollama/ollama:latest; then
           break
         fi
-        sleep 20
+        sleep 15
+      done
+
+      docker rm -f ollama >/dev/null 2>&1 || true
+      docker run -d --name ollama --restart unless-stopped \
+        -p 127.0.0.1:11434:11434 \
+        -v ollama:/root/.ollama \
+        -e OLLAMA_KEEP_ALIVE=24h \
+        ollama/ollama:latest
+
+      # The first pull downloads several gigabytes, so retry rather than fail once.
+      for model in ${join(" ", models)}; do
+        for attempt in $(seq 1 40); do
+          if docker exec ollama ollama pull "$model"; then
+            break
+          fi
+          sleep 20
+        done
       done
 
       if ! command -v caddy >/dev/null 2>&1; then
@@ -74,9 +92,6 @@ write_files:
       # that resolves to this instance and requires the bearer token.
       domain="$(curl -fsS https://api.ipify.org).sslip.io"
       cat > /etc/caddy/Caddyfile <<EOF
-      {
-        email ${email}
-      }
       https://$domain {
         @authed header Authorization "Bearer ${token}"
         handle @authed {
@@ -88,7 +103,7 @@ write_files:
       systemctl enable caddy
       systemctl restart caddy
 
-      ollama ps || true
+      ollama ps >/dev/null 2>&1 || docker exec ollama ollama ps || true
 
   - path: /etc/systemd/system/decision-model.service
     content: |

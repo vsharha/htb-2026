@@ -14,21 +14,22 @@ import { keywordWeights } from "@/lib/stand-in/keyword-weights";
 import { readAnalysisCsv, readAnalysisJson } from "@/lib/stand-in/data-files";
 import type { TractColumn } from "@/lib/tract-columns";
 
-const TIMEOUT_MS = 45_000;
+const TIMEOUT_MS = 300_000;
 
 /**
  * The answer levels for every column, from against to for. A column can count
  * against a customer as well as for one: high incomes suit an affluent
  * audience and not a low-income one, and median age points opposite ways for
  * young and older audiences. So the level keeps its direction, and the weight
- * runs from -1 to 1.
+ * runs from -1 to 1. The wording is short because every question repeats it,
+ * and CPU inference time scales with prompt length.
  */
 const LEVELS = [
-  "Strongly against: the target customers are much less likely to have this trait.",
-  "Against: the target customers are somewhat less likely to have this trait.",
-  "Not relevant: the description says nothing either way about this trait.",
-  "For: the target customers are somewhat more likely to have this trait.",
-  "Strongly for: the target customers are much more likely to have this trait.",
+  "Much less likely to have this trait.",
+  "Somewhat less likely to have this trait.",
+  "No relation to this trait.",
+  "Somewhat more likely to have this trait.",
+  "Much more likely to have this trait.",
 ];
 
 /**
@@ -65,7 +66,7 @@ function request(columns: TractColumn[], brief: Brief) {
         c.name,
         {
           type: "score" as const,
-          instructions: `How does this trait of an area's ${c.measures === "lives" ? "residents" : c.measures === "works" ? "workers" : "passers-by"} relate to the startup's target customers? Trait: ${c.description}.`,
+          instructions: `Trait of the area's ${c.measures === "lives" ? "residents" : c.measures === "works" ? "workers" : "passers-by"}: ${c.description}.`,
           criteria: LEVELS,
         },
       ]),

@@ -1,14 +1,16 @@
 # Decision model on Vultr
 
-A Vultr Cloud GPU instance running a Jev-compatible System One decision model
-behind a token-protected HTTPS endpoint. The web app's audience scoring calls
+A Vultr instance running a Jev-compatible System One decision model behind a
+token-protected HTTPS endpoint. The web app's audience scoring calls
 `/v1/systemone` on it, so the decision model runs on Vultr rather than a hosted
 API.
 
-The instance installs NVIDIA drivers (rebooting once if needed), Ollama, the
-model and Caddy from cloud-init. Caddy obtains a certificate for
-`<ip>.sslip.io`, which resolves to the instance, and returns 401 unless the
-request carries the bearer token. Ollama itself stays on localhost.
+Cloud-init installs Docker, pulls `ollama/ollama` from Docker Hub (Ollama's own
+installer downloads from GitHub releases, which rate-limits), pulls the models,
+and runs Caddy. Caddy obtains a certificate for `<ip>.sslip.io`, which resolves
+to the instance, returns 401 unless the request carries the bearer token, and
+proxies to Ollama on localhost. Ubuntu's firewall only allows SSH, HTTP and
+HTTPS.
 
 ## Use
 
@@ -34,15 +36,28 @@ The instance bills hourly from creation. Destroy it when the demo ends:
 tofu destroy
 ```
 
-## Plan choice
+Changing `user_data` replaces the instance, because Vultr only runs it at first
+boot.
 
-`plan` defaults to `vcg-a16-1c-6gb`, the cheapest NVIDIA plan with enough VRAM
-for `clef-flash` (11–12 GB). List what the account can actually deploy:
+## Plans
+
+`plan` defaults to `vhp-12c-24gb-amd`, a 12-vCPU, 24 GB CPU instance at
+$0.197/h. It runs a 9B model in about 24 tokens per second of prompt
+processing: a single question takes seconds, but the 21-question audience
+request takes a couple of minutes, so this plan is for proving the setup rather
+than for a fast demo.
+
+A GPU plan is the same stack: set `plan` to a `vcg-*` ID and the cloud-init
+installs the NVIDIA driver and reboots once before starting the model. Check
+what the account can actually deploy, because a plan the account is not enabled
+for is listed with an empty `locations` list:
 
 ```sh
 curl -s -H "Authorization: Bearer $VULTR_API_KEY" \
   'https://api.vultr.com/v2/plans?type=vcg' | jq '.plans[] | {id, gpu_type, gpu_vram, locations}'
+for r in $(curl -s -H "Authorization: Bearer $VULTR_API_KEY" \
+  'https://api.vultr.com/v2/regions?per_page=500' | jq -r '.regions[].id'); do
+  echo "$r: $(curl -s -H "Authorization: Bearer $VULTR_API_KEY" \
+    "https://api.vultr.com/v2/regions/$r/availability?type=vcg" | jq -r '.available_plans[]?' | tr '\n' ' ')"
+done
 ```
-
-Any CPU plan also works — Ollama falls back to CPU when no driver is present —
-but a 9B model then takes tens of seconds per request instead of milliseconds.
