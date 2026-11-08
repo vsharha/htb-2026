@@ -119,17 +119,19 @@ function Pending({ children }: { children: React.ReactNode }) {
  */
 const EXPECTED_SECONDS = 90;
 
-function Scoring() {
+function Scoring({ scoring }: { scoring: RunState["scoring"] }) {
   const [seconds, setSeconds] = useState(0);
   useEffect(() => {
     const id = window.setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => window.clearInterval(id);
   }, []);
-  const progress = Math.min(seconds / EXPECTED_SECONDS, 0.97);
+  const progress = scoring ? Math.min(scoring.answered / scoring.total, 0.97) : Math.min(seconds / EXPECTED_SECONDS, 0.97);
   return (
     <div className="flex max-w-sm flex-col gap-2">
       <p className="animate-pulse text-sm text-muted-foreground">
-        Scoring 2,324 census tracts with the self-hosted model… {seconds}s of about {EXPECTED_SECONDS}
+        {scoring
+          ? `Scoring 2,324 census tracts… ${scoring.answered} of ${scoring.total} traits · ${seconds}s`
+          : `Scoring 2,324 census tracts with the self-hosted model… ${seconds}s of about ${EXPECTED_SECONDS}`}
       </p>
       <div
         className="h-1.5 w-full overflow-hidden rounded-full bg-foreground/10"
@@ -280,7 +282,7 @@ function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | n
     <>
       <Section title="Biggest observed gaps">
         {!layers ? (
-          <Scoring />
+          <Scoring scoring={run.scoring} />
         ) : (
           <NeighborhoodRanking layers={layers} layer="gap" />
         )}
@@ -306,7 +308,7 @@ function CustomersTab({ run, layers, focus, placements }: { run: RunState; layer
     <>
       <Section title="Most customers">
         {!layers ? (
-          <Scoring />
+          <Scoring scoring={run.scoring} />
         ) : (
           <NeighborhoodRanking layers={layers} layer="fit" />
         )}
@@ -322,8 +324,13 @@ function CustomersTab({ run, layers, focus, placements }: { run: RunState; layer
         )}
         {run.fit?.stats && (
           <p className="text-xs text-muted-foreground">
-            {run.fit.stats.model} answered 21 traits in {(run.fit.stats.durationMs / 1000).toFixed(1)} s
+            {run.fit.stats.model} answered {run.fit.weights.length} traits in {(run.fit.stats.durationMs / 1000).toFixed(1)} s
             {run.fit.stats.inputTokens ? ` from ${run.fit.stats.inputTokens.toLocaleString()} input tokens` : ""} on Vultr CPU.
+          </p>
+        )}
+        {run.scoring && (
+          <p className="text-xs text-muted-foreground">
+            Still scoring: {run.scoring.answered} of {run.scoring.total} traits so far. The map refines as each batch arrives.
           </p>
         )}
         {!weights ? (

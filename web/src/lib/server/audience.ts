@@ -1,10 +1,12 @@
-"use server";
-
 // Scores the target customer against the tract columns with a decision model,
 // then combines the real tract numbers in code. The model sees the brief and
-// the 21 column descriptions, never a tract: one request asks one score
-// question per column. A self-hosted System One endpoint, when configured,
-// takes the call; Jev through AI Gateway does it otherwise.
+// the column descriptions, never a tract: one request asks one score question
+// per column. A self-hosted System One endpoint, when configured, takes the
+// call; Jev through AI Gateway does it otherwise.
+//
+// Columns are asked in batches so the map can be scored and shown after each
+// one. A CPU-served model takes tens of seconds per batch, and a map that fills
+// in beats one blank screen.
 
 import { experimental_decide as decide } from "ai";
 
@@ -15,6 +17,10 @@ import { readAnalysisCsv, readAnalysisJson } from "@/lib/stand-in/data-files";
 import type { TractColumn } from "@/lib/tract-columns";
 
 const TIMEOUT_MS = 300_000;
+const BATCH_SIZE = 7;
+
+/** One audience fit, plus how many traits it covers. */
+export type AudienceBatch = AudienceFit & { answered: number; total: number };
 
 /**
  * The answer levels for every column, from against to for. A column can count
@@ -133,7 +139,11 @@ async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnW
   return answersToWeights(columns, answers);
 }
 
-async function weightsFor(columns: TractColumn[], brief: Brief): Promise<Pick<AudienceFit, "weights" | "source" | "stats">> {
+/**
+ * Asks the model one batch of columns. The self-hosted endpoint is tried
+ * first, then Jev, then keyword weights, so a batch always returns something.
+ */
+async function ask(columns: TractColumn[], brief: Brief): Promise<Omit<AudienceFit, "scores">> {
   const systemOne = getSystemOneConfig();
   if (systemOne) {
     const started = Date.now();
@@ -159,15 +169,8 @@ async function weightsFor(columns: TractColumn[], brief: Brief): Promise<Pick<Au
   return { weights: keywordWeights(columns, brief.targetCustomer), source: "keywords" };
 }
 
-export async function scoreAudience(brief: Brief): Promise<AudienceFit> {
-  const [columns, tracts] = await Promise.all([
-    readAnalysisJson<TractColumn[]>("columns.json"),
-    readAnalysisCsv("nyc_tracts.csv"),
-  ]);
-
-  const { weights, source, stats } = await weightsFor(columns, brief);
-
-  const markets = new Set<string>(brief.markets);
+/** Ranks the tracts by the weighted traits, from 0 to 1, strongest last. */
+function rankTracts(tracts: Record<string, string>[], columns: TractColumn[], weights: ColumnWeight[], markets: Set<string>) {
   const raw: [string, number][] = [];
   for (const tract of tracts) {
     if (!markets.has(tract.borough)) continue;
@@ -187,6 +190,47 @@ export async function scoreAudience(brief: Brief): Promise<AudienceFit> {
   raw.forEach(([geoid], i) => {
     scores[geoid] = Number((i / Math.max(raw.length - 1, 1)).toFixed(4));
   });
+  return scores;
+}
 
-  return { weights, scores, source, stats };
+/**
+ * Yields a fit after each batch, so a caller can show a map that fills in.
+ * The last yield is the complete fit.
+ */
+export async function* scoreBatches(brief: Brief, signal?: AbortSignal): AsyncGenerator<AudienceBatch> {
+  const [columns, tracts] = await Promise.all([
+    readAnalysisJson<TractColumn[]>("columns.json"),
+    readAnalysisCsv("nyc_tracts.csv"),
+  ]);
+
+  const markets = new Set<string>(brief.markets);
+  const batches: TractColumn[][] = [];
+  for (let i = 0; i < columns.length; i += BATCH_SIZE) batches.push(columns.slice(i, i + BATCH_SIZE));
+
+  const weights: ColumnWeight[] = [];
+  let source: AudienceFit["source"] = "keywords";
+  let model = "";
+  let durationMs = 0;
+  let inputTokens: number | undefined;
+
+  for (const [batchIndex, batch] of batches.entries()) {
+    if (signal?.aborted) return;
+    const answer = await ask(batch, brief);
+    weights.push(...answer.weights);
+    // A keyword batch anywhere makes the whole fit the fallback's quality.
+    if (batchIndex === 0) source = answer.source;
+    else if (answer.source === "keywords") source = "keywords";
+    model = answer.stats?.model ?? model;
+    durationMs += answer.stats?.durationMs ?? 0;
+    inputTokens = inputTokens === undefined ? answer.stats?.inputTokens : inputTokens + (answer.stats?.inputTokens ?? 0);
+
+    yield {
+      weights: [...weights],
+      scores: rankTracts(tracts, columns, weights, markets),
+      source,
+      stats: model ? { model, durationMs, inputTokens } : undefined,
+      answered: weights.length,
+      total: columns.length,
+    };
+  }
 }
