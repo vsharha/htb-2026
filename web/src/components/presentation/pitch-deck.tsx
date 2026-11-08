@@ -248,7 +248,7 @@ function HowItWorksSlide() {
 function DemoSlide() {
   return (
     <Slide padding="0px">
-      <div className="relative flex h-full flex-col px-16 pt-12 pb-24 text-foreground">
+      <div className="relative flex h-full flex-col px-24 pt-12 pb-24 text-foreground">
         <div className="flex items-baseline justify-between">
           <h2 className="font-heading text-[2.6rem] font-bold tracking-tight">Live demo</h2>
           <p className="text-base text-muted-foreground">A budgeting app for people who share a flat</p>
