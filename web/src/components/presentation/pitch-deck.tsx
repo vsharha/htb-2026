@@ -212,7 +212,7 @@ type PipelineNode = { name: string; detail: ReactNode; x: number; y: number };
  * moving its paths.
  */
 const pipelineNodes: PipelineNode[] = [
-  { name: "Your prompt", detail: "Startup, customer and budget", x: 0, y: 100 },
+  { name: "Guided brief", detail: "Startup, customer, price, budget and market", x: 0, y: 100 },
   { name: "Audience fit", detail: (
       <>
         <span className="font-bold text-foreground">System 1</span> classifier on census, jobs and subway data
