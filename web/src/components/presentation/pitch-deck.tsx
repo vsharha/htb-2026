@@ -148,7 +148,7 @@ function CoverSlide() {
       <div className="relative isolate flex h-full items-center px-24">
         <SlideGlow />
         <div className={`${sheet} relative max-w-[880px] rounded-[2rem] px-16 py-14`}>
-          <Eyebrow>HackTheBurgh 2026 · Demo city: New York</Eyebrow>
+          <Eyebrow>HackTheBurgh 2026</Eyebrow>
           <h1 className="mt-6 text-[9rem] leading-[0.9]">
             <Wordmark className="tracking-[-0.04em]" />
           </h1>
