@@ -6,9 +6,8 @@ import { cn } from "@/lib/utils";
  */
 export function Wordmark({ className }: { className?: string }) {
   return (
-    <span className={cn("font-heading tracking-[-0.03em] [font-variation-settings:'opsz'_96]", className)}>
-      <span className="font-light">Place</span>
-      <span className="font-extrabold">wise</span>
+    <span className={cn("font-heading font-light tracking-[-0.03em] [font-variation-settings:'opsz'_96]", className)}>
+      Placewise
     </span>
   );
 }
