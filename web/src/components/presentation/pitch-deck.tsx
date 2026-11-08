@@ -210,12 +210,12 @@ const pipelineNodes: PipelineNode[] = [
   { name: "Your prompt", detail: "Startup, customer and budget", x: 0, y: 100 },
   { name: "Audience fit", detail: (
       <>
-        <span className="font-bold text-heat-hot">System 1</span> classifier on census, jobs and subway data
+        <span className="font-bold text-foreground">System 1</span> classifier on census, jobs and subway data
       </>
     ), x: 299, y: 0 },
   { name: "Competitors", detail: (
       <>
-        <span className="font-bold text-heat-hot">Agent</span> finds their outdoor ads
+        <span className="font-bold text-foreground">Agent</span> finds their outdoor ads
       </>
     ), x: 299, y: 200 },
   { name: "Gap", detail: "Strong audience, no competitor ads", x: 598, y: 100 },
