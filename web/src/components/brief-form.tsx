@@ -114,18 +114,18 @@ export function BriefForm({
       <p className={cn(sentenceType, "leading-[1.55] text-balance")}>
         Our company is{" "}
         <label className="sr-only" htmlFor="description">What the company is, in a few words</label>
-        <input id="description" name="description" required defaultValue={filled?.description ?? ""} placeholder="a budgeting app" className={cn(blank, "min-w-[12ch]")} />{" "}
+        <input id="description" name="description" required defaultValue={filled?.description ?? ""} placeholder="a dating app for serious relationships" className={cn(blank, "min-w-[12ch]")} />{" "}
         in{" "}
         <span className="whitespace-nowrap">
-          <BlankSelect name="industry" label="Industry" options={INDUSTRY_OPTIONS} defaultValue={filled?.industry ?? null} placeholder="fintech" required />.
+          <BlankSelect name="industry" label="Industry" options={INDUSTRY_OPTIONS} defaultValue={filled?.industry ?? null} placeholder="consumer apps" required />.
         </span>{" "}
         We want to reach{" "}
         <label className="sr-only" htmlFor="targetCustomer">The customers the company wants to reach</label>
-        <input id="targetCustomer" name="targetCustomer" required defaultValue={filled?.targetCustomer ?? ""} placeholder="young renters in tech" className={cn(blank, "min-w-[12ch]")} />{" "}
+        <input id="targetCustomer" name="targetCustomer" required defaultValue={filled?.targetCustomer ?? ""} placeholder="single professionals in their 20s and 30s" className={cn(blank, "min-w-[12ch]")} />{" "}
         who would pay{" "}
         <label className="sr-only" htmlFor="pays">What a customer pays, in US dollars</label>
         <span className="whitespace-nowrap">
-          $<input id="pays" name="pays" {...money} defaultValue={filled?.customerPays.amount ?? ""} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="12" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
+          $<input id="pays" name="pays" {...money} defaultValue={filled?.customerPays.amount ?? ""} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="30" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
         </span>{" "}
         per{" "}
         <span className="whitespace-nowrap">
@@ -134,7 +134,7 @@ export function BriefForm({
         and we can spend{" "}
         <label className="sr-only" htmlFor="budget">Monthly advertising budget, in US dollars</label>
         <span className="whitespace-nowrap">
-          $<input id="budget" name="budget" {...money} defaultValue={filled?.monthlyBudget ?? ""} pattern="[0-9]+" placeholder="3000" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
+          $<input id="budget" name="budget" {...money} defaultValue={filled?.monthlyBudget ?? ""} pattern="[0-9]+" placeholder="8000" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
         </span>{" "}
         a month on ads in{" "}
         <span className="whitespace-nowrap">
