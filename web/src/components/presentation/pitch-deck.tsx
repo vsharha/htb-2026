@@ -320,7 +320,7 @@ function NextStepsSlide() {
       <SlideBody number={5}>
         <Eyebrow>Next steps</Eyebrow>
         <h2 className="mt-6 max-w-[1050px] font-heading text-[4.75rem] leading-[1] font-bold tracking-[-0.03em] text-balance">
-          From a map of the gap to a plan you can buy.
+          Turn the map into a buy list.
         </h2>
         <ul className="mt-14 list-disc space-y-5 pl-10 text-[2.4rem] leading-snug marker:text-muted-foreground">
           {nextSteps.map((step) => (
