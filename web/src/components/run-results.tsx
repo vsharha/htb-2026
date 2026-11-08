@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin } from "lucide-react";
+import { ChevronDown, MapPin } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CompetitorLogo } from "@/components/competitor-logo";
@@ -60,22 +60,41 @@ function Section({
   title,
   aside,
   busy,
+  collapsible,
   children,
 }: {
   title: string;
   aside?: React.ReactNode;
   busy?: boolean;
+  /** The heading becomes a button that folds the section's content away; it starts open. */
+  collapsible?: boolean;
   children: React.ReactNode;
 }) {
+  const header = (
+    <div className="flex items-baseline justify-between gap-3">
+      <div className="flex items-baseline gap-2">
+        <h2 className="font-heading text-lg font-semibold tracking-tight">{title}</h2>
+        {busy && <Throbber />}
+      </div>
+      <span className="flex items-center gap-2 text-xs text-muted-foreground">
+        {aside}
+        {collapsible && <ChevronDown aria-hidden className="size-4 self-center transition-transform group-open:rotate-180 motion-reduce:transition-none" />}
+      </span>
+    </div>
+  );
+  if (collapsible) {
+    return (
+      <details open className="group flex flex-col gap-3">
+        <summary className="cursor-pointer list-none outline-none marker:hidden focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
+          {header}
+        </summary>
+        <div className="mt-3 flex flex-col gap-3">{children}</div>
+      </details>
+    );
+  }
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between gap-3">
-        <div className="flex items-baseline gap-2">
-          <h2 className="font-heading text-lg font-semibold tracking-tight">{title}</h2>
-          {busy && <Throbber />}
-        </div>
-        {aside && <span className="text-xs text-muted-foreground">{aside}</span>}
-      </div>
+      {header}
       {children}
     </section>
   );
@@ -371,7 +390,7 @@ function AgentTrace({ trace, researching, recorded }: { trace: TraceEntry[]; res
     stages.set(entry.stage, [...(stages.get(entry.stage) ?? []), entry]);
   }
   return (
-    <Section title="How the agent worked" aside={trace.length > 0 ? `${trace.length} steps` : undefined} busy={researching}>
+    <Section title="How the agent worked" aside={trace.length > 0 ? `${trace.length} steps` : undefined} busy={researching} collapsible>
       {trace.length === 0 ? (
         researching ? (
           <Pending>Waiting for the agent&rsquo;s first step…</Pending>
