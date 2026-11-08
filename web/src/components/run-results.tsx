@@ -87,7 +87,11 @@ function TractRanking({ layers, layer, value }: { layers: TractLayers; layer: La
 
 function PlacementRow({ placement: p, number, focus }: { placement: Placement; number: number; focus: MapFocus }) {
   const row = useRef<HTMLButtonElement>(null);
-  const active = focus.hovered === p.id || focus.selected?.id === p.id;
+  const chosen = focus.selected?.id === p.id;
+  const active = focus.hovered === p.id || chosen;
+  // The first placement is the best match, and the one picked on the map or in
+  // the list gets the strongest treatment. The rest stay flat rows.
+  const best = number === 1;
 
   // A click on the marker scrolls its row into view.
   const selected = focus.selected;
@@ -96,7 +100,7 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
   }, [selected, p.id]);
 
   return (
-    <li className="border-b border-border last:border-0">
+    <li className={best || chosen ? "py-1.5" : "border-b border-border last:border-0"}>
       <button
         ref={row}
         type="button"
@@ -106,8 +110,13 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
         onBlur={() => focus.hover(null)}
         onClick={() => focus.select(p.id, "list")}
         className={
-          "-mx-2 flex w-[calc(100%+1rem)] cursor-pointer gap-3 rounded-lg px-2 py-2.5 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
-          (active ? "bg-foreground/5" : "")
+          "-mx-2 flex w-[calc(100%+1rem)] cursor-pointer gap-3 px-2 text-left transition-all outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
+          (chosen
+            ? "rounded-xl bg-background px-3 py-3.5 shadow-md ring-2 ring-foreground"
+            : best
+              ? "rounded-xl bg-foreground/5 px-3 py-3.5 ring-1 ring-foreground/15"
+              : "rounded-lg py-2.5 ") +
+          (active && !chosen && !best ? "bg-foreground/5" : "")
         }
       >
         <span
@@ -119,8 +128,9 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
           {number}
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="flex items-baseline justify-between gap-3 text-sm">
-            <span className="font-medium">{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
+          {best && <span className="text-[11px] font-semibold tracking-wide text-heat-hot uppercase">Best match</span>}
+          <span className={"flex items-baseline justify-between gap-3 " + (best || chosen ? "text-base" : "text-sm")}>
+            <span className={best || chosen ? "font-semibold" : "font-medium"}>{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
             <span className="text-right">
               <span className="font-mono tabular-nums">${p.costPerAudienceMember.toFixed(3)}</span>
               <span className="text-xs text-muted-foreground"> / customer</span>
