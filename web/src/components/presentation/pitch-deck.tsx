@@ -187,8 +187,7 @@ function ProblemSlide() {
         <div className="mt-auto flex items-end gap-16">
           <p className="font-heading text-[8rem] leading-[0.85] font-bold tracking-[-0.04em] text-heat-hot">5,556</p>
           <p className="max-w-[640px] pb-2 text-[1.9rem] leading-snug text-muted-foreground">
-            LinkNYC kiosks and bus shelters in New York. No public list says which reach your customers, which your
-            competitors already hold, or what they cost.
+            street ad spots in New York. Which ones reach your customers?
           </p>
         </div>
       </SlideBody>
