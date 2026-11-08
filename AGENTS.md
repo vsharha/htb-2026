@@ -15,7 +15,7 @@
 - Tracks decide what we build. When proposing a feature, name the tracks it strengthens. Prefer features that serve the priority tracks, and ones that serve several tracks at once.
 - Challenges decide how we build, not what. An agent never adds a challenge's technology to the project on its own. It may suggest a challenge where its technology fits a feature the tracks already call for, but never at the cost of a priority track. When a feature also qualifies for a challenge, say so.
 
-Priority tracks, most important first: TODO, not decided yet.
+Priority tracks, most important first: G-Research, Metaview's overall prize, HRT.
 
 Priority challenges, most important first: TODO, not decided yet.
 
@@ -27,7 +27,7 @@ Read `docs/event/tracks.md` or `docs/event/challenges.md` before work aimed at a
 
 ## Project
 
-The idea is locked in: the audience heatmap, chosen by the user on 7 November 2026. A startup describes its target customer, and the product maps where in a city those customers live, work and pass through, where competitors already advertise to them, and the gap between the two, ending with placements to buy in the gap areas. The demo city is New York. Read `docs/ideas/audience-heatmap.md` before feature work on it. The track and challenge priorities above are still undecided.
+The idea is locked in: the audience heatmap, chosen by the user on 7 November 2026. A startup describes its target customer, and the product maps where in a city those customers live, work and pass through, where competitors already advertise to them, and the gap between the two, ending with placements to buy in the gap areas. The demo city is New York. Read `docs/ideas/audience-heatmap.md` before feature work on it. The challenge priorities above are still undecided.
 
 Python tools are managed with uv, and Node.js tools with pnpm. Do not use pip, poetry, npm or yarn.
 
