@@ -199,24 +199,55 @@ function ProblemSlide() {
   );
 }
 
-const steps = [
-  {
-    name: "Describe",
-    detail: "One sentence about your startup and its customer, what they pay, and your monthly budget.",
-  },
-  {
-    name: "Customers",
-    detail: "Jev turns the sentence into weights on 21 census, jobs and subway measures, then scores all 2,327 census tracts.",
-  },
-  {
-    name: "Competitors",
-    detail: "An agent searches press, trade sites and social media for competitors’ outdoor campaigns and pins each one.",
-  },
-  {
-    name: "Gap",
-    detail: "Strong audience, no competitor ads. Up to 12 kiosks and bus shelters to buy there, each with a way to measure it.",
-  },
+type PipelineNode = { name: string; detail: string; x: number; y: number };
+
+/**
+ * Box positions inside the 1118 x 320 diagram, in pixels. The connector paths
+ * in PipelineDiagram start and end on these boxes' edges, so moving a box means
+ * moving its paths.
+ */
+const pipelineNodes: PipelineNode[] = [
+  { name: "Your brief", detail: "Startup, customer and budget", x: 0, y: 100 },
+  { name: "Audience fit", detail: "Census, jobs and subway data", x: 299, y: 0 },
+  { name: "Competitors", detail: "Agent finds their outdoor ads", x: 299, y: 200 },
+  { name: "Gap", detail: "Strong audience, no competitor ads", x: 598, y: 100 },
+  { name: "Placements", detail: "Up to 12 kiosks and bus shelters to buy", x: 898, y: 100 },
 ];
+
+const pipelinePaths = [
+  "M220 160 C 260 160, 260 60, 295 60",
+  "M220 160 C 260 160, 260 260, 295 260",
+  "M519 60 C 560 60, 560 160, 594 160",
+  "M519 260 C 560 260, 560 160, 594 160",
+  "M818 160 L 894 160",
+];
+
+function PipelineDiagram() {
+  return (
+    <div className="relative h-[320px] w-[1118px]">
+      <svg aria-hidden viewBox="0 0 1118 320" className="absolute inset-0 text-muted-foreground">
+        <defs>
+          <marker id="pipeline-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor" />
+          </marker>
+        </defs>
+        {pipelinePaths.map((d) => (
+          <path key={d} d={d} fill="none" stroke="currentColor" strokeWidth={2.5} markerEnd="url(#pipeline-arrow)" />
+        ))}
+      </svg>
+      {pipelineNodes.map((node) => (
+        <div
+          key={node.name}
+          className={`${sheet} absolute flex h-[120px] w-[220px] flex-col justify-center rounded-2xl px-5`}
+          style={{ left: node.x, top: node.y }}
+        >
+          <p className="font-heading text-[1.6rem] leading-tight font-bold tracking-tight">{node.name}</p>
+          <p className="mt-1 text-[1.05rem] leading-snug text-muted-foreground">{node.detail}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function HowItWorksSlide() {
   return (
@@ -226,17 +257,8 @@ function HowItWorksSlide() {
         <h2 className="mt-6 max-w-[1000px] font-heading text-[3.75rem] leading-[1.02] font-bold tracking-[-0.03em] text-balance">
           One sentence about your customer becomes a list of places to advertise.
         </h2>
-        <div className="mt-auto pt-10">
-          <div className="h-2 rounded-full bg-gradient-to-r from-heat-cool via-heat-mid to-heat-hot" />
-          <ol className="mt-8 grid grid-cols-4 gap-10">
-            {steps.map((step, index) => (
-              <li key={step.name}>
-                <p className="font-mono text-base text-muted-foreground">{index + 1}</p>
-                <p className="mt-2 font-heading text-[2.1rem] font-bold tracking-tight">{step.name}</p>
-                <p className="mt-3 text-[1.3rem] leading-snug text-muted-foreground">{step.detail}</p>
-              </li>
-            ))}
-          </ol>
+        <div className="mt-14">
+          <PipelineDiagram />
         </div>
       </SlideBody>
       <Notes>
