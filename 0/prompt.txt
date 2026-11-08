@@ -1,0 +1,61 @@
+so why is this adding all this networking, and how much is the cost etc
+
+---
+
+yeah lets go with A, im not sure about what my account can do
+
+---
+
+id like to get a self hosted model working, even if it doesnt work well. i can explain that infra is managed with tofu and could be setup with a gpu if i had access. id just like to prove that it works with a self hosted model even if its entirely on the cpu
+
+---
+
+so what is the ip of the page so i can see it. yeah we wont get gpus in time it will have to be cpu only
+
+---
+
+can we host the whole of the webserver as well
+
+---
+
+could we also get some metrics on how the decision model is going since it takes ages, not a grafana dashboard but can we just have some stats on screen
+
+---
+
+can we get a progress bar or something like that
+
+---
+
+do you think we could get it that the map fills in gradually rather than waiting
+
+---
+
+why are there no recommended spots on the customers for ad spots
+
+---
+
+can we add the openai key to the host? just ssh in ? its in /web/.env.local
+
+---
+
+ive added two keys
+
+---
+
+so does it currently do all the seaching with the system one? can we have the map update more ?
+
+---
+
+ah sorry i didnt mean the searching  i mean the classification. how come we arent getting the gap tab when searching for food companies preset
+
+---
+
+we have quite a few untracked files, git ignore the api key for vultr and handle the rest
+
+---
+
+check if that work is needed and remove it if not
+
+---
+
+commit
