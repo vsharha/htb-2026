@@ -191,13 +191,16 @@ function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | nu
         ) : (
           <ul className="flex flex-col gap-3">
             {weights.map((w) => (
-              <li key={w.column} className="flex flex-col gap-1">
+              <li key={w.column} className="group flex flex-col gap-1">
                 <div className="flex items-baseline justify-between gap-3 text-sm">
                   <span>
                     {w.weight < 0 && <span className="text-muted-foreground">Less likely: </span>}
                     {w.description}
                   </span>
-                  <span className="shrink-0 font-mono text-xs text-muted-foreground">{MEASURE_LABEL[w.measures]}</span>
+                  <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
+                    <span className="group-hover:hidden">{MEASURE_LABEL[w.measures]}</span>
+                    <span className="hidden group-hover:inline">{w.weight > 0 ? "+" : ""}{w.weight.toFixed(2)}</span>
+                  </span>
                 </div>
                 <div className="h-1.5 rounded-full bg-foreground/10">
                   <div

@@ -3,8 +3,8 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { setWorkerUrl, type ExpressionSpecification } from "maplibre-gl";
-import { useEffect, useMemo, useRef } from "react";
-import Map, { Layer, Marker, NavigationControl, Source, type MapRef } from "react-map-gl/maplibre";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Map, { Layer, Marker, NavigationControl, Popup, Source, type MapRef } from "react-map-gl/maplibre";
 
 import { CompetitorLogo } from "@/components/competitor-logo";
 import { campaignId } from "@/components/use-audience-run";
@@ -13,6 +13,7 @@ import type { MapFocus } from "@/components/use-map-focus";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
+import { tractLabel } from "@/lib/tracts";
 
 // MapLibre looks for its worker next to its own module, where the bundler
 // leaves nothing. This hands the bundler the worker file to emit and serve.
@@ -32,6 +33,13 @@ function heatRamp(id: LayerId): ExpressionSpecification {
 
 /** CARTO's light basemap: streets and water in greys, so the tract colours carry the map. */
 const BASEMAP = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+
+/** The value a hovered tract shows, labelled the way its tab's ranking labels it. */
+const TRACT_VALUE: Record<LayerId, { label: string; format: (value: number) => string }> = {
+  fit: { label: "Audience fit", format: (value) => `top ${Math.max((1 - value) * 100, 0.1).toFixed(1)}%` },
+  competition: { label: "Competition", format: (value) => value.toFixed(2) },
+  gap: { label: "Gap", format: (value) => value.toFixed(2) },
+};
 
 export function TractMap({
   shapes,
@@ -88,6 +96,7 @@ export function TractMap({
   const audienceOnly = recommendationLayer(campaigns) === "fit";
   const paintLayer = layer === "gap" && audienceOnly ? "fit" : layer;
   const showTracts = layer !== "competition" || !audienceOnly;
+  const [hoveredTract, setHoveredTract] = useState<{ geoid: string; value: number; longitude: number; latitude: number } | null>(null);
 
   return (
     <Map
@@ -98,6 +107,18 @@ export function TractMap({
       mapStyle={BASEMAP}
       style={{ width: "100%", height: "100%" }}
       attributionControl={{ compact: true }}
+      onMouseMove={(event) => {
+        const geoid = showTracts
+          ? (map.current?.queryRenderedFeatures(event.point, { layers: ["tract-fill"] })[0]?.properties?.geoid as string | undefined)
+          : undefined;
+        const value = geoid ? layers?.[geoid]?.[paintLayer] : undefined;
+        setHoveredTract(
+          geoid && value !== undefined
+            ? { geoid, value, longitude: event.lngLat.lng, latitude: event.lngLat.lat }
+            : null,
+        );
+      }}
+      onMouseLeave={() => setHoveredTract(null)}
     >
       <NavigationControl position="top-right" showCompass={false} />
       <Source id="tracts" type="geojson" data={tracts}>
@@ -158,6 +179,25 @@ export function TractMap({
             </Marker>
           );
         })}
+      {showTracts && hoveredTract && (
+        <Popup
+          longitude={hoveredTract.longitude}
+          latitude={hoveredTract.latitude}
+          offset={12}
+          closeButton={false}
+          closeOnClick={false}
+          maxWidth="220px"
+          className="pointer-events-none"
+        >
+          <div className="font-sans text-xs leading-tight text-foreground">
+            <p className="font-medium">{tractLabel(hoveredTract.geoid)}</p>
+            <p className="mt-0.5 text-muted-foreground">
+              {TRACT_VALUE[paintLayer].label}{" "}
+              <span className="font-mono tabular-nums text-foreground">{TRACT_VALUE[paintLayer].format(hoveredTract.value)}</span>
+            </p>
+          </div>
+        </Popup>
+      )}
     </Map>
   );
 }
