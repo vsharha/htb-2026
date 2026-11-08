@@ -182,7 +182,7 @@ function ProblemSlide() {
           alt="Map of the San Francisco Bay Area covered in colourful location pins"
           width={640}
           height={671}
-          className={`${sheet} absolute top-20 right-24 w-[340px] rounded-2xl`}
+          className="absolute top-20 right-24 w-[340px] rounded-2xl border border-border"
         />
         <div className="mt-auto flex items-end gap-16">
           <p className="font-heading text-[8rem] leading-[0.85] font-bold tracking-[-0.04em] text-heat-hot">5,556</p>
