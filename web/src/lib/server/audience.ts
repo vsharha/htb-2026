@@ -11,7 +11,7 @@
 import { experimental_decide as decide } from "ai";
 
 import type { AudienceFit, Brief, ColumnWeight } from "@/lib/contract";
-import { getAudienceModel, getAudiencePreference, getSystemOneConfig, hasAudienceCredentials } from "@/lib/server/ai";
+import { getAudienceModel, getAudienceModelOrder, getSystemOneConfig, hasAudienceCredentials } from "@/lib/server/ai";
 import { keywordWeights } from "@/lib/stand-in/keyword-weights";
 import { readAnalysisCsv, readAnalysisJson } from "@/lib/stand-in/data-files";
 import type { TractColumn } from "@/lib/tract-columns";
@@ -163,7 +163,7 @@ async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnW
  */
 async function ask(columns: TractColumn[], brief: Brief): Promise<Omit<AudienceFit, "scores">> {
   const systemOne = getSystemOneConfig();
-  const order = getAudiencePreference() === "systemone" ? (["systemone", "jev"] as const) : (["jev", "systemone"] as const);
+  const order = getAudienceModelOrder();
 
   for (const model of order) {
     if (model === "jev") {
@@ -230,7 +230,7 @@ export async function* scoreBatches(brief: Brief, signal?: AbortSignal): AsyncGe
   const markets = new Set<string>(brief.markets);
   // Only the self-hosted CPU model is slow enough to need batching; Jev
   // answers all the columns in one fast request, as main does.
-  const batchSize = getAudiencePreference() === "systemone" && getSystemOneConfig() ? BATCH_SIZE : columns.length;
+  const batchSize = getAudienceModelOrder()[0] === "systemone" && getSystemOneConfig() ? BATCH_SIZE : columns.length;
   const batches: TractColumn[][] = [];
   for (let i = 0; i < columns.length; i += batchSize) batches.push(columns.slice(i, i + batchSize));
 

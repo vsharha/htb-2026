@@ -79,12 +79,13 @@ export function getAudienceModel() {
 }
 
 /**
- * Which decision model is tried first. Jev is the default, so a checkout with
- * both keys set still uses Jev; only an explicit AUDIENCE_MODEL=systemone,
- * which the Vultr deployment sets, prefers the self-hosted model.
+ * Which decision models may answer, in order. Jev alone unless
+ * AUDIENCE_MODEL=systemone, so a local checkout can never quietly use the
+ * self-hosted endpoint: that model is reachable only from the deployment that
+ * opts in. Anything after Jev in the local case is the keyword fallback.
  */
-export function getAudiencePreference(): "jev" | "systemone" {
-  return process.env.AUDIENCE_MODEL === "systemone" ? "systemone" : "jev";
+export function getAudienceModelOrder(): Array<"jev" | "systemone"> {
+  return process.env.AUDIENCE_MODEL === "systemone" ? ["systemone", "jev"] : ["jev"];
 }
 
 /**

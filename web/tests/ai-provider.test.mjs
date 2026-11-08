@@ -7,7 +7,7 @@ registerHooks({ resolve(specifier, context, nextResolve) {
   if (specifier === "server-only") return { url: "data:text/javascript,", shortCircuit: true };
   return nextResolve(specifier, context);
 } });
-const { AI_MODELS, getAudienceModel, getAudiencePreference, getCompetitorAI, getSystemOneConfig, hasAudienceCredentials } = await import("../src/lib/server/ai.ts");
+const { AI_MODELS, getAudienceModel, getAudienceModelOrder, getCompetitorAI, getSystemOneConfig, hasAudienceCredentials } = await import("../src/lib/server/ai.ts");
 
 function withEnvironment(values, run) {
   const previous = Object.fromEntries(Object.keys(values).map((name) => [name, process.env[name]]));
@@ -57,10 +57,11 @@ test("the self-hosted endpoint is configured from the environment and defaults i
   });
 });
 
-test("Jev is preferred unless AUDIENCE_MODEL names the self-hosted model", () => {
-  withEnvironment({ AUDIENCE_MODEL: undefined }, () => assert.equal(getAudiencePreference(), "jev"));
-  withEnvironment({ AUDIENCE_MODEL: "systemone" }, () => assert.equal(getAudiencePreference(), "systemone"));
-  withEnvironment({ AUDIENCE_MODEL: "anything-else" }, () => assert.equal(getAudiencePreference(), "jev"));
+test("only an explicit opt-in lets the self-hosted model answer", () => {
+  withEnvironment({ AUDIENCE_MODEL: undefined }, () => assert.deepEqual(getAudienceModelOrder(), ["jev"]));
+  withEnvironment({ AUDIENCE_MODEL: "jev" }, () => assert.deepEqual(getAudienceModelOrder(), ["jev"]));
+  withEnvironment({ AUDIENCE_MODEL: "anything-else" }, () => assert.deepEqual(getAudienceModelOrder(), ["jev"]));
+  withEnvironment({ AUDIENCE_MODEL: "systemone" }, () => assert.deepEqual(getAudienceModelOrder(), ["systemone", "jev"]));
 });
 
 test("credentials are checked separately for research and audience scoring", () => {
