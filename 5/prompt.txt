@@ -1,0 +1,5 @@
+there can be a weird bug with the clicking on the placements to buy hwere it will keep sucking you back to it. expected behaviour is that when we click on the placement ot buy we shift focus to the map once and thats it
+
+---
+
+you dont need chromium or playwright just use nix develop -c for py or npm
