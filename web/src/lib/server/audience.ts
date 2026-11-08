@@ -16,7 +16,8 @@ import { keywordWeights } from "@/lib/stand-in/keyword-weights";
 import { readAnalysisCsv, readAnalysisJson } from "@/lib/stand-in/data-files";
 import type { TractColumn } from "@/lib/tract-columns";
 
-const TIMEOUT_MS = 300_000;
+const SYSTEMONE_TIMEOUT_MS = 300_000;
+const JEV_TIMEOUT_MS = 20_000;
 const BATCH_SIZE = 7;
 
 /** One audience fit, plus how many traits it covers. */
@@ -102,7 +103,7 @@ async function systemOneWeights(
     method: "POST",
     headers,
     body: JSON.stringify({ model: config.model, ...request(columns, brief) }),
-    signal: AbortSignal.timeout(TIMEOUT_MS),
+    signal: AbortSignal.timeout(SYSTEMONE_TIMEOUT_MS),
   });
 
   if (!response.ok) {
@@ -127,7 +128,7 @@ async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnW
   const result = await decide({
     model: getAudienceModel(),
     ...request(columns, brief),
-    abortSignal: AbortSignal.timeout(TIMEOUT_MS),
+    abortSignal: AbortSignal.timeout(JEV_TIMEOUT_MS),
   });
 
   const answers: Record<string, unknown> = {};
@@ -204,8 +205,11 @@ export async function* scoreBatches(brief: Brief, signal?: AbortSignal): AsyncGe
   ]);
 
   const markets = new Set<string>(brief.markets);
+  // The self-hosted CPU model is slow enough that batching it buys a map that
+  // fills in; Jev answers all the columns in one fast request, as before.
+  const batchSize = getSystemOneConfig() ? BATCH_SIZE : columns.length;
   const batches: TractColumn[][] = [];
-  for (let i = 0; i < columns.length; i += BATCH_SIZE) batches.push(columns.slice(i, i + BATCH_SIZE));
+  for (let i = 0; i < columns.length; i += batchSize) batches.push(columns.slice(i, i + batchSize));
 
   const weights: ColumnWeight[] = [];
   let source: AudienceFit["source"] = "keywords";

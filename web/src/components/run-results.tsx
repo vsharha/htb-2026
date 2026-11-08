@@ -131,7 +131,7 @@ function Scoring({ scoring }: { scoring: RunState["scoring"] }) {
       <p className="animate-pulse text-sm text-muted-foreground">
         {scoring
           ? `Scoring 2,324 census tracts… ${scoring.answered} of ${scoring.total} traits · ${seconds}s`
-          : `Scoring 2,324 census tracts with the self-hosted model… ${seconds}s of about ${EXPECTED_SECONDS}`}
+          : `Scoring 2,324 census tracts… ${seconds}s`}
       </p>
       <div
         className="h-1.5 w-full overflow-hidden rounded-full bg-foreground/10"
@@ -325,7 +325,8 @@ function CustomersTab({ run, layers, focus, placements }: { run: RunState; layer
         {run.fit?.stats && (
           <p className="text-xs text-muted-foreground">
             {run.fit.stats.model} answered {run.fit.weights.length} traits in {(run.fit.stats.durationMs / 1000).toFixed(1)} s
-            {run.fit.stats.inputTokens ? ` from ${run.fit.stats.inputTokens.toLocaleString()} input tokens` : ""} on Vultr CPU.
+            {run.fit.stats.inputTokens ? ` from ${run.fit.stats.inputTokens.toLocaleString()} input tokens` : ""}
+            {run.fit.source === "systemone" ? " on Vultr CPU." : " through AI Gateway."}
           </p>
         )}
         {run.scoring && (
