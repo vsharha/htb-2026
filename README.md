@@ -4,6 +4,8 @@ Placewise shows a startup where to buy outdoor ads in New York. You describe you
 
 Built at HackTheBurgh 2026.
 
+![The Placewise form, a fill-in-the-blank brief describing the startup and its target customer](screenshots/form-empty.png)
+
 ## Run the web app
 
 You need Node.js and pnpm. From `web/`:
