@@ -7,7 +7,7 @@ import { useSyncExternalStore } from "react";
 // one small store, read with useSettings().
 
 export type Corners = "rounded" | "sharp";
-export type PaletteId = "default" | "blue" | "purple" | "teal";
+export type PaletteId = "default" | "blue" | "purple" | "teal" | "navy";
 /** "fade" keeps the weakest 65% of tracts nearly clear; "classic" is the earlier ramp that tints every tract by its score. */
 export type HeatStyle = "fade" | "classic";
 export type Settings = { corners: Corners; palette: PaletteId; heat: HeatStyle; cost: boolean };
@@ -107,6 +107,38 @@ export const PALETTES: Record<PaletteId, { label: string; swatches: string[]; he
       "--heat-cool": "#0B5450",
       "--heat-mid": "#7FC2BA",
       "--heat-hot": "#2F8F86",
+    },
+  },
+  // The heat colours darken from light to dark rather than changing hue alone,
+  // so a reader who cannot tell the hues apart still ranks the tracts. That is
+  // what the four themes above lack: their lightness peaks at heat-mid, which
+  // leaves heat-cool and heat-hot equally bright.
+  navy: {
+    label: "Navy, amber",
+    // #F7FBFF #C7E9B4 #41B6C4 #1D91C0 #08306B, accent #FEB24C
+    swatches: ["#F7FBFF", "#C7E9B4", "#41B6C4", "#1D91C0", "#08306B", "#FEB24C"],
+    heat: { mid: "#41B6C4", hot: "#08306B" },
+    vars: {
+      "--background": "#F7FBFF",
+      "--foreground": "#08306B",
+      "--card": "#FFFFFF",
+      "--card-foreground": "#08306B",
+      "--popover": "#FFFFFF",
+      "--popover-foreground": "#08306B",
+      "--primary": "#08306B",
+      "--primary-foreground": "#F7FBFF",
+      "--secondary": "#DEEBF7",
+      "--secondary-foreground": "#08306B",
+      "--muted": "color-mix(in oklab, #DEEBF7 35%, #F7FBFF)",
+      "--muted-foreground": "#2C6EA8",
+      "--accent": "#FEB24C",
+      "--accent-foreground": "#08306B",
+      "--border": "#C6DBEF",
+      "--input": "#C6DBEF",
+      "--ring": "#1D91C0",
+      "--heat-cool": "#C7E9B4",
+      "--heat-mid": "#41B6C4",
+      "--heat-hot": "#08306B",
     },
   },
 };
