@@ -245,8 +245,9 @@ export function TractMap({
                 className={
                   "flex size-7 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-foreground shadow-sm transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
                   (counted ? "" : "border-dashed ") +
-                  // A solid fill would hide the dashed border, so those markers only tint.
-                  (active ? "scale-125 " + (counted ? "bg-foreground" : "bg-foreground/25") : "bg-background/95")
+                  (active ? "scale-125 " : "") +
+                  // The background runs under the border, so a foreground fill would hide the dashes.
+                  (active && counted ? "bg-foreground" : "bg-background/95")
                 }
               >
                 <CompetitorLogo
