@@ -1,0 +1,39 @@
+{
+  "cli_version": "0.13.1",
+  "checkpoint_id": "01M6XB64Q08G246SD3GTF2BZT3",
+  "session_id": "ses_e45971ecbffeAVhyC544aBWMbn",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-08T10:27:46.738166953Z",
+  "branch": "vultr2",
+  "checkpoints_count": 3,
+  "save_step_count": 4,
+  "files_touched": [],
+  "agent": "OpenCode",
+  "model": "deepseek-v4.1-flash",
+  "turn_id": "9fc8017b6f0c",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 21083,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 7528576,
+    "output_tokens": 6484,
+    "api_call_count": 28
+  },
+  "redaction": {
+    "replacements": 208,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 76,
+      "credentialed_uri": 0,
+      "entropy": 162,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 11
+  }
+}
