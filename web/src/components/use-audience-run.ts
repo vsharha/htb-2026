@@ -101,6 +101,5 @@ export function useAudienceRun() {
     }
   }, []);
 
-  const busy = run !== null && !run.error && (run.placements === null || !run.agentDone);
-  return { run, start, busy };
+  return { run, start };
 }

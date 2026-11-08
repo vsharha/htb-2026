@@ -18,7 +18,7 @@ const sheet = "bg-card text-card-foreground shadow-[0_24px_60px_-20px_rgb(21_23_
  * still in it.
  */
 export function AudienceRun() {
-  const { run, start, busy } = useAudienceRun();
+  const { run, start } = useAudienceRun();
   const [brief, setBrief] = useState<Brief | null>(null);
   const [editing, setEditing] = useState(true);
   const [revealing, setRevealing] = useState(false);
@@ -46,7 +46,7 @@ export function AudienceRun() {
         <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-3 sm:px-8">
           <section className={`${sheet} flex flex-col gap-12 rounded-b-[2.5rem] px-6 pt-8 pb-12 sm:px-14 sm:pt-12 sm:pb-16`}>
             <SiteHeader className="text-[clamp(1.35rem,3vw,2.35rem)]" />
-            <BriefForm onSubmit={submit} busy={busy} />
+            <BriefForm onSubmit={submit} />
           </section>
         </main>
       </div>

@@ -82,10 +82,8 @@ const SAMPLE_BRIEF: Brief = {
 
 export function BriefForm({
   onSubmit,
-  busy,
 }: {
   onSubmit: (brief: Brief) => void;
-  busy: boolean;
 }) {
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -150,8 +148,8 @@ export function BriefForm({
       </p>
 
       <div className="flex flex-wrap items-center gap-4">
-        <Button type="submit" disabled={busy} className="h-14 gap-3 rounded-full pr-6 pl-7 text-lg [&_svg:not([class*='size-'])]:size-5">
-          {busy ? "Mapping your audience…" : "Map my audience"}
+        <Button type="submit" className="h-14 gap-3 rounded-full pr-6 pl-7 text-lg [&_svg:not([class*='size-'])]:size-5">
+          Map my audience
           <ArrowRight />
         </Button>
       </div>
