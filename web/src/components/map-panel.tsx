@@ -45,7 +45,10 @@ export function MapPanel({
   className?: string;
 }) {
   const audienceOnly = recommendationLayer(campaigns) === "fit";
-  const current = LAYERS.find((l) => l.id === (layer === "gap" && audienceOnly ? "fit" : layer))!;
+  const current = LAYERS.find((l) => l.id === layer)!;
+  const showCampaigns = layer !== "fit";
+  // Placements show on every layer that lists them; Customers lists them only without a Gap tab.
+  const showPlacements = showCampaigns || audienceOnly;
 
   return (
     <section className={cn("relative overflow-hidden", className)}>
@@ -70,17 +73,20 @@ export function MapPanel({
             </div>
           </>
         )}
-        {layer === "gap" && audienceOnly && <p className="mt-2 text-xs text-muted-foreground">Audience fit only. Competition coverage unknown.</p>}
-        {layer !== "fit" && (
+        {showPlacements && (
           <ul className="mt-3 flex flex-col gap-1.5 text-xs">
-            <li className="flex items-center gap-2">
-              <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground"><span className="size-2 rounded-[2px] bg-foreground/25" /></span>
-              Current ad, at a matched location
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="size-4 shrink-0 rounded-full border-2 border-dashed border-foreground" />
-              Approximate, historical or undated ad
-            </li>
+            {showCampaigns && (
+              <>
+                <li className="flex items-center gap-2">
+                  <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground"><span className="size-2 rounded-[2px] bg-foreground/25" /></span>
+                  Current ad, at a matched location
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="size-4 shrink-0 rounded-full border-2 border-dashed border-foreground" />
+                  Approximate, historical or undated ad
+                </li>
+              </>
+            )}
             <li className="flex items-center gap-2">
               <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground bg-background font-mono text-[9px] font-semibold">
                 1

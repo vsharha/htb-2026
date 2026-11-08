@@ -13,7 +13,8 @@ export const LAYERS: { id: LayerId; label: string; low: string; high: string }[]
 ];
 
 /** Picks the layer the map shows and the results column explains. */
-export function LayerTabs({ layer, onChange, audienceOnly = false }: { layer: LayerId; onChange: (layer: LayerId) => void; audienceOnly?: boolean }) {
+export function LayerTabs({ layer, onChange, showGap }: { layer: LayerId; onChange: (layer: LayerId) => void; showGap: boolean }) {
+  const tabs = showGap ? LAYERS : LAYERS.filter((l) => l.id !== "gap");
   const items = useRef(new Map<LayerId, HTMLElement>());
   const [pill, setPill] = useState<{ left: number; width: number } | null>(null);
 
@@ -34,7 +35,7 @@ export function LayerTabs({ layer, onChange, audienceOnly = false }: { layer: La
       aria-label="Map layer"
       value={[layer]}
       onValueChange={(v) => {
-        const next = LAYERS.find((l) => l.id === v[0]);
+        const next = tabs.find((l) => l.id === v[0]);
         if (next) onChange(next.id);
       }}
       spacing={0}
@@ -47,7 +48,7 @@ export function LayerTabs({ layer, onChange, audienceOnly = false }: { layer: La
           style={{ left: pill.left, width: pill.width }}
         />
       )}
-      {LAYERS.map((l) => (
+      {tabs.map((l) => (
         <ToggleGroupItem
           key={l.id}
           value={l.id}
@@ -59,7 +60,7 @@ export function LayerTabs({ layer, onChange, audienceOnly = false }: { layer: La
           // (the toggle's hover and pressed greys) would flash over the pill.
           className="relative h-8 flex-1 rounded-full! bg-transparent px-2 text-sm text-foreground/60 transition-[color] duration-300 hover:bg-transparent hover:text-foreground aria-pressed:bg-transparent aria-pressed:text-background aria-pressed:hover:text-background motion-reduce:transition-none"
         >
-          {l.id === "gap" && audienceOnly ? "Locations" : l.label}
+          {l.label}
         </ToggleGroupItem>
       ))}
     </ToggleGroup>

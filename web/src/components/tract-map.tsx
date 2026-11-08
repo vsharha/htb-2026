@@ -94,7 +94,6 @@ export function TractMap({
     return location ? [{ campaign, location, id: campaignId(campaign, i) }] : [];
   });
   const audienceOnly = recommendationLayer(campaigns) === "fit";
-  const paintLayer = layer === "gap" && audienceOnly ? "fit" : layer;
   const showTracts = layer !== "competition" || !audienceOnly;
   const [hoveredTract, setHoveredTract] = useState<{ geoid: string; value: number; longitude: number; latitude: number } | null>(null);
 
@@ -111,7 +110,7 @@ export function TractMap({
         const geoid = showTracts
           ? (map.current?.queryRenderedFeatures(event.point, { layers: ["tract-fill"] })[0]?.properties?.geoid as string | undefined)
           : undefined;
-        const value = geoid ? layers?.[geoid]?.[paintLayer] : undefined;
+        const value = geoid ? layers?.[geoid]?.[layer] : undefined;
         setHoveredTract(
           geoid && value !== undefined
             ? { geoid, value, longitude: event.lngLat.lng, latitude: event.lngLat.lat }
@@ -122,7 +121,7 @@ export function TractMap({
     >
       <NavigationControl position="top-right" showCompass={false} />
       <Source id="tracts" type="geojson" data={tracts}>
-        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(paintLayer), "fill-opacity": showTracts ? 1 : 0 }} />
+        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer), "fill-opacity": showTracts ? 1 : 0 }} />
         <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.3, "line-opacity": showTracts ? 0.6 : 0 }} />
       </Source>
       {layer !== "fit" &&
@@ -155,8 +154,8 @@ export function TractMap({
             </Marker>
           );
         })}
-      {/* The recommendations tab keeps placement numbers separate from audience traits. */}
-      {layer !== "fit" &&
+      {/* With a Gap tab, the Customers layer keeps placement numbers separate from audience traits. */}
+      {(layer !== "fit" || audienceOnly) &&
         placements?.map((p, i) => {
           const active = focus.hovered === p.id || focus.selected?.id === p.id;
           return (
@@ -192,8 +191,8 @@ export function TractMap({
           <div className="font-sans text-xs leading-tight text-foreground">
             <p className="font-medium">{tractLabel(hoveredTract.geoid)}</p>
             <p className="mt-0.5 text-muted-foreground">
-              {TRACT_VALUE[paintLayer].label}{" "}
-              <span className="font-mono tabular-nums text-foreground">{TRACT_VALUE[paintLayer].format(hoveredTract.value)}</span>
+              {TRACT_VALUE[layer].label}{" "}
+              <span className="font-mono tabular-nums text-foreground">{TRACT_VALUE[layer].format(hoveredTract.value)}</span>
             </p>
           </div>
         </Popup>

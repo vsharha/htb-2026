@@ -8,7 +8,6 @@ import { ResultsList, useRunView } from "@/components/run-results";
 import { SiteHeader } from "@/components/site-header";
 import type { RunState } from "@/components/use-audience-run";
 import { CITIES, type Brief } from "@/lib/contract";
-import { recommendationLayer } from "@/lib/gap";
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 
@@ -37,12 +36,12 @@ export function ResultsSplit({
   /** Shows an edit button beside the brief summary. */
   onEditBrief?: () => void;
 }) {
-  const { layer, setLayer, campaigns, competitors, layers, focus, campaignFocus } = useRunView(run);
+  const { layer, setLayer, hasGap, campaigns, competitors, layers, focus, campaignFocus } = useRunView(run);
   return (
     <div className="flex flex-col bg-card text-card-foreground lg:grid lg:h-dvh lg:grid-cols-[2fr_1fr] lg:grid-rows-[auto_1fr] lg:overflow-hidden">
       <div className="flex flex-col gap-5 px-5 py-4 sm:px-8 lg:col-start-2 lg:pt-8 lg:pb-2">
         <SiteHeader />
-        <LayerTabs layer={layer} onChange={setLayer} audienceOnly={recommendationLayer(campaigns) === "fit"} />
+        <LayerTabs layer={layer} onChange={setLayer} showGap={hasGap} />
       </div>
       <MapPanel
         shapes={run.shapes}
@@ -71,7 +70,7 @@ export function ResultsSplit({
             </button>
           )}
         </div>
-        <ResultsList run={run} layers={layers} campaigns={campaigns} competitors={competitors} layer={layer} focus={focus} campaignFocus={campaignFocus} />
+        <ResultsList run={run} layers={layers} campaigns={campaigns} competitors={competitors} layer={layer} hasGap={hasGap} focus={focus} campaignFocus={campaignFocus} />
       </aside>
     </div>
   );

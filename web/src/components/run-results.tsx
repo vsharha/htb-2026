@@ -26,8 +26,13 @@ const TOP_TRACTS = 5;
 
 /** The selected layer, the campaigns found so far, the map layers they produce and the focused placement and campaign. */
 export function useRunView(run: RunState) {
-  const [layer, setLayer] = useState<LayerId>("gap");
+  const [chosen, setLayer] = useState<LayerId>("gap");
   const campaigns = useMemo(() => campaignsOf(run.events), [run.events]);
+  const hasGap = recommendationLayer(campaigns) === "gap";
+  // The Gap tab exists only once a current campaign has a precise location.
+  // Until then the default choice of Gap shows Customers, so the Gap tab
+  // opens by itself when it appears unless another tab was picked.
+  const layer = chosen === "gap" && !hasGap ? "fit" : chosen;
   const competitors = useMemo(() => competitorsOf(run.events), [run.events]);
   const layers = useMemo(
     () => (run.shapes && run.fit ? computeLayers(run.shapes, run.fit, campaigns) : null),
@@ -44,7 +49,7 @@ export function useRunView(run: RunState) {
       campaignMarks.select(id, from);
     },
   };
-  return { layer, setLayer, campaigns, competitors, layers, focus, campaignFocus };
+  return { layer, setLayer, hasGap, campaigns, competitors, layers, focus, campaignFocus };
 }
 
 function Section({ title, aside, children }: { title: string; aside?: React.ReactNode; children: React.ReactNode }) {
@@ -128,45 +133,54 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
   );
 }
 
+function PlacementsSection({ run, focus, audienceOnly }: { run: RunState; focus: MapFocus; audienceOnly: boolean }) {
+  return (
+    <Section title="Placements to buy" aside={run.placements && `${run.placements.length} found`}>
+      {audienceOnly && (
+        <p className="text-xs text-muted-foreground">
+          Chosen by audience fit. Competition coverage is unknown, so these are not confirmed gaps in competitors&rsquo; advertising.
+          {!run.agentDone && !run.error && " They are re-ranked if competitors’ current ads are found."}
+        </p>
+      )}
+      {!run.placements ? (
+        <Pending>{audienceOnly ? "Finding kiosks and bus shelters near your audience…" : "Finding kiosks and bus shelters in the observed gaps…"}</Pending>
+      ) : run.placements.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          No kiosks or bus shelters in these areas fit your budget. Raise the budget to include bus shelters.
+        </p>
+      ) : (
+        <ol className="flex flex-col">
+          {run.placements.map((p, i) => (
+            <PlacementRow key={p.id} placement={p} number={i + 1} focus={focus} />
+          ))}
+        </ol>
+      )}
+    </Section>
+  );
+}
+
 function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | null; focus: MapFocus }) {
-  const ranking = recommendationLayer(campaignsOf(run.events));
-  const audienceOnly = ranking === "fit";
   return (
     <>
-      <Section title={audienceOnly ? "Best audience locations" : "Biggest observed gaps"}>
+      <Section title="Biggest observed gaps">
         {!layers ? (
           <Pending>Scoring 2,324 census tracts…</Pending>
         ) : (
-          <TractRanking layers={layers} layer={ranking} value={(s) => s.toFixed(2)} />
+          <TractRanking layers={layers} layer="gap" value={(s) => s.toFixed(2)} />
         )}
-        {layers && !run.agentDone && !run.error && <Pending>{audienceOnly ? "Researching competitors; placements currently follow audience fit…" : "Updating as more competitors’ ads are found…"}</Pending>}
+        {layers && !run.agentDone && !run.error && <Pending>Updating as more competitors&rsquo; ads are found…</Pending>}
         <p className="text-xs text-muted-foreground">
-          {audienceOnly
-            ? "Competition coverage unknown. These placements follow audience fit; they are not confirmed gaps in competitors’ advertising."
-            : "Ranked against the current campaigns we could locate, not a complete inventory. Missing evidence means unknown coverage."}
+          Ranked against the current campaigns we could locate, not a complete inventory. Missing evidence means unknown coverage.
         </p>
       </Section>
 
-      <Section title="Placements to buy" aside={run.placements && `${run.placements.length} found`}>
-        {!run.placements ? (
-          <Pending>{audienceOnly ? "Finding kiosks and bus shelters near your audience…" : "Finding kiosks and bus shelters in the observed gaps…"}</Pending>
-        ) : run.placements.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No kiosks or bus shelters in these areas fit your budget. Raise the budget to include bus shelters.
-          </p>
-        ) : (
-          <ol className="flex flex-col">
-            {run.placements.map((p, i) => (
-              <PlacementRow key={p.id} placement={p} number={i + 1} focus={focus} />
-            ))}
-          </ol>
-        )}
-      </Section>
+      <PlacementsSection run={run} focus={focus} audienceOnly={false} />
     </>
   );
 }
 
-function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | null }) {
+/** Without a Gap tab, the placements chosen by audience fit are listed here. */
+function CustomersTab({ run, layers, focus, placements }: { run: RunState; layers: TractLayers | null; focus: MapFocus; placements: boolean }) {
   // Traits that count for or against the customer, strongest either way first.
   const weights = run.fit?.weights.filter((w) => w.weight !== 0).sort((a, b) => Math.abs(b.weight) - Math.abs(a.weight));
   const aside = run.fit && (run.fit.source === "jev" ? "weighted by Jev" : "weighted by keywords");
@@ -179,6 +193,8 @@ function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | nu
           <TractRanking layers={layers} layer="fit" value={(s) => `top ${Math.max((1 - s) * 100, 0.1).toFixed(1)}%`} />
         )}
       </Section>
+
+      {placements && <PlacementsSection run={run} focus={focus} audienceOnly />}
 
       <Section title="Who we looked for" aside={aside}>
         {run.fit?.source === "keywords" && (
@@ -329,6 +345,7 @@ export function ResultsList({
   campaigns,
   competitors,
   layer,
+  hasGap,
   focus,
   campaignFocus,
 }: {
@@ -337,6 +354,7 @@ export function ResultsList({
   campaigns: Campaign[];
   competitors: Competitor[];
   layer: LayerId;
+  hasGap: boolean;
   focus: MapFocus;
   campaignFocus: MapFocus;
 }) {
@@ -350,7 +368,7 @@ export function ResultsList({
         </p>
       )}
       {layer === "gap" && <GapTab run={run} layers={layers} focus={focus} />}
-      {layer === "fit" && <CustomersTab run={run} layers={layers} />}
+      {layer === "fit" && <CustomersTab run={run} layers={layers} focus={focus} placements={!hasGap} />}
       {layer === "competition" && <CompetitorsTab run={run} competitors={competitors} campaigns={campaigns} focus={campaignFocus} />}
     </div>
   );
