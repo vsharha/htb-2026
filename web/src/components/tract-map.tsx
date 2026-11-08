@@ -104,7 +104,11 @@ export function TractMap({
   useEffect(() => {
     if (selected?.from !== "list") return;
     const p = placements?.find((x) => x.id === selected.id);
-    if (p) map.current?.flyTo({ center: [p.longitude, p.latitude], zoom: Math.max(map.current.getZoom(), 14) });
+    if (!p) return;
+    map.current?.flyTo({ center: [p.longitude, p.latitude], zoom: Math.max(map.current.getZoom(), 14) });
+    // On phones the map sits above the scrolling column, so selecting a
+    // placement from the list scrolls back up to it.
+    map.current?.getContainer().scrollIntoView({ behavior: "smooth", block: "start" });
   }, [selected, placements]);
   const selectedCampaign = campaignFocus.selected;
   useEffect(() => {
