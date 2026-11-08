@@ -99,10 +99,8 @@ function ClusterMarker({ sites }: { sites: Placement[] }) {
         type="button"
         aria-label={`${sites.length} placements close together, zoom in`}
         onClick={() => current?.fitBounds(boundsOf(sites), { padding: 80, maxZoom: 17, duration: 600 })}
-        className="flex size-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-accent font-mono text-xs font-bold text-accent-foreground tabular-nums shadow-sm ring-4 ring-accent/30 outline-none focus-visible:ring-ring/50"
-      >
-        {sites.length}
-      </button>
+        className="size-8 cursor-pointer rounded-full border-2 border-white bg-accent shadow-sm ring-4 ring-accent/30 outline-none focus-visible:ring-ring/50"
+      />
     </Marker>
   );
 }
@@ -173,9 +171,10 @@ export function TractMap({
     [shapes, layers],
   );
 
-  // Placement markers that would overlap at this zoom merge into one numbered
-  // by how many it holds. The selected one always stays on its own so it is
-  // never hidden inside a group.
+  // Placement markers that would overlap at this zoom merge into one unnumbered
+  // marker, because a number on the map always identifies a single placement in
+  // the list. The selected one always stays on its own so it is never hidden
+  // inside a group.
   const placementGroups = useMemo(() => {
     const points = (placements ?? []).map((placement, i) => ({
       ...worldPixel(placement.longitude, placement.latitude, zoom),
