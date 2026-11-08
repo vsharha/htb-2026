@@ -7,7 +7,7 @@ import type { MapFocus } from "@/components/use-map-focus";
 import { getCampaignLocation } from "@/lib/campaign-location";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
-import { paletteTheme, useSettings } from "@/lib/settings";
+import { layerHeatStyle, paletteTheme, useSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 
 /** What the colour measures on each layer. */
@@ -59,7 +59,8 @@ export function MapPanel({
 }) {
   const audienceOnly = recommendationLayer(campaigns) === "fit";
   const current = LAYERS.find((l) => l.id === layer)!;
-  const { heat: heatStyle, palette, dark } = useSettings();
+  const { heat, palette, dark } = useSettings();
+  const heatStyle = layerHeatStyle(layer, heat);
   const ramp = paletteTheme(palette, dark).ramp;
   const showCampaigns = layer !== "fit";
   // Placements show on every layer that lists them; Customers lists them only without a Gap tab.

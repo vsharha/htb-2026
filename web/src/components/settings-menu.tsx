@@ -55,7 +55,7 @@ export function SettingsMenu() {
             <span>
               Percentile classes
               <span className="block text-xs text-muted-foreground">
-                On: four classes by percentile, with the bottom half unpainted. Off: the earlier ramp, where every tract is tinted by its score.
+                On: four classes by percentile, with the bottom half unpainted. Off: the earlier ramp, where every tract is tinted by its score. The Competitors tab always uses the earlier ramp.
               </span>
             </span>
           </label>

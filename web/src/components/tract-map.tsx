@@ -14,7 +14,7 @@ import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { campaignAffectsHeatmap, getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
 import { clusterByDistance, worldPixel } from "@/lib/cluster";
-import { paletteTheme, useSettings, type HeatStyle, type PaletteTheme } from "@/lib/settings";
+import { layerHeatStyle, paletteTheme, useSettings, type HeatStyle, type PaletteTheme } from "@/lib/settings";
 import { tractCode, tractName } from "@/lib/tracts";
 
 // MapLibre looks for its worker next to its own module, where the bundler
@@ -24,9 +24,8 @@ setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url)
 // MapLibre paints with plain colour values, not CSS variables, so the fill
 // colours come from the chosen palette in lib/settings.ts. The classes are
 // percentiles of the layer's own values: below the 50th nothing is painted,
-// then four classes up to the top 3%. A layer whose values bunch up, such as
-// competition with few ads, would otherwise colour the whole city. The legend
-// in map-panel.tsx draws the same classes.
+// then four classes up to the top 3%. The legend in map-panel.tsx draws the
+// same classes.
 const CLASS_PERCENTILES = [0.5, 0.75, 0.9, 0.97];
 const CLASS_OPACITY = 0.85;
 
@@ -142,7 +141,8 @@ export function TractMap({
   focus: MapFocus;
   campaignFocus: MapFocus;
 }) {
-  const { palette, heat: heatStyle, dark } = useSettings();
+  const { palette, heat, dark } = useSettings();
+  const heatStyle = layerHeatStyle(layer, heat);
   const map = useRef<MapRef>(null);
   const [zoom, setZoom] = useState(10.2);
 

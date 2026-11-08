@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 
+import type { LayerId } from "@/lib/gap";
+
 // Experimental interface settings, kept in localStorage and applied to the
 // document root so every page picks them up. Each setting is a plain value in
 // one small store, read with useSettings().
@@ -10,6 +12,10 @@ export type Corners = "rounded" | "sharp";
 export type PaletteId = "classic" | "teal" | "blue" | "purple" | "navy";
 /** "fade" paints five percentile classes with the bottom half clear; "classic" is the earlier ramp that tints every tract by its score. */
 export type HeatStyle = "fade" | "classic";
+/** Competition depends only on distance to the nearest ad, so percentile classes would draw distance rings around the ads. */
+export function layerHeatStyle(layer: LayerId, style: HeatStyle): HeatStyle {
+  return layer === "competition" ? "classic" : style;
+}
 /** "system" follows the operating system's preference; the other two are a choice made in the settings menu. */
 export type Mode = "system" | "light" | "dark";
 export type Settings = {
