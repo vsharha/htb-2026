@@ -28,10 +28,22 @@ export type AudienceBatch = AudienceFit & { answered: number; total: number };
  * against a customer as well as for one: high incomes suit an affluent
  * audience and not a low-income one, and median age points opposite ways for
  * young and older audiences. So the level keeps its direction, and the weight
- * runs from -1 to 1. The wording is short because every question repeats it,
- * and CPU inference time scales with prompt length.
+ * runs from -1 to 1.
  */
-const LEVELS = [
+const JEV_LEVELS = [
+  "Strongly against: the target customers are much less likely to have this trait.",
+  "Against: the target customers are somewhat less likely to have this trait.",
+  "Not relevant: the description says nothing either way about this trait.",
+  "For: the target customers are somewhat more likely to have this trait.",
+  "Strongly for: the target customers are much more likely to have this trait.",
+];
+
+/**
+ * The same levels in shorter wording for the self-hosted model, because every
+ * question repeats them and CPU inference time scales with prompt length. The
+ * scale and its meaning are identical.
+ */
+const SYSTEMONE_LEVELS = [
   "Much less likely to have this trait.",
   "Somewhat less likely to have this trait.",
   "No relation to this trait.",
@@ -60,8 +72,8 @@ function toWeight(answer: unknown, top: number): number {
   return Number(Math.max(-1, Math.min(1, (level / top) * 2 - 1)).toFixed(2));
 }
 
-/** The questions and state both decision-model paths send. */
-function request(columns: TractColumn[], brief: Brief) {
+/** The questions and state a decision model receives, with its own level wording. */
+function request(columns: TractColumn[], brief: Brief, levels: string[], compact: boolean) {
   return {
     state: {
       "target customer": brief.targetCustomer,
@@ -69,20 +81,25 @@ function request(columns: TractColumn[], brief: Brief) {
       industry: brief.industry,
     },
     questions: Object.fromEntries(
-      columns.map((c) => [
-        c.name,
-        {
-          type: "score" as const,
-          instructions: `Trait of the area's ${c.measures === "lives" ? "residents" : c.measures === "works" ? "workers" : "passers-by"}: ${c.description}.`,
-          criteria: LEVELS,
-        },
-      ]),
+      columns.map((c) => {
+        const area = c.measures === "lives" ? "residents" : c.measures === "works" ? "workers" : "passers-by";
+        return [
+          c.name,
+          {
+            type: "score" as const,
+            instructions: compact
+              ? `Trait of the area's ${area}: ${c.description}.`
+              : `How does this trait of an area's ${area} relate to the startup's target customers? Trait: ${c.description}.`,
+            criteria: levels,
+          },
+        ];
+      }),
     ),
   };
 }
 
-function answersToWeights(columns: TractColumn[], answers: Record<string, unknown>): ColumnWeight[] {
-  const top = LEVELS.length - 1;
+function answersToWeights(columns: TractColumn[], answers: Record<string, unknown>, levels: string[]): ColumnWeight[] {
+  const top = levels.length - 1;
   return columns.map((c) => ({
     column: c.name,
     description: c.description,
@@ -102,7 +119,7 @@ async function systemOneWeights(
   const response = await fetch(config.url, {
     method: "POST",
     headers,
-    body: JSON.stringify({ model: config.model, ...request(columns, brief) }),
+    body: JSON.stringify({ model: config.model, ...request(columns, brief, SYSTEMONE_LEVELS, true) }),
     signal: AbortSignal.timeout(SYSTEMONE_TIMEOUT_MS),
   });
 
@@ -119,7 +136,7 @@ async function systemOneWeights(
   const answers = body.answers ?? body.result?.answers;
   if (!answers || typeof answers !== "object") throw new Error("decision model returned no answers");
   return {
-    weights: answersToWeights(columns, answers as Record<string, unknown>),
+    weights: answersToWeights(columns, answers as Record<string, unknown>, SYSTEMONE_LEVELS),
     inputTokens: typeof body.usage?.input_tokens === "number" ? body.usage.input_tokens : undefined,
   };
 }
@@ -127,7 +144,7 @@ async function systemOneWeights(
 async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnWeight[]> {
   const result = await decide({
     model: getAudienceModel(),
-    ...request(columns, brief),
+    ...request(columns, brief, JEV_LEVELS, false),
     abortSignal: AbortSignal.timeout(JEV_TIMEOUT_MS),
   });
 
@@ -137,7 +154,7 @@ async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnW
     if (answer?.type !== "score") throw new Error(`Jev returned no score for "${c.name}".`);
     answers[c.name] = answer;
   }
-  return answersToWeights(columns, answers);
+  return answersToWeights(columns, answers, JEV_LEVELS);
 }
 
 /**
