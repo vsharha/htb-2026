@@ -311,7 +311,7 @@ function CampaignRow({ campaign: c, id, website, focus }: { campaign: Campaign; 
             {c.competitor}: {c.title}
           </a>
           <div className="text-xs text-muted-foreground">
-            {location ? LOCATION_PRECISION_LABELS[location.precision] : "Location not resolved"} · {c.kind}
+            {location ? LOCATION_PRECISION_LABELS[location.precision] : c.reach === "citywide" ? "Citywide, no fixed location" : c.reach === "borough" ? "Borough-wide, no fixed location" : "No location found"} · {c.kind}
           </div>
           <p className="text-xs text-muted-foreground">
             {c.coverage === "current" ? "Confirmed current dates" : c.coverage === "historical" ? "Historical campaign" : "Current coverage unknown"}
@@ -332,7 +332,7 @@ function CampaignRow({ campaign: c, id, website, focus }: { campaign: Campaign; 
           ) : (
             <>
               {c.location && <p className="text-xs text-muted-foreground">{c.location}</p>}
-              <p className="text-xs text-muted-foreground">{c.locationNote ?? "The source does not identify a specific location we can map."}</p>
+              {!c.reach && <p className="text-xs text-muted-foreground">{c.locationNote ?? "The research found no place named for this campaign."}</p>}
             </>
           )}
           {c.evidence && <p className="mt-1 text-xs text-muted-foreground">{c.evidence}</p>}
@@ -385,6 +385,11 @@ function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState;
         {outcome.unmapped > 0 && (
           <p className="text-xs text-muted-foreground">
             {outcome.unmapped === 1 ? "1 ad isn’t on the map" : `${outcome.unmapped} ads aren’t on the map`}: no reliable location match.
+          </p>
+        )}
+        {outcome.widespread > 0 && (
+          <p className="text-xs text-muted-foreground">
+            {outcome.widespread === 1 ? "1 ad runs" : `${outcome.widespread} ads run`} across the city or a borough, so {outcome.widespread === 1 ? "it has" : "they have"} no single point on the map.
           </p>
         )}
         {!run.agentDone && !run.error && <Pending>{steps.at(-1) ?? "Searching…"}</Pending>}

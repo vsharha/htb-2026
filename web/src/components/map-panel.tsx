@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 
 import { LAYERS } from "@/components/layer-tabs";
 import type { MapFocus } from "@/components/use-map-focus";
+import { getCampaignLocation } from "@/lib/campaign-location";
 import type { Campaign, Competitor, Placement } from "@/lib/contract";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
 import { PALETTES, useSettings } from "@/lib/settings";
@@ -63,6 +64,7 @@ export function MapPanel({
   const showCampaigns = layer !== "fit";
   // Placements show on every layer that lists them; Customers lists them only without a Gap tab.
   const showPlacements = showCampaigns || audienceOnly;
+  const citywide = campaigns.filter((campaign) => campaign.reach === "citywide" && !getCampaignLocation(campaign)).length;
 
   return (
     <section className={cn("relative overflow-hidden", className)}>
@@ -94,6 +96,11 @@ export function MapPanel({
               <span className="text-right">{current.high}</span>
             </div>
           </>
+        )}
+        {layer === "competition" && citywide > 0 && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {citywide === 1 ? "1 citywide campaign" : `${citywide} citywide campaigns`}, not pinned
+          </p>
         )}
         {showPlacements && (
           <ul className="mt-3 flex flex-col gap-1.5 text-xs">

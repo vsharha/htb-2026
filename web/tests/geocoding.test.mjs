@@ -151,6 +151,39 @@ test("street corners are placed from the city's centerline, never from a differe
   assert.equal(bare.location.precision, "address");
 });
 
+const brooklynItself = { ...timesSquare, lon: -73.9497, lat: 40.6526, name: "Brooklyn", formatted: "Brooklyn, New York, NY, United States", county: "Kings County", result_type: "suburb" };
+const fortGreene = { ...brooklynItself, lon: -73.9766, lat: 40.6908, name: "Fort Greene", formatted: "Brooklyn, Fort Greene, New York, NY, United States" };
+
+test("a neighbourhood becomes an approximate marker at the neighbourhood, never the centre of its borough", () => {
+  assert.equal(selectGeocodingResult(payload(brooklynItself), "Fort Greene, Brooklyn").location, null);
+  const { location } = selectGeocodingResult(payload(fortGreene), "Fort Greene");
+  assert.equal(location.precision, "area");
+  assert.equal(location.latitude, fortGreene.lat);
+});
+
+test("a neighbourhood named exactly is accepted at Geoapify's lower confidence, unlike other weak matches", () => {
+  const soho = { ...fortGreene, name: "SoHo", rank: { confidence: 0.5 } };
+  assert.equal(selectGeocodingResult(payload(soho), "SoHo").location.precision, "area");
+  assert.equal(selectGeocodingResult(payload(soho), "Tribeca").location, null);
+});
+
+test("a neighbourhood is not taken for a street that shares its words", () => {
+  const street = (name) => ({ ...timesSquare, name, result_type: "street" });
+  assert.equal(selectGeocodingResult(payload(street("Concourse Village West")), "West Village, Manhattan").location, null);
+  assert.equal(selectGeocodingResult(payload(street("Chelsea Road")), "Chelsea, Manhattan").location, null);
+  assert.equal(selectGeocodingResult(payload(street("West 42nd Street")), "42nd Street").location.precision, "area");
+});
+
+test("a business named after a neighbourhood is not taken for the neighbourhood", () => {
+  const clinic = { ...timesSquare, name: "Upper East Side Veterinary Center", rank: { confidence: 0.81 } };
+  assert.equal(selectGeocodingResult(payload(clinic), "Upper East Side, Manhattan").location, null);
+});
+
+test("a location naming only the city is citywide, and one naming a borough is borough-wide", async () => {
+  assert.equal((await geocodeCampaignLocation("New York City, New York")).reach, "citywide");
+  assert.equal((await geocodeCampaignLocation("Brooklyn, New York")).reach, "borough");
+});
+
 test("a location naming only a borough is not geocoded", async () => {
   const result = await geocodeCampaignLocation("Manhattan, New York, NY, United States of America");
   assert.equal(result.location, null);

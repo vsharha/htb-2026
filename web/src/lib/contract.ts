@@ -105,6 +105,8 @@ export type Campaign = {
   /** Older recordings may contain only a station match. */
   mapLocation?: CampaignLocation | null;
   locationNote?: string;
+  /** Set when the source describes a campaign spread across the city or a borough, which no single map point can represent. */
+  reach?: "citywide" | "borough";
 };
 
 export type ResearchSummary = {

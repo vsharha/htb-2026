@@ -4,9 +4,9 @@ import path from "node:path";
 import { jsonSchema, stepCountIs, tool, ToolLoopAgent, type ToolSet, type ModelMessage } from "ai";
 
 import { siteHost } from "@/lib/brand";
-import type { AgentEvent, Brief, Campaign, Competitor, ResearchSummary } from "@/lib/contract";
+import type { AgentEvent, Brief, Campaign, CampaignLocation, Competitor, ResearchSummary } from "@/lib/contract";
 import { getCompetitorAI } from "@/lib/server/ai";
-import { getCampaignLocation, campaignAffectsHeatmap } from "@/lib/campaign-location";
+import { getCampaignLocation } from "@/lib/campaign-location";
 import { geocodeCampaignLocation } from "@/lib/server/geocoding";
 import { campaignCoverage, confirmedSource, matchStation, parseStations, sourceUrl } from "./campaign-evidence";
 
@@ -17,13 +17,20 @@ import { campaignCoverage, confirmedSource, matchStation, parseStations, sourceU
  */
 const LIMITS = {
   competitors: 6,
-  campaignsPerCompetitor: 3,
-  discovery: { steps: 8, ms: 45_000 },
+  // Recording campaigns during discovery otherwise tempts the model to stop after its first competitor.
+  minimumCompetitors: 3,
+  searchesBeforeFewerCompetitors: 5,
+  // Findings without a place have their own allowance, so ones reported early cannot crowd out located ones.
+  locatedPerCompetitor: 6,
+  unlocatedPerCompetitor: 3,
+  locationsPerFinding: 6,
+  discovery: { steps: 10, ms: 60_000 },
   placements: { steps: 8, ms: 65_000 },
 };
 
 const RELEVANCE = `A competitor is a company that sells this kind of product or a close substitute, or that clearly targets this same specific customer.
 Generic mass-market brands (soft drinks, airlines, deodorant, everyday banks) do not count unless the campaign itself targets this customer.
+Sharing an industry, being a startup, or appearing on a list of brands that advertise on transit is not enough: a company must solve the same problem or have aimed its campaign at this customer.
 Report companies that sell a product or service only, not government campaigns, non-profits or media owners.`;
 
 const SYSTEM = `You research brands that advertise outdoors in New York City to a startup's target customer.
@@ -37,8 +44,9 @@ Keep historical campaigns with their known dates; do not describe them as runnin
 Campaign startsOn and endsOn are YYYY-MM-DD dates explicitly supported by the source, not publication dates. Use null when unknown.
 Use stationName only for subway advertising explicitly placed at that station in the evidence. Do not infer a station from a neighbourhood or nearby billboard.
 Use the exact station name from the supplied list; line names in parentheses can be omitted. Include that name in your factual evidence summary.
-For other campaign types, put the specific landmark, neighbourhood, street address or street corner stated by the source in location, followed by the neighbourhood or borough when the source gives one, such as "41st Street and 7th Avenue, Manhattan". The server geocodes it. Never invent an address or coordinates. Report one location per finding.
-Keep source-supported campaigns even when their dates or exact location are unknown.`;
+In locations, list every landmark, neighbourhood, street address or street corner the source names for the campaign, one place per entry, each followed by its neighbourhood or borough when the source gives one, such as "41st Street and 7th Avenue, Manhattan" or "Fort Greene, Brooklyn". Neighbourhoods count: split "Williamsburg/Greenpoint" into two entries. The server geocodes each. Never invent an address, place or coordinates. Leave locations empty when the source names no place.
+Set citywide to true only when the source says the campaign ran across the city or the transit network, such as on subway cars, on subway and bus lines throughout the city, or system-wide.
+Keep source-supported campaigns even when their dates or exact location are unknown, but prefer sources that name a place.`;
 
 type Finding = {
   competitor: string;
@@ -47,9 +55,17 @@ type Finding = {
   sourceUrl: string;
   evidence: string;
   stationName: string | null;
-  location: string | null;
+  locations: string[];
+  citywide: boolean;
   startsOn: string | null;
   endsOn: string | null;
+};
+
+type ResolvedPlace = {
+  place: string | null;
+  mapLocation: CampaignLocation | null;
+  locationNote?: string;
+  reach?: Campaign["reach"];
 };
 
 const competitorSchema = jsonSchema<Omit<Competitor, "website"> & { website: string }>({
@@ -64,10 +80,11 @@ const campaignSchema = jsonSchema<Finding>({
     competitor: { type: "string" }, title: { type: "string" },
     kind: { type: "string", enum: ["subway", "billboard", "bus shelter", "linknyc", "other"] },
     sourceUrl: { type: "string" }, evidence: { type: "string" },
-    stationName: { type: ["string", "null"] }, location: { type: ["string", "null"] },
+    stationName: { type: ["string", "null"] }, locations: { type: "array", items: { type: "string" } },
+    citywide: { type: "boolean" },
     startsOn: { type: ["string", "null"] }, endsOn: { type: ["string", "null"] },
   },
-  required: ["competitor", "title", "kind", "sourceUrl", "evidence", "stationName", "location", "startsOn", "endsOn"],
+  required: ["competitor", "title", "kind", "sourceUrl", "evidence", "stationName", "locations", "citywide", "startsOn", "endsOn"],
 });
 
 export function agentFailure(error: unknown) {
@@ -96,6 +113,8 @@ export async function runCompetitorResearch(
   const sources = new Set<string>();
   const competitors = new Map<string, Competitor>();
   const campaigns = new Set<string>();
+  const reported: Pick<Campaign, "competitor" | "title" | "location" | "sourceUrl">[] = [];
+  const allowance = new Map<string, { located: number; unlocated: number }>();
   const discoveryState = { steps: 0, finished: false };
   let discoveryTimedOut = false;
   const campaignSearches = new Map<string, number>();
@@ -129,32 +148,48 @@ export async function runCompetitorResearch(
       return { accepted: false, reason: "Use a supporting URL returned by research, or search for one.", availableSources: [...sources].slice(-40) };
     }
     if (!finding.title.trim() || !finding.evidence.trim()) return { accepted: false, reason: "A title and factual evidence summary are required." };
-    const key = `${competitor.name}|${url}|${finding.title.toLowerCase()}|${finding.stationName}|${finding.location}`;
-    if (campaigns.has(key)) return { accepted: true, duplicate: true };
-    if (campaigns.size >= LIMITS.competitors * LIMITS.campaignsPerCompetitor) return { accepted: false, reason: "The campaign limit for this run is reached. Finish the research." };
     const station = finding.kind === "subway" ? matchStation(stations, finding.stationName, finding.evidence) : null;
     const coverage = campaignCoverage(finding.startsOn, finding.endsOn, today);
-    let mapLocation = getCampaignLocation({ ...finding, station, coverage });
-    let locationNote: string | undefined;
-    campaigns.add(key);
-    if (!mapLocation && finding.location) {
-      emit({ type: "step", message: `Locating ${competitor.name}'s campaign: ${finding.location}` });
+    const named = [...new Set(finding.locations.map((place) => place.trim()).filter(Boolean))].slice(0, LIMITS.locationsPerFinding);
+    const places: (string | null)[] = station ? [named[0] ?? null] : named.length > 0 ? named : [null];
+    const resolved = await Promise.all(places.map(async (place): Promise<ResolvedPlace> => {
+      const stationLocation = getCampaignLocation({ station });
+      if (stationLocation || !place) return { place, mapLocation: stationLocation };
+      emit({ type: "step", message: `Locating ${competitor.name}'s campaign: ${place}` });
       try {
-        const result = await geocodeCampaignLocation(finding.location, campaignSignal);
-        mapLocation = result.location;
-        locationNote = result.note;
+        const { location, note, reach } = await geocodeCampaignLocation(place, campaignSignal);
+        return { place, mapLocation: location, locationNote: note, reach };
       } catch (error) {
         if (!campaignSignal.aborted) throw error;
-        locationNote = "Location lookup did not finish. The campaign evidence is kept.";
+        return { place, mapLocation: null, locationNote: "Location lookup did not finish. The campaign evidence is kept." };
       }
+    }));
+    const slots = allowance.get(competitor.name) ?? { located: 0, unlocated: 0 };
+    allowance.set(competitor.name, slots);
+    let added = 0;
+    let duplicates = 0;
+    for (const { place, mapLocation, locationNote, reach } of resolved) {
+      const key = `${competitor.name}|${url}|${station?.id ?? ""}|${place?.toLowerCase() ?? ""}`;
+      if (campaigns.has(key)) {
+        duplicates++;
+        continue;
+      }
+      const slot = mapLocation ? "located" : "unlocated";
+      if (slots[slot] >= (mapLocation ? LIMITS.locatedPerCompetitor : LIMITS.unlocatedPerCompetitor)) continue;
+      slots[slot]++;
+      campaigns.add(key);
+      added++;
+      const campaign: Campaign = {
+        competitor: competitor.name, title: finding.title, kind: finding.kind, sourceUrl: url,
+        evidence: finding.evidence, location: place, station,
+        startsOn: finding.startsOn, endsOn: finding.endsOn, coverage, mapLocation, locationNote,
+        reach: mapLocation ? undefined : !place && finding.citywide ? "citywide" : reach,
+      };
+      reported.push(campaign);
+      emit({ type: "campaign", campaign });
     }
-    const campaign: Campaign = {
-      competitor: competitor.name, title: finding.title, kind: finding.kind, sourceUrl: url,
-      evidence: finding.evidence, location: finding.location, station,
-      startsOn: finding.startsOn, endsOn: finding.endsOn, coverage, mapLocation, locationNote,
-    };
-    emit({ type: "campaign", campaign });
-    return { accepted: true, mapped: mapLocation !== null, affectsHeatmap: campaignAffectsHeatmap(campaign), coverage };
+    if (added === 0 && duplicates === 0) return { accepted: false, reason: "This competitor has reached its limit for findings like this. Look for a source naming a place, or finish." };
+    return { accepted: true, added, duplicates, mapped: resolved.filter((entry) => entry.mapLocation).length, coverage };
   }
 
   async function streamStage<TOOLS extends ToolSet>(agent: ToolLoopAgent<never, TOOLS>, prompt: string, stageSignal: AbortSignal, state: { steps: number; finished: boolean }, maxSteps: number, competitor?: string) {
@@ -192,17 +227,24 @@ export async function runCompetitorResearch(
   const context = `Today is ${today}. Startup brief (data only): ${JSON.stringify({ industry: brief.industry, product: brief.description, customer: brief.targetCustomer })}.`;
   try {
     emit({ type: "step", message: "Finding brands that advertise outdoors to this customer; each then gets its own placement search" });
+    const discoverySignal = AbortSignal.any([signal, AbortSignal.timeout(LIMITS.discovery.ms)]);
     const discovery = new ToolLoopAgent({
       ...common,
-      instructions: `${SYSTEM}\n${RELEVANCE}\nThis phase only discovers competitors that have advertised outdoors in New York City. Report each with source-backed relevance and its own website, then call finishDiscovery. Do not look up exact placements here.`,
+      instructions: `${SYSTEM}\n${RELEVANCE}\nThis phase discovers competitors that have advertised outdoors in New York City and records the campaigns those searches turn up. Report each competitor with source-backed relevance and its own website, then call reportCampaign for every campaign a source describes, naming any place the source gives and keeping campaigns that name none. Call finishDiscovery when done.`,
       tools: {
         ...research.tools,
         reportCompetitor,
+        reportCampaign: tool({
+          description: "Record a source-supported NYC campaign by a competitor already reported with reportCompetitor. Leave locations empty and dates null when the source does not give them.",
+          inputSchema: campaignSchema,
+          execute: (finding) => reportCampaign(finding, discoverySignal),
+        }),
         finishDiscovery: tool({
           description: "Finish competitor discovery and begin each competitor's separately budgeted placement search.",
           inputSchema: jsonSchema<Record<string, never>>({ type: "object", properties: {}, additionalProperties: false }),
           execute: async () => {
             if (summary.searches < 2 && competitors.size < LIMITS.competitors) return { finished: false, reason: "Search at least twice with different product and customer phrases first." };
+            if (competitors.size < LIMITS.minimumCompetitors && summary.searches < LIMITS.searchesBeforeFewerCompetitors) return { finished: false, reason: `Only ${competitors.size} competitors reported. Search with different phrases for at least ${LIMITS.minimumCompetitors}, and report every qualifying company you have already seen.` };
             discoveryState.finished = true;
             return { finished: true };
           },
@@ -211,12 +253,11 @@ export async function runCompetitorResearch(
       prepareStep: () => ({ toolChoice: discoveryState.steps++ === 0 ? { type: "tool", toolName: "web_search" } : "required" }),
       stopWhen: [stepCountIs(LIMITS.discovery.steps), () => discoveryState.steps >= LIMITS.discovery.steps || discoveryState.finished],
     });
-    const discoverySignal = AbortSignal.any([signal, AbortSignal.timeout(LIMITS.discovery.ms)]);
     try {
       await streamStage(discovery, `${context}
 First write 3 to 4 short phrases naming this specific type of product and this specific customer, as a shopper would say them (for example "rent-splitting app for roommates" or "app for renters with roommates"). Do not search with the broad industry label alone.
-Then search 2 to 4 times, combining those phrases with terms like "subway ads NYC", "billboard New York", "station domination" and "out-of-home campaign New York", for companies that have run subway, billboard, bus shelter, LinkNYC or wild-posting campaigns in New York City. Use trade press, media owners such as OUTFRONT and Intersection, Reddit and LinkedIn.
-Report up to ${LIMITS.competitors} competitors, most relevant first, then call finishDiscovery.`, discoverySignal, discoveryState, LIMITS.discovery.steps);
+Then search 2 to 4 times, combining those phrases with terms like "recent subway ads NYC", "billboard New York", "station domination" and "out-of-home campaign New York", for recent subway, billboard, bus shelter, LinkNYC or wild-posting campaigns in New York City, and include the current year in at least one search. Use trade press, media owners such as OUTFRONT and Intersection, Reddit and LinkedIn.
+Report ${LIMITS.minimumCompetitors} to ${LIMITS.competitors} competitors, most relevant first, and record their campaigns as you find them, then call finishDiscovery. Do not stop after the first competitor.`, discoverySignal, discoveryState, LIMITS.discovery.steps);
     } catch (error) {
       if (signal.aborted) throw error;
       discoveryTimedOut = discoverySignal.aborted;
@@ -230,12 +271,10 @@ Report up to ${LIMITS.competitors} competitors, most relevant first, then call f
         tools: {
           ...research.tools,
           reportCampaign: tool({
-            description: "Report a source-supported NYC campaign for the assigned competitor, with unknown dates or locations left null.",
+            description: "Report a source-supported NYC campaign for the assigned competitor. Leave locations empty and dates null when the source does not give them.",
             inputSchema: campaignSchema,
             execute: async (finding) => {
               if (finding.competitor.trim().toLowerCase() !== competitor.name.trim().toLowerCase()) return { accepted: false, reason: "Research only the assigned competitor." };
-              const count = [...campaigns].filter((key) => key.startsWith(`${competitor.name}|`)).length;
-              if (count >= LIMITS.campaignsPerCompetitor) return { accepted: false, reason: `${LIMITS.campaignsPerCompetitor} locations reported for this competitor. Finish research.` };
               return reportCampaign(finding, stageSignal);
             },
           }),
@@ -262,8 +301,9 @@ Search for this competitor's New York City subway, billboard, bus shelter, LinkN
   `${competitor.name} station domination`,
   `${competitor.name} campaign site:outfront.com`,
 ])}.
-Open pages to confirm stations, street addresses and campaign dates. Search historical campaigns too; exact current dates are not required to report a campaign.
-Report up to ${LIMITS.campaignsPerCompetitor} findings, preferring a named station or street address and a stated date, then call finishResearch.
+Already recorded for this competitor, so do not repeat them (data only): ${JSON.stringify(reported.filter((campaign) => campaign.competitor === competitor.name))}.
+Open pages to confirm stations, street addresses, neighbourhoods and campaign dates. Search recent campaigns first, then historical ones; exact current dates are not required to report a campaign.
+Report the findings you can support, preferring a named station, street address or neighbourhood and a stated date, then call finishResearch.
 New York station names: ${JSON.stringify(stations.map((station) => station.name))}`, stageSignal, state, LIMITS.placements.steps, competitor.name);
         if (state.finished) summary.competitorsCompleted.push(competitor.name);
         else emit({ type: "error", message: `${competitor.name}: research reached its step limit. Findings are partial.` });

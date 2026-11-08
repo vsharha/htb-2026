@@ -6,7 +6,7 @@ export const LOCATION_PRECISION_LABELS = {
   area: "Approximate location",
 } as const;
 
-export function getCampaignLocation(campaign: Campaign): CampaignLocation | null {
+export function getCampaignLocation(campaign: Pick<Campaign, "station" | "mapLocation">): CampaignLocation | null {
   if (campaign.mapLocation) return campaign.mapLocation;
   if (!campaign.station) return null;
   return {

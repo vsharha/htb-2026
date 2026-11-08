@@ -17,9 +17,9 @@ const { recommendationLayer } = await import("../src/lib/gap.ts");
 const brief = { industry: "Fintech", description: "a shared budgeting app", targetCustomer: "roommates", city: "new-york" };
 const competitors = ["Alpha", "Beta", "Gamma"];
 const url = (name) => `https://agency.example/${name.toLowerCase()}`;
-const finding = (name) => ({ competitor: name, title: "NYC subway campaign", kind: "subway", sourceUrl: url(name), evidence: "A source-supported NYC subway campaign.", stationName: null, location: null, startsOn: null, endsOn: null });
+const finding = (name) => ({ competitor: name, title: "NYC subway campaign", kind: "subway", sourceUrl: url(name), evidence: "A source-supported NYC subway campaign.", stationName: null, locations: [], citywide: false, startsOn: null, endsOn: null });
 
-function adapter({ fail, timeout, unfinished, rejectSource = false, empty = false } = {}) {
+function adapter({ fail, timeout, unfinished, rejectSource = false, empty = false, findings = {}, discoveryFinding, discoveryCompetitors = 3 } = {}) {
   const steps = new Map();
   const model = new MockLanguageModelV4({ doStream: async (options) => {
     const discovery = options.tools.some((tool) => tool.name === "finishDiscovery");
@@ -40,12 +40,21 @@ function adapter({ fail, timeout, unfinished, rejectSource = false, empty = fals
     if (step < 2) {
       toolName = "web_search";
       input = { query: `${name} NYC campaign ${step}` };
-      result = { sources: (discovery ? competitors : [name]).map((candidate) => ({ type: "url", url: url(candidate) })), action: { type: "search", query: input.query } };
-    } else if (discovery && step <= 4) {
+      result = { sources: (discovery ? competitors : [name]).flatMap((candidate) => [url(candidate), ...[1, 2, 3, 4, 5].map((n) => `${url(candidate)}/${n}`)]).map((value) => ({ type: "url", url: value })), action: { type: "search", query: input.query } };
+    } else if (discovery && step <= 1 + discoveryCompetitors) {
       toolName = "reportCompetitor";
       input = { name: competitors[step - 2], reason: "Same customers", sourceUrl: url(competitors[step - 2]) };
+    } else if (discovery && step === 5 && discoveryFinding) {
+      toolName = "reportCampaign";
+      input = discoveryFinding;
     } else if (discovery) {
       toolName = "finishDiscovery";
+      input = {};
+    } else if (findings[name]?.[step - 2]) {
+      toolName = "reportCampaign";
+      input = findings[name][step - 2];
+    } else if (findings[name]) {
+      toolName = "finishResearch";
       input = {};
     } else if (!empty && (step === 2 || rejectSource && step === 3 || name === unfinished)) {
       toolName = "reportCampaign";
@@ -82,6 +91,46 @@ test("each competitor gets its own placement search and can report undated, unma
   assert.equal(outcome.unmapped, 3);
   assert.equal(outcome.unknownDates, 3);
   assert.equal(outcome.qualifying, 0);
+});
+
+const campaignsOf = (events) => events.filter((event) => event.type === "campaign").map((event) => event.campaign);
+const corner = "Lafayette and Prince Streets, Manhattan";
+
+test("discovery cannot finish on one competitor until it has searched more widely", async () => {
+  const { complete, summary } = await research({ discoveryCompetitors: 1 });
+  assert.equal(complete, false);
+  assert.deepEqual(summary.competitorsSearched, ["Alpha"]);
+});
+
+test("a campaign found during discovery is kept and not repeated by the placement search", async () => {
+  const { events } = await research({ discoveryFinding: { ...finding("Alpha"), citywide: true }, findings: { Alpha: [{ ...finding("Alpha"), citywide: true }] } });
+  const alpha = campaignsOf(events).filter((campaign) => campaign.competitor === "Alpha");
+  assert.equal(alpha.length, 1);
+  assert.equal(alpha[0].reach, "citywide");
+  assert.equal(researchOutcome(events, true).widespread, 1);
+});
+
+test("each place in a finding becomes its own row and a named borough is labelled, not pinned", async () => {
+  const { events } = await research({ findings: { Alpha: [{ ...finding("Alpha"), kind: "other", locations: [corner, "Brooklyn"] }] } });
+  const [placed, borough] = campaignsOf(events).filter((campaign) => campaign.competitor === "Alpha");
+  assert.equal(placed.location, corner);
+  assert.equal(placed.mapLocation.precision, "address");
+  assert.equal(placed.reach, undefined);
+  assert.equal(borough.mapLocation, null);
+  assert.equal(borough.reach, "borough");
+});
+
+test("a named place that cannot be located is not labelled citywide", async () => {
+  const { events } = await research({ findings: { Alpha: [{ ...finding("Alpha"), kind: "other", citywide: true, locations: ["Brooklyn"] }] } });
+  assert.equal(campaignsOf(events).find((campaign) => campaign.competitor === "Alpha").reach, "borough");
+});
+
+test("findings without a place cannot use up the allowance for located ones", async () => {
+  const vague = [1, 2, 3, 4].map((n) => ({ ...finding("Alpha"), sourceUrl: `${url("Alpha")}/${n}` }));
+  const { events } = await research({ findings: { Alpha: [...vague, { ...finding("Alpha"), kind: "other", locations: [corner] }] } });
+  const alpha = campaignsOf(events).filter((campaign) => campaign.competitor === "Alpha");
+  assert.equal(alpha.filter((campaign) => !campaign.mapLocation).length, 3);
+  assert.equal(alpha.filter((campaign) => campaign.mapLocation).length, 1);
 });
 
 test("failed and timed-out competitors do not discard other competitors' findings", async (context) => {

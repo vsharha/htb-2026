@@ -35,6 +35,11 @@ const NEIGHBOURHOODS: Record<Borough, string[]> = {
 
 const SUFFIX = /\b(street|st|avenue|ave|av|place|pl|road|rd|boulevard|blvd|drive|dr|square|sq|parkway|pkwy|lane|ln|terrace|ter|court|ct)\.?$/i;
 
+/** Whether a place name reads as a street rather than an area: it holds a number or ends in a street word. */
+export function namesStreet(name: string) {
+  return /\d/.test(name) || SUFFIX.test(name.trim());
+}
+
 /** The same name with a common suffix added, for sources that write "Lafayette" for Lafayette Street. */
 export function withSuffixes(key: string) {
   return SUFFIX.test(key) || /^\d+$/.test(key) ? [key] : [key, `${key} ST`, `${key} AVE`];

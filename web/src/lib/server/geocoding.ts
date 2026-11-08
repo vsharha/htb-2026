@@ -3,14 +3,15 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import type { Borough, CampaignLocation } from "@/lib/contract";
-import { parseIntersection, withSuffixes } from "@/lib/street-names";
+import type { Borough, Campaign, CampaignLocation } from "@/lib/contract";
+import { namesStreet, parseIntersection, withSuffixes } from "@/lib/street-names";
 
-type GeocodingResult = { location: CampaignLocation | null; note?: string };
+type GeocodingResult = { location: CampaignLocation | null; note?: string; reach?: Campaign["reach"] };
 const CACHE_MS = 24 * 60 * 60 * 1000;
 const cache = new Map<string, { expires: number; result: GeocodingResult }>();
 const NYC_COUNTIES = new Set(["new york", "kings", "queens", "bronx", "richmond"]);
 const BOROUGH_NAMES = new Set(["manhattan", "brooklyn", "queens", "bronx", "the bronx", "staten island", "new york", "new york city", "nyc"]);
+const CITY_PARTS = new Set(["new york", "new york city", "nyc", "new york ny", "new york new york", "ny", "usa", "us", "united states", "united states of america"]);
 const NYC_CITIES = new Set(["new york", "new york city", "brooklyn", "queens", "bronx", "the bronx", "staten island"]);
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -25,9 +26,20 @@ function candidate(value: unknown, query: string) {
   if (!record(value) || !record(value.rank)) return null;
   const { lon, lat, formatted, result_type: type } = value;
   const confidence = value.rank.confidence;
+  const place = typeof value.name === "string" ? normalize(value.name) : "";
+  const asked = normalize(query.split(",")[0]);
+  // For "Fort Greene, Brooklyn" Geoapify returns Brooklyn itself with full confidence, which would stack every neighbourhood on the borough's centre.
+  if (place !== asked && (BOROUGH_NAMES.has(place) || place.endsWith(" county"))) return null;
+  // "Upper East Side, Manhattan" otherwise resolves to a veterinary clinic named after the area.
+  if (type === "amenity" && place !== asked && place.includes(asked)) return null;
+  // "West Village" otherwise resolves to Concourse Village West in the Bronx, and "Chelsea" to Chelsea Road on Staten Island.
+  if (type === "street" && place !== asked && !namesStreet(asked)) return null;
+  // Geoapify scores neighbourhoods it names exactly, such as SoHo, at only 0.5.
+  const neighbourhood = place === asked && (type === "suburb" || type === "district");
+  const minimumConfidence = neighbourhood ? 0.5 : 0.7;
   if (typeof lon !== "number" || typeof lat !== "number" || !Number.isFinite(lon) || !Number.isFinite(lat)
     || lon < -74.26 || lon > -73.7 || lat < 40.477 || lat > 40.917
-    || typeof formatted !== "string" || typeof confidence !== "number" || !Number.isFinite(confidence) || confidence < 0.7
+    || typeof formatted !== "string" || typeof confidence !== "number" || !Number.isFinite(confidence) || confidence < minimumConfidence
     || ["country", "state", "county", "city", "postcode", "unknown"].includes(String(type))) return null;
   const county = typeof value.county === "string" ? normalize(value.county).replace(/ county$/, "") : "";
   const city = typeof value.city === "string" ? normalize(value.city) : "";
@@ -41,7 +53,8 @@ function candidate(value: unknown, query: string) {
   const attribution = record(value.datasource) && typeof value.datasource.attribution === "string"
     ? value.datasource.attribution : "© OpenStreetMap contributors";
   const location: CampaignLocation = {
-    latitude: lat, longitude: lon, label: formatted,
+    // A neighbourhood's formatted address can name only its borough, as SoHo's does.
+    latitude: lat, longitude: lon, label: neighbourhood ? `${value.name}, New York` : formatted,
     precision: addressMatch ? "address" : "area",
     source: "geoapify", attribution,
   };
@@ -106,11 +119,12 @@ export async function locateIntersection(query: string): Promise<GeocodingResult
 export async function geocodeCampaignLocation(query: string, signal?: AbortSignal): Promise<GeocodingResult> {
   const key = normalize(query);
   if (!key || query.length > 500) return { location: null, note: "No specific campaign location was provided." };
-  if (["new york", "new york city", "nyc", "new york ny", "new york new york"].includes(key)) {
-    return { location: null, note: "The source names only the city, not a specific campaign location." };
+  const parts = query.split(",").map(normalize);
+  if (parts.every((part) => CITY_PARTS.has(part))) {
+    return { location: null, note: "The source names only the city, not a specific campaign location.", reach: "citywide" };
   }
-  if (query.split(",").every((part) => BOROUGH_NAMES.has(normalize(part)) || ["ny", "usa", "us", "united states", "united states of america"].includes(normalize(part)))) {
-    return { location: null, note: "The source names only a borough, not a specific campaign location." };
+  if (parts.every((part) => BOROUGH_NAMES.has(part) || CITY_PARTS.has(part))) {
+    return { location: null, note: "The source names only a borough, not a specific campaign location.", reach: "borough" };
   }
   const corner = await locateIntersection(query);
   if (corner) return corner;
