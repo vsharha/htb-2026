@@ -1,9 +1,10 @@
 "use client";
 
+import { MapPin } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { campaignsOf, type RunState } from "@/components/use-audience-run";
-import { usePlacementFocus, type PlacementFocus } from "@/components/use-placement-focus";
+import { campaignId, campaignsOf, type RunState } from "@/components/use-audience-run";
+import { useMapFocus, type MapFocus } from "@/components/use-map-focus";
 import type { Campaign, Placement } from "@/lib/contract";
 import { getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { computeLayers, recommendationLayer, strongest, type LayerId, type TractLayers } from "@/lib/gap";
@@ -22,7 +23,7 @@ const MEASURE_LABEL = { lives: "lives", works: "works", passes: "passes through"
 /** How many tracts each tab ranks. */
 const TOP_TRACTS = 5;
 
-/** The selected layer, the campaigns found so far, the map layers they produce and the focused placement. */
+/** The selected layer, the campaigns found so far, the map layers they produce and the focused placement and campaign. */
 export function useRunView(run: RunState) {
   const [layer, setLayer] = useState<LayerId>("gap");
   const campaigns = useMemo(() => campaignsOf(run.events), [run.events]);
@@ -30,8 +31,18 @@ export function useRunView(run: RunState) {
     () => (run.shapes && run.fit ? computeLayers(run.shapes, run.fit, campaigns) : null),
     [run.shapes, run.fit, campaigns],
   );
-  const focus = usePlacementFocus();
-  return { layer, setLayer, campaigns, layers, focus };
+  const focus = useMapFocus();
+  // Campaigns are listed only on the competition tab, so a click on a
+  // campaign marker opens that tab before its row can scroll into view.
+  const campaignMarks = useMapFocus();
+  const campaignFocus: MapFocus = {
+    ...campaignMarks,
+    select: (id, from) => {
+      if (from === "map") setLayer("competition");
+      campaignMarks.select(id, from);
+    },
+  };
+  return { layer, setLayer, campaigns, layers, focus, campaignFocus };
 }
 
 function Section({ title, aside, children }: { title: string; aside?: React.ReactNode; children: React.ReactNode }) {
@@ -64,7 +75,7 @@ function TractRanking({ layers, layer, value }: { layers: TractLayers; layer: La
   );
 }
 
-function PlacementRow({ placement: p, number, focus }: { placement: Placement; number: number; focus: PlacementFocus }) {
+function PlacementRow({ placement: p, number, focus }: { placement: Placement; number: number; focus: MapFocus }) {
   const row = useRef<HTMLButtonElement>(null);
   const active = focus.hovered === p.id || focus.selected?.id === p.id;
 
@@ -115,7 +126,7 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
   );
 }
 
-function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | null; focus: PlacementFocus }) {
+function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | null; focus: MapFocus }) {
   const ranking = recommendationLayer(campaignsOf(run.events));
   const audienceOnly = ranking === "fit";
   return (
@@ -201,7 +212,59 @@ function CustomersTab({ run, layers }: { run: RunState; layers: TractLayers | nu
   );
 }
 
-function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign[] }) {
+function CampaignRow({ campaign: c, id, focus }: { campaign: Campaign; id: string; focus: MapFocus }) {
+  const row = useRef<HTMLLIElement>(null);
+  const location = getCampaignLocation(c);
+  const active = !!location && (focus.hovered === id || focus.selected?.id === id);
+
+  // A click on the marker scrolls its row into view.
+  const selected = focus.selected;
+  useEffect(() => {
+    if (selected?.id === id && selected.from === "map") row.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [selected, id]);
+
+  return (
+    <li
+      ref={row}
+      onMouseEnter={location ? () => focus.hover(id) : undefined}
+      onMouseLeave={location ? () => focus.hover(null) : undefined}
+      className={"-mr-2 rounded-r-lg border-l-4 border-heat-hot py-1 pr-2 pl-3 transition-colors " + (active ? "bg-foreground/5" : "")}
+    >
+      <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
+        {c.competitor}: {c.title}
+      </a>
+      <div className="font-mono text-xs text-muted-foreground">
+        {location ? LOCATION_PRECISION_LABELS[location.precision] : "Location not resolved"} · {c.kind}
+      </div>
+      <p className="text-xs text-muted-foreground">
+        {c.coverage === "current" ? "Confirmed current dates" : c.coverage === "historical" ? "Historical campaign" : "Current coverage unknown"}
+        {(c.startsOn || c.endsOn) && `: ${c.startsOn ?? "unknown start"} to ${c.endsOn ?? "unknown end"}`}
+      </p>
+      {location ? (
+        <button
+          type="button"
+          onFocus={() => focus.hover(id)}
+          onBlur={() => focus.hover(null)}
+          onClick={() => focus.select(id, "list")}
+          className="flex cursor-pointer items-center gap-1 rounded text-left text-xs text-muted-foreground underline-offset-2 outline-none hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          <MapPin className="size-3 shrink-0" aria-hidden />
+          {location.label}
+          <span className="sr-only">: show on map</span>
+        </button>
+      ) : (
+        <>
+          {c.location && <p className="text-xs text-muted-foreground">{c.location}</p>}
+          <p className="text-xs text-muted-foreground">{c.locationNote ?? "The source does not identify a specific location we can map."}</p>
+        </>
+      )}
+      {c.evidence && <p className="mt-1 text-xs text-muted-foreground">{c.evidence}</p>}
+      {location && <p className="mt-1 text-[10px] text-muted-foreground">Location: {location.attribution}</p>}
+    </li>
+  );
+}
+
+function CompetitorsTab({ run, campaigns, focus }: { run: RunState; campaigns: Campaign[]; focus: MapFocus }) {
   const competitors = run.events.flatMap((e) => (e.type === "competitor" ? [e.competitor] : []));
   const steps = run.events.flatMap((e) => (e.type === "step" ? [e.message] : []));
   const errors = run.events.flatMap((e) => (e.type === "error" ? [e.message] : []));
@@ -232,24 +295,9 @@ function CompetitorsTab({ run, campaigns }: { run: RunState; campaigns: Campaign
           {campaigns.length > 0 && <p>{outcome.qualifying} campaigns have current dates and precise locations; {outcome.historical} historical; {outcome.unknownDates} with current dates unconfirmed.</p>}
         </div>
         <ul className="flex flex-col gap-2.5 text-sm" aria-live="polite">
-          {campaigns.map((c, i) => {
-            const location = getCampaignLocation(c);
-            return <li key={`${c.sourceUrl}|${c.title}|${i}`} className="border-l-4 border-heat-hot pl-3">
-              <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
-                {c.competitor}: {c.title}
-              </a>
-              <div className="font-mono text-xs text-muted-foreground">
-                {location ? LOCATION_PRECISION_LABELS[location.precision] : "Location not resolved"} · {c.kind}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {c.coverage === "current" ? "Confirmed current dates" : c.coverage === "historical" ? "Historical campaign" : "Current coverage unknown"}
-                {(c.startsOn || c.endsOn) && `: ${c.startsOn ?? "unknown start"} to ${c.endsOn ?? "unknown end"}`}
-              </p>
-              {(location || c.location) && <p className="text-xs text-muted-foreground">{location?.label ?? c.location}</p>}
-              {!location && <p className="text-xs text-muted-foreground">{c.locationNote ?? "The source does not identify a specific location we can map."}</p>}
-              {c.evidence && <p className="mt-1 text-xs text-muted-foreground">{c.evidence}</p>}
-            </li>;
-          })}
+          {campaigns.map((c, i) => (
+            <CampaignRow key={campaignId(c, i)} campaign={c} id={campaignId(c, i)} focus={focus} />
+          ))}
         </ul>
         {outcome.unmapped > 0 && (
           <p className="text-xs text-muted-foreground">
@@ -274,12 +322,14 @@ export function ResultsList({
   campaigns,
   layer,
   focus,
+  campaignFocus,
 }: {
   run: RunState;
   layers: TractLayers | null;
   campaigns: Campaign[];
   layer: LayerId;
-  focus: PlacementFocus;
+  focus: MapFocus;
+  campaignFocus: MapFocus;
 }) {
   const recording = run.events.find((e) => e.type === "recording");
   return (
@@ -292,7 +342,7 @@ export function ResultsList({
       )}
       {layer === "gap" && <GapTab run={run} layers={layers} focus={focus} />}
       {layer === "fit" && <CustomersTab run={run} layers={layers} />}
-      {layer === "competition" && <CompetitorsTab run={run} campaigns={campaigns} />}
+      {layer === "competition" && <CompetitorsTab run={run} campaigns={campaigns} focus={campaignFocus} />}
     </div>
   );
 }

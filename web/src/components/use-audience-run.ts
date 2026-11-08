@@ -35,6 +35,11 @@ function loadShapes() {
   return shapesRequest;
 }
 
+/** Identifies a campaign within one run; campaigns are only ever appended, so the index is stable. */
+export function campaignId(campaign: Campaign, index: number) {
+  return `${index}|${campaign.sourceUrl}|${campaign.title}`;
+}
+
 export function campaignsOf(events: AgentEvent[]): Campaign[] {
   return events.flatMap((e) => (e.type === "campaign" ? [e.campaign] : []));
 }

@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 
 import { LAYERS } from "@/components/layer-tabs";
-import type { PlacementFocus } from "@/components/use-placement-focus";
+import type { MapFocus } from "@/components/use-map-focus";
 import type { Campaign, Placement } from "@/lib/contract";
 import { recommendationLayer, type LayerId, type TractLayers, type TractShapes } from "@/lib/gap";
 import { cn } from "@/lib/utils";
@@ -29,6 +29,7 @@ export function MapPanel({
   placements,
   layer,
   focus,
+  campaignFocus,
   className,
 }: {
   shapes: TractShapes | null;
@@ -36,7 +37,8 @@ export function MapPanel({
   campaigns: Campaign[];
   placements: Placement[] | null;
   layer: LayerId;
-  focus: PlacementFocus;
+  focus: MapFocus;
+  campaignFocus: MapFocus;
   /** Sizes the map; the panel fills whatever box this gives it. */
   className?: string;
 }) {
@@ -46,7 +48,7 @@ export function MapPanel({
   return (
     <section className={cn("relative overflow-hidden", className)}>
       {shapes ? (
-        <TractMap shapes={shapes} layers={layers} layer={layer} campaigns={campaigns} placements={placements} focus={focus} />
+        <TractMap shapes={shapes} layers={layers} layer={layer} campaigns={campaigns} placements={placements} focus={focus} campaignFocus={campaignFocus} />
       ) : (
         <MapPlaceholder>Loading New York&rsquo;s census tracts…</MapPlaceholder>
       )}
