@@ -76,7 +76,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       heat: { mid: "#f2b134", hot: "#e0334f" },
       ramp: ["#F7D58E", "#F2B134", "#EC7A3F", "#E0334F"],
       accent: "#F4F6FA",
-      accentDark: "#E0334F",
+      accentDark: "#C9CFD8",
       ink3: "#8792A2",
       tab: "#E7EAF0",
       vars: {
