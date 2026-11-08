@@ -152,12 +152,30 @@
   animation: heat-glow-rotate 1200ms linear both;
 }
 
+@keyframes heat-glow-drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(var(--drift-x), var(--drift-y)) scale(1.15);
+  }
+}
+
+.heat-glow-drift {
+  animation: heat-glow-drift var(--drift-duration) ease-in-out infinite alternate;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .results-reveal {
     animation-duration: 1ms;
   }
 
   .heat-glow-rotate {
+    animation: none;
+  }
+
+  .heat-glow-drift {
     animation: none;
   }
 }
