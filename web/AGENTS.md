@@ -3,7 +3,8 @@
 The web app is a Next.js 16 project (App Router, TypeScript, Tailwind CSS 4, ESLint), managed with pnpm. Run commands from `web/`:
 
 - `pnpm dev`: dev server on http://localhost:3000
-- `pnpm lint`, `pnpm typecheck` and `pnpm build`: the checks to run before each commit
+- `pnpm lint` and `pnpm typecheck`: run before each commit
+- `pnpm build`: also run before committing a change to config, dependencies, routing, data fetching or server code. Skip it for changes confined to component markup and styling.
 
 Copy `.env.example` to `.env.local` and fill it in before running the app. It lists the AI Gateway key that Jev's audience scoring needs; without it, scoring falls back to keyword matching.
 
@@ -25,5 +26,6 @@ LLM calls and AI agents go through the Vercel AI SDK (`ai` plus a provider packa
 
 ## Checking frontend work
 
-- Check a frontend change on the running dev server with Playwright or a browser before reporting it done: look at the page, use the changed flow, and read the console for errors.
+- Check a change to behaviour, data flow or layout on the running dev server with Playwright or a browser before reporting it done: look at the page, use the changed flow, and read the console for errors.
+- Skip the browser check for a cosmetic change confined to one component, such as a colour, text, spacing or icon. Say in the reply that it wasn't checked in the browser.
 - Before starting a dev server, check whether one is already running, by its process or by probing its port, and reuse it. A change to config, dependencies or env means stopping it and starting a fresh one. Never leave several instances running.
