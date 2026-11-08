@@ -272,7 +272,7 @@ function PipelineDiagram() {
 function HowItWorksSlide() {
   return (
     <Slide padding="0px">
-      <SlideBody number={3}>
+      <SlideBody number={4}>
         <Eyebrow>How it works</Eyebrow>
         <h2 className="mt-6 max-w-[1000px] font-heading text-[3.75rem] leading-[1.02] font-bold tracking-[-0.03em] text-balance">
           One brief about your customer becomes a list of places to advertise.
@@ -367,7 +367,7 @@ function DemoSlide() {
           <p className="text-base text-muted-foreground">A dating app for people looking for a serious relationship</p>
         </div>
         <DemoFrame />
-        <SlideFooter number={4} />
+        <SlideFooter number={3} />
       </div>
       <Notes>
         Submit the empty form to run the sample brief: a dating app for people looking for a serious relationship, targeting
@@ -416,8 +416,8 @@ export function PitchDeck() {
       <Deck theme={theme} template={<></>}>
         <CoverSlide />
         <ProblemSlide />
-        <HowItWorksSlide />
         <DemoSlide />
+        <HowItWorksSlide />
         <NextStepsSlide />
       </Deck>
     </>
