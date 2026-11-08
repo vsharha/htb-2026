@@ -88,7 +88,7 @@ async function systemOneWeights(
   columns: TractColumn[],
   brief: Brief,
   config: NonNullable<ReturnType<typeof getSystemOneConfig>>,
-): Promise<ColumnWeight[]> {
+): Promise<{ weights: ColumnWeight[]; inputTokens?: number }> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (config.token) headers.Authorization = `Bearer ${config.token}`;
 
@@ -104,10 +104,17 @@ async function systemOneWeights(
     throw new Error(`decision model ${response.status}${text ? `: ${text.slice(0, 200)}` : ""}`);
   }
 
-  const body = (await response.json()) as { answers?: unknown; result?: { answers?: unknown } };
+  const body = (await response.json()) as {
+    answers?: unknown;
+    result?: { answers?: unknown };
+    usage?: { input_tokens?: unknown };
+  };
   const answers = body.answers ?? body.result?.answers;
   if (!answers || typeof answers !== "object") throw new Error("decision model returned no answers");
-  return answersToWeights(columns, answers as Record<string, unknown>);
+  return {
+    weights: answersToWeights(columns, answers as Record<string, unknown>),
+    inputTokens: typeof body.usage?.input_tokens === "number" ? body.usage.input_tokens : undefined,
+  };
 }
 
 async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnWeight[]> {
@@ -126,19 +133,22 @@ async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnW
   return answersToWeights(columns, answers);
 }
 
-async function weightsFor(columns: TractColumn[], brief: Brief): Promise<Pick<AudienceFit, "weights" | "source">> {
+async function weightsFor(columns: TractColumn[], brief: Brief): Promise<Pick<AudienceFit, "weights" | "source" | "stats">> {
   const systemOne = getSystemOneConfig();
   if (systemOne) {
+    const started = Date.now();
     try {
-      return { weights: await systemOneWeights(columns, brief, systemOne), source: "systemone" };
+      const { weights, inputTokens } = await systemOneWeights(columns, brief, systemOne);
+      return { weights, source: "systemone", stats: { model: systemOne.model, durationMs: Date.now() - started, inputTokens } };
     } catch (error) {
       console.error("The self-hosted decision model failed; trying Jev instead.", error);
     }
   }
 
   if (hasAudienceCredentials()) {
+    const started = Date.now();
     try {
-      return { weights: await jevWeights(columns, brief), source: "jev" };
+      return { weights: await jevWeights(columns, brief), source: "jev", stats: { model: "Jev", durationMs: Date.now() - started } };
     } catch (error) {
       console.error("Jev failed; weighting the audience by keywords instead.", error);
     }
@@ -155,7 +165,7 @@ export async function scoreAudience(brief: Brief): Promise<AudienceFit> {
     readAnalysisCsv("nyc_tracts.csv"),
   ]);
 
-  const { weights, source } = await weightsFor(columns, brief);
+  const { weights, source, stats } = await weightsFor(columns, brief);
 
   const markets = new Set<string>(brief.markets);
   const raw: [string, number][] = [];
@@ -178,5 +188,5 @@ export async function scoreAudience(brief: Brief): Promise<AudienceFit> {
     scores[geoid] = Number((i / Math.max(raw.length - 1, 1)).toFixed(4));
   });
 
-  return { weights, scores, source };
+  return { weights, scores, source, stats };
 }
