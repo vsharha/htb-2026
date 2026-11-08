@@ -158,7 +158,7 @@ function CoverSlide() {
         <div className={`${sheet} relative max-w-[880px] rounded-[2rem] px-16 py-14`}>
           <Eyebrow>HackTheBurgh 2026</Eyebrow>
           <h1 className="mt-6 text-[9rem] leading-[0.9]">
-            <Wordmark className="tracking-[-0.04em]" />
+            <Wordmark className="tracking-[-0.04em] lowercase" />
           </h1>
           <p className="mt-8 text-[2.1rem] leading-snug text-balance">
             Street advertising for startups, placed where your customers are and your competitors aren&rsquo;t.
@@ -379,9 +379,6 @@ function NextStepsSlide() {
     <Slide padding="0px">
       <SlideBody number={5}>
         <Eyebrow>Next steps</Eyebrow>
-        <h2 className="mt-6 max-w-[1050px] font-heading text-[4.75rem] leading-[1] font-bold tracking-[-0.03em] text-balance">
-          Turn the map into a buy list.
-        </h2>
         <ul className="mt-14 list-disc space-y-5 pl-10 text-[2.4rem] leading-snug marker:text-muted-foreground">
           {nextSteps.map((step) => (
             <li key={step}>{step}</li>
