@@ -36,13 +36,13 @@ Selected:
 
 ## Q4. Project description (optional)
 
-Placewise shows a startup where in New York its target customers live, work and pass through, where competitors have advertised outdoors, and which placements to buy where the audience is strong and competition is low. It is for startups that want customers beyond Meta and Google but have no media agency and a limited budget.
+We built Placewise to tell you where in a city to buy street advertising, by finding where your customers are and where your competitors have not reached them. If you want customers beyond Meta and Google, you can advertise on the street, but customers are not spread evenly across a city, and no public list shows where competitors have advertised. With a limited budget and no media agency, you have no easy way to see either.
 
-A startup fills in a short brief: its product, target customer, what a customer pays, its monthly budget and its city. Jev, a decision model from TypeSafe AI, scores that target customer against each column of a prebuilt dataset of New York census tracts. The dataset comes from public data on residents, jobs, subway trips and advertising locations. The app combines the weighted columns into an audience fit score for every tract.
+You describe your customer in a sentence, because the people worth reaching differ for every product. Jev, a decision model from TypeSafe AI, scores that sentence against public data on the city's residents, jobs and subway trips, and we combine the results into an audience fit score for every census tract.
 
-A research agent searches the web and reads campaign pages to find competitors' outdoor advertising. Each finding keeps its source link, date and location, and the app places it on the map by subway station, street corner or address. Only campaigns from the past 12 months with a precise location count as competition. Where there are none, the app reports competition coverage as unknown rather than low.
+Nobody publishes competitors' advertising, so our research agent searches the web, reads campaign pages and maps each campaign with its source and date. That shows you which high-fit areas competitors have left open, which is what separates us from audience maps that already exist. We only claim a gap we have evidence for: only campaigns from the past 12 months with a precise location count as competition, and a search that finds nothing is reported as unknown coverage, not low competition.
 
-Each run ends with up to 12 LinkNYC kiosks and bus shelters to buy, at least 500 metres apart. They are ranked by observed gap, or by audience fit when no campaign qualifies. The placement costs shown are invented estimates, because verified prices are not built yet. The audience fit scores, competitor findings and placement locations are real.
+Every run ends with up to 12 outdoor placements to buy, such as street kiosks and bus shelters, because you can act on a placement but not on a map alone. The placement costs we show are invented estimates, because advertising prices are mostly unpublished, but the audience fit scores, competitor findings and placement locations are real.
 
 ## Q5. Project Repository URL \*
 
