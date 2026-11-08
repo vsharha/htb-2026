@@ -107,8 +107,9 @@ export function TractMap({
       style={{ width: "100%", height: "100%" }}
       attributionControl={{ compact: true }}
       onMouseMove={(event) => {
-        const geoid = showTracts
-          ? (map.current?.queryRenderedFeatures(event.point, { layers: ["tract-fill"] })[0]?.properties?.geoid as string | undefined)
+        // Mouse moves can arrive before the style has loaded and the layer has been added.
+        const geoid = showTracts && map.current?.getLayer("tract-fill")
+          ? (map.current.queryRenderedFeatures(event.point, { layers: ["tract-fill"] })[0]?.properties?.geoid as string | undefined)
           : undefined;
         const value = geoid ? layers?.[geoid]?.[layer] : undefined;
         setHoveredTract(
