@@ -99,7 +99,10 @@ export type Campaign = {
   location: string | null;
   startsOn: string | null;
   endsOn: string | null;
-  coverage: "current" | "historical" | "unknown";
+  /** "recent" means the source shows the campaign running within the past 12 months; the ad may no longer be up. */
+  coverage: "current" | "recent" | "historical" | "unknown";
+  /** The latest date the source shows the campaign running. Older recordings do not have it. */
+  latestEvidenceOn?: string | null;
   /** The subway station the server matched the campaign to, or null when it could not place it. */
   station: Station | null;
   /** Older recordings may contain only a station match. */

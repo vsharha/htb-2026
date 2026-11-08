@@ -76,7 +76,7 @@ export function MapPanel({
 
       <div className="pointer-events-none absolute bottom-9 left-3 w-52 rounded-lg bg-background/95 p-3 shadow-sm sm:bottom-4 sm:left-4 sm:w-56">
         {layer === "competition" && audienceOnly ? (
-          <p className="text-xs text-muted-foreground">Current competition coverage unknown</p>
+          <p className="text-xs text-muted-foreground">Recent competition coverage unknown</p>
         ) : (
           <>
             <p className="mb-1.5 text-xs text-muted-foreground">{LEGEND_TITLE[layer]}</p>
@@ -108,7 +108,7 @@ export function MapPanel({
               <>
                 <li className="flex items-center gap-2">
                   <span className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground"><span className="size-2 rounded-[2px] bg-foreground/25" /></span>
-                  Current ad, at a matched location
+                  Recent ad, at a matched location
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="size-4 shrink-0 rounded-full border-2 border-dashed border-foreground" />

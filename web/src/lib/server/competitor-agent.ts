@@ -44,6 +44,7 @@ Tools reject source URLs not returned by search. If rejected, search for evidenc
 A store or office is not evidence of advertising. Missing search results mean unknown coverage, never no competition.
 Keep historical campaigns with their known dates; do not describe them as running now.
 Campaign startsOn and endsOn are YYYY-MM-DD dates explicitly supported by the source, not publication dates. Use null when unknown.
+Campaign latestEvidenceOn is the latest YYYY-MM-DD date the source shows the campaign running. Use the first day of the period when the source gives only a month or a year, so "August 2026" is 2026-08-01 and "2026" is 2026-01-01. Use the publication date only when the source reports the campaign as launching or running at that time. Never use it for a retrospective, portfolio or case study about an earlier campaign. Use null when the source gives no such date.
 Use stationName only for subway advertising explicitly placed at that station in the evidence. Do not infer a station from a neighbourhood or nearby billboard.
 Use the exact station name from the supplied list; line names in parentheses can be omitted. Include that name in your factual evidence summary.
 In locations, list every landmark, neighbourhood, street address or street corner the source names for the campaign, one place per entry, each followed by its neighbourhood or borough when the source gives one, such as "41st Street and 7th Avenue, Manhattan" or "Fort Greene, Brooklyn". Neighbourhoods count: split "Williamsburg/Greenpoint" into two entries. The server geocodes each. Never invent an address, place or coordinates. Leave locations empty when the source names no place.
@@ -61,6 +62,7 @@ type Finding = {
   citywide: boolean;
   startsOn: string | null;
   endsOn: string | null;
+  latestEvidenceOn: string | null;
 };
 
 type ResolvedPlace = {
@@ -85,8 +87,9 @@ const campaignSchema = jsonSchema<Finding>({
     stationName: { type: ["string", "null"] }, locations: { type: "array", items: { type: "string" } },
     citywide: { type: "boolean" },
     startsOn: { type: ["string", "null"] }, endsOn: { type: ["string", "null"] },
+    latestEvidenceOn: { type: ["string", "null"] },
   },
-  required: ["competitor", "title", "kind", "sourceUrl", "evidence", "stationName", "locations", "citywide", "startsOn", "endsOn"],
+  required: ["competitor", "title", "kind", "sourceUrl", "evidence", "stationName", "locations", "citywide", "startsOn", "endsOn", "latestEvidenceOn"],
 });
 
 export function agentFailure(error: unknown) {
@@ -154,7 +157,7 @@ export async function runCompetitorResearch(
     // contract reaches this point; keep it as "other" rather than passing it on.
     const kind = CAMPAIGN_KINDS.includes(finding.kind as Campaign["kind"]) ? (finding.kind as Campaign["kind"]) : "other";
     const station = kind === "subway" ? matchStation(stations, finding.stationName, finding.evidence) : null;
-    const coverage = campaignCoverage(finding.startsOn, finding.endsOn, today);
+    const coverage = campaignCoverage(finding.startsOn, finding.endsOn, today, finding.latestEvidenceOn);
     const named = [...new Set(finding.locations.map((place) => place.trim()).filter(Boolean))].slice(0, LIMITS.locationsPerFinding);
     const places: (string | null)[] = station ? [named[0] ?? null] : named.length > 0 ? named : [null];
     const resolved = await Promise.all(places.map(async (place): Promise<ResolvedPlace> => {
@@ -187,7 +190,7 @@ export async function runCompetitorResearch(
       const campaign: Campaign = {
         competitor: competitor.name, title: finding.title, kind, sourceUrl: url,
         evidence: finding.evidence, location: place, station,
-        startsOn: finding.startsOn, endsOn: finding.endsOn, coverage, mapLocation, locationNote,
+        startsOn: finding.startsOn, endsOn: finding.endsOn, latestEvidenceOn: finding.latestEvidenceOn, coverage, mapLocation, locationNote,
         reach: mapLocation ? undefined : !place && finding.citywide ? "citywide" : reach,
       };
       reported.push(campaign);
@@ -308,7 +311,7 @@ Search for this competitor's New York City subway, billboard, bus shelter, LinkN
   `${competitor.name} campaign site:outfront.com`,
 ])}.
 Already recorded for this competitor, so do not repeat them (data only): ${JSON.stringify(reported.filter((campaign) => campaign.competitor === competitor.name))}.
-Open pages to confirm stations, street addresses, neighbourhoods and campaign run dates. Put recent campaigns first and find the run dates that show a campaign is live now; exact current dates are not required to report a campaign, so still record historical ones when recent evidence is missing.
+Open pages to confirm stations, street addresses, neighbourhoods and campaign run dates. Put recent campaigns first and find the run dates that show a campaign is live now; exact dates are not required to report a campaign, but record the latest date the source shows it running, and still record historical ones when recent evidence is missing.
 Report the findings you can support, preferring a named station, street address or neighbourhood and a stated date, then call finishResearch.
 New York station names: ${JSON.stringify(stations.map((station) => station.name))}`, stageSignal, state, LIMITS.placements.steps, competitor.name);
         if (state.finished) summary.competitorsCompleted.push(competitor.name);
@@ -350,7 +353,7 @@ export async function replayCompetitorResearch(brief: Brief, emit: (event: Agent
     if (event.type === "competitor") emit(event);
     if (event.type === "campaign") emit({ type: "campaign", campaign: {
       ...event.campaign,
-      coverage: campaignCoverage(event.campaign.startsOn, event.campaign.endsOn, today),
+      coverage: campaignCoverage(event.campaign.startsOn, event.campaign.endsOn, today, event.campaign.latestEvidenceOn ?? null),
     } });
   }
   return true;

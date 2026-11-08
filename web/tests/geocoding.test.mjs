@@ -58,6 +58,8 @@ test("marker visibility is independent of dates and heatmap eligibility", () => 
   assert.equal(campaignAffectsHeatmap(campaign), false);
   assert.equal(campaignAffectsHeatmap({ ...campaign, coverage: "current" }), false);
   assert.equal(campaignAffectsHeatmap({ ...campaign, coverage: "current", mapLocation: { ...location, precision: "address" } }), true);
+  assert.equal(campaignAffectsHeatmap({ ...campaign, coverage: "recent", mapLocation: { ...location, precision: "address" } }), true);
+  assert.equal(campaignAffectsHeatmap({ ...campaign, coverage: "recent" }), false);
   assert.equal(campaignAffectsHeatmap({ ...campaign, coverage: "historical", mapLocation: { ...location, precision: "address" } }), false);
 });
 

@@ -24,7 +24,7 @@ export function useRunView(run: RunState) {
   const [chosen, setLayer] = useState<LayerId>("gap");
   const campaigns = useMemo(() => campaignsOf(run.events), [run.events]);
   const hasGap = recommendationLayer(campaigns) === "gap";
-  // The Gap tab exists only once a current campaign has a precise location.
+  // The Gap tab exists only once a campaign from the past 12 months has a precise location.
   // Until then the default choice of Gap shows Customers, so the Gap tab
   // opens by itself when it appears unless another tab was picked.
   const layer = chosen === "gap" && !hasGap ? "fit" : chosen;
@@ -192,7 +192,7 @@ function PlacementsSection({ run, focus, audienceOnly }: { run: RunState; focus:
       {audienceOnly && (
         <p className="text-xs text-muted-foreground">
           Chosen by audience fit. Competition coverage is unknown, so these are not confirmed gaps in competitors&rsquo; advertising.
-          {!run.agentDone && !run.error && " They are re-ranked if competitors’ current ads are found."}
+          {!run.agentDone && !run.error && " They are re-ranked if competitors’ recent ads are found."}
         </p>
       )}
       {!run.placements ? (
@@ -223,7 +223,7 @@ function GapTab({ run, layers, focus }: { run: RunState; layers: TractLayers | n
         )}
         {layers && !run.agentDone && !run.error && <Pending>Updating as more competitors&rsquo; ads are found…</Pending>}
         <p className="text-xs text-muted-foreground">
-          Ranked against the current campaigns we could locate, not a complete inventory. Missing evidence means unknown coverage.
+          Ranked against campaigns from the past 12 months that we could locate, not a complete inventory. An ad may no longer be up, and missing evidence means unknown coverage.
         </p>
       </Section>
 
@@ -314,8 +314,8 @@ function CampaignRow({ campaign: c, id, website, focus }: { campaign: Campaign; 
             {location ? LOCATION_PRECISION_LABELS[location.precision] : c.reach === "citywide" ? "Citywide, no fixed location" : c.reach === "borough" ? "Borough-wide, no fixed location" : "No location found"} · {c.kind}
           </div>
           <p className="text-xs text-muted-foreground">
-            {c.coverage === "current" ? "Confirmed current dates" : c.coverage === "historical" ? "Historical campaign" : "Current coverage unknown"}
-            {(c.startsOn || c.endsOn) && `: ${c.startsOn ?? "unknown start"} to ${c.endsOn ?? "unknown end"}`}
+            {c.coverage === "current" ? "Confirmed current dates" : c.coverage === "recent" ? "Ran in the past 12 months" : c.coverage === "historical" ? "Older campaign" : "Undated campaign"}
+            {c.startsOn || c.endsOn ? `: ${c.startsOn ?? "unknown start"} to ${c.endsOn ?? "unknown end"}` : c.latestEvidenceOn && `: latest evidence ${c.latestEvidenceOn}`}
           </p>
           {location ? (
             <button
@@ -375,7 +375,7 @@ function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState;
           <p className="font-medium text-foreground">{outcome.label}</p>
           {outcome.summary && <p>{outcome.summary.competitorsSearched.length} of {competitors.length} competitors searched; {outcome.summary.competitorsCompleted.length} completed. {outcome.summary.searches} searches; {outcome.summary.sources} source URLs found.</p>}
           {!!outcome.summary?.rejectedSources && <p>{outcome.summary.rejectedSources} {outcome.summary.rejectedSources === 1 ? "finding rejected" : "findings rejected"} because the source URL was absent from this research.</p>}
-          {campaigns.length > 0 && <p>{outcome.qualifying} campaigns have current dates and precise locations; {outcome.historical} historical; {outcome.unknownDates} with current dates unconfirmed.</p>}
+          {campaigns.length > 0 && <p>{outcome.qualifying} {outcome.qualifying === 1 ? "campaign" : "campaigns"} from the past 12 months {outcome.qualifying === 1 ? "has a precise location" : "have precise locations"}; {outcome.historical} older; {outcome.unknownDates} undated.</p>}
         </div>
         <ul className="flex flex-col gap-2.5 text-sm" aria-live="polite">
           {campaigns.map((c, i) => (
@@ -394,7 +394,7 @@ function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState;
         )}
         {!run.agentDone && !run.error && <Pending>{steps.at(-1) ?? "Searching…"}</Pending>}
         {(run.agentDone || run.error) && campaigns.length === 0 && <p className="text-sm text-muted-foreground">{outcome.empty}</p>}
-        {campaigns.length > 0 && outcome.qualifying === 0 && <p className="text-sm text-muted-foreground">Campaign evidence was found, but none establishes current coverage at a precise location. Placement recommendations use audience fit.</p>}
+        {campaigns.length > 0 && outcome.qualifying === 0 && <p className="text-sm text-muted-foreground">Campaign evidence was found, but none shows a campaign from the past 12 months at a precise location. Placement recommendations use audience fit.</p>}
         {errors.map((m) => (
           <p key={m} className="text-sm text-destructive">{m}</p>
         ))}

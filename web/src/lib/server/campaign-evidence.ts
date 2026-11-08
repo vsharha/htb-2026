@@ -41,7 +41,7 @@ export function matchStation(stations: Station[], location: string | null, evide
   return inBorough.length === 1 ? inBorough[0] : null;
 }
 
-export function campaignCoverage(startsOn: string | null, endsOn: string | null, today: string): Campaign["coverage"] {
+export function campaignCoverage(startsOn: string | null, endsOn: string | null, today: string, latestEvidenceOn: string | null = null): Campaign["coverage"] {
   const valid = (date: string | null): date is string => {
     if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
     const parsed = new Date(`${date}T00:00:00Z`);
@@ -49,7 +49,10 @@ export function campaignCoverage(startsOn: string | null, endsOn: string | null,
   };
   if ((startsOn && !valid(startsOn)) || (endsOn && !valid(endsOn))) return "unknown";
   if (startsOn && endsOn && startsOn > endsOn) return "unknown";
-  if (endsOn && endsOn < today) return "historical";
   if (startsOn && endsOn && startsOn <= today && endsOn >= today) return "current";
-  return "unknown";
+  const latest = [startsOn, endsOn, valid(latestEvidenceOn) ? latestEvidenceOn : null]
+    .filter((date): date is string => date !== null && date <= today).sort().at(-1);
+  if (!latest) return "unknown";
+  const yearAgo = `${Number(today.slice(0, 4)) - 1}${today.slice(4)}`;
+  return latest >= yearAgo ? "recent" : "historical";
 }

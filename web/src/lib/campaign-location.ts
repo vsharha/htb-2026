@@ -21,5 +21,5 @@ export function getCampaignLocation(campaign: Pick<Campaign, "station" | "mapLoc
 
 export function campaignAffectsHeatmap(campaign: Campaign) {
   const location = getCampaignLocation(campaign);
-  return campaign.coverage === "current" && location !== null && location.precision !== "area";
+  return (campaign.coverage === "current" || campaign.coverage === "recent") && location !== null && location.precision !== "area";
 }

@@ -17,7 +17,7 @@ const { recommendationLayer } = await import("../src/lib/gap.ts");
 const brief = { industry: "Fintech", description: "a shared budgeting app", targetCustomer: "roommates", city: "new-york" };
 const competitors = ["Alpha", "Beta", "Gamma"];
 const url = (name) => `https://agency.example/${name.toLowerCase()}`;
-const finding = (name) => ({ competitor: name, title: "NYC subway campaign", kind: "subway", sourceUrl: url(name), evidence: "A source-supported NYC subway campaign.", stationName: null, locations: [], citywide: false, startsOn: null, endsOn: null });
+const finding = (name) => ({ competitor: name, title: "NYC subway campaign", kind: "subway", sourceUrl: url(name), evidence: "A source-supported NYC subway campaign.", stationName: null, locations: [], citywide: false, startsOn: null, endsOn: null, latestEvidenceOn: null });
 
 function adapter({ fail, timeout, unfinished, rejectSource = false, empty = false, findings = {}, discoveryFinding, discoveryCompetitors = 3 } = {}) {
   const steps = new Map();
@@ -172,11 +172,12 @@ test("completed empty searches differ from failure, partial research and timeout
   assert.equal(researchOutcome([...events, { type: "error", message: "Disconnected" }], true).label, "Research incomplete");
 });
 
-test("recommendations use audience fit unless current, precisely located campaign evidence exists", () => {
+test("recommendations use audience fit unless current or recent, precisely located campaign evidence exists", () => {
   const campaign = { ...finding("Alpha"), coverage: "unknown", station: null, mapLocation: { latitude: 40.75, longitude: -73.98, precision: "area" } };
   assert.equal(recommendationLayer([]), "fit");
   assert.equal(recommendationLayer([campaign]), "fit");
   assert.equal(recommendationLayer([{ ...campaign, coverage: "current" }]), "fit");
   assert.equal(recommendationLayer([{ ...campaign, coverage: "historical", mapLocation: { ...campaign.mapLocation, precision: "address" } }]), "fit");
   assert.equal(recommendationLayer([{ ...campaign, coverage: "current", mapLocation: { ...campaign.mapLocation, precision: "address" } }]), "gap");
+  assert.equal(recommendationLayer([{ ...campaign, coverage: "recent", mapLocation: { ...campaign.mapLocation, precision: "address" } }]), "gap");
 });

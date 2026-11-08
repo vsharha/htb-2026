@@ -38,11 +38,20 @@ test("only explicit, unambiguous subway station names are matched", () => {
   assert.equal(matchStation(stations, null, "A citywide campaign."), null);
 });
 
-test("publication dates and incomplete dates cannot establish current coverage", () => {
+test("only a date range spanning today is current, and evidence from the past 12 months is recent", () => {
   const today = "2026-11-07";
   assert.equal(campaignCoverage("2026-11-01", "2026-11-30", today), "current");
   assert.equal(campaignCoverage(null, "2020-01-01", today), "historical");
-  assert.equal(campaignCoverage("2026-11-01", null, today), "unknown");
+  assert.equal(campaignCoverage("2026-11-01", null, today), "recent");
+  assert.equal(campaignCoverage(null, "2026-06-30", today), "recent");
+  assert.equal(campaignCoverage(null, null, today, "2026-08-01"), "recent");
+  assert.equal(campaignCoverage(null, null, today, "2025-11-07"), "recent");
+  assert.equal(campaignCoverage(null, null, today, "2025-11-06"), "historical");
+  assert.equal(campaignCoverage("2015-03-17", null, today), "historical");
+  assert.equal(campaignCoverage("2015-03-17", null, today, "2026-08-01"), "recent");
+  assert.equal(campaignCoverage("2026-12-01", null, today), "unknown");
+  assert.equal(campaignCoverage(null, null, today, "2026-12-01"), "unknown");
+  assert.equal(campaignCoverage(null, null, today, "August 2026"), "unknown");
   assert.equal(campaignCoverage(null, null, today), "unknown");
   assert.equal(campaignCoverage("2026-11-30", "2026-11-01", today), "unknown");
   assert.equal(campaignCoverage("2026-02-30", "2026-12-01", today), "unknown");
@@ -54,7 +63,9 @@ test("historical and undated campaigns cannot lower the gap score", () => {
   for (const coverage of ["historical", "unknown"]) {
     assert.equal(computeLayers(shapes, fit, [{ station: stations[0], coverage }])["1"].gap, 0.8);
   }
-  assert.equal(computeLayers(shapes, fit, [{ station: stations[0], coverage: "current" }])["1"].gap, 0);
+  for (const coverage of ["current", "recent"]) {
+    assert.equal(computeLayers(shapes, fit, [{ station: stations[0], coverage }])["1"].gap, 0);
+  }
 });
 
 test("SDK transport decodes split SSE chunks and emits each finding once", async () => {

@@ -8,7 +8,7 @@ import type { LayerId } from "@/lib/gap";
 /** In reading order: who the customers are, where competitors reach, and what that leaves. */
 export const LAYERS: { id: LayerId; label: string; low: string; high: string }[] = [
   { id: "fit", label: "Customers", low: "Few", high: "Many" },
-  { id: "competition", label: "Competitors", low: "No confirmed ads nearby", high: "Confirmed current ads" },
+  { id: "competition", label: "Competitors", low: "No confirmed ads nearby", high: "Confirmed recent ads" },
   { id: "gap", label: "Gap", low: "Covered or few customers", high: "High fit, no confirmed ads" },
 ];
 
