@@ -1,0 +1,51 @@
+{
+  "cli_version": "0.13.1",
+  "checkpoint_id": "01M6W8KWAJ45BTETY9E8T8R10R",
+  "session_id": "ses_e47cdda1bffeh4adaxN9myW562",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-08T00:23:31.809188982Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "save_step_count": 1,
+  "files_touched": [
+    "data/competitors/sample-run.json",
+    "docs/product.md",
+    "docs/status.md",
+    "web/src/components/map-panel.tsx",
+    "web/src/components/run-results.tsx",
+    "web/src/components/tract-map.tsx",
+    "web/src/components/use-audience-run.ts",
+    "web/src/lib/contract.ts",
+    "web/src/lib/server/competitor-agent.ts"
+  ],
+  "agent": "OpenCode",
+  "model": "iceman-contributor-free",
+  "turn_id": "b2604fbdf9d8",
+  "checkpoint_transcript_start": 83,
+  "transcript_lines_at_start": 83,
+  "compact_transcript_start": 13,
+  "token_usage": {
+    "input_tokens": 25568,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1332224,
+    "output_tokens": 4159,
+    "api_call_count": 8
+  },
+  "redaction": {
+    "replacements": 14,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 14,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 20
+  }
+}
