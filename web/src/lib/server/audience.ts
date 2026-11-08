@@ -11,7 +11,7 @@
 import { experimental_decide as decide } from "ai";
 
 import type { AudienceFit, Brief, ColumnWeight } from "@/lib/contract";
-import { getAudienceModel, getSystemOneConfig, hasAudienceCredentials } from "@/lib/server/ai";
+import { getAudienceModel, getAudiencePreference, getSystemOneConfig, hasAudienceCredentials } from "@/lib/server/ai";
 import { keywordWeights } from "@/lib/stand-in/keyword-weights";
 import { readAnalysisCsv, readAnalysisJson } from "@/lib/stand-in/data-files";
 import type { TractColumn } from "@/lib/tract-columns";
@@ -163,27 +163,33 @@ async function jevWeights(columns: TractColumn[], brief: Brief): Promise<ColumnW
  */
 async function ask(columns: TractColumn[], brief: Brief): Promise<Omit<AudienceFit, "scores">> {
   const systemOne = getSystemOneConfig();
-  if (systemOne) {
+  const order = getAudiencePreference() === "systemone" ? (["systemone", "jev"] as const) : (["jev", "systemone"] as const);
+
+  for (const model of order) {
+    if (model === "jev") {
+      if (!hasAudienceCredentials()) continue;
+      const started = Date.now();
+      try {
+        return { weights: await jevWeights(columns, brief), source: "jev", stats: { model: "Jev", durationMs: Date.now() - started } };
+      } catch (error) {
+        console.error("Jev failed; trying the next decision model.", error);
+      }
+      continue;
+    }
+
+    if (!systemOne) continue;
     const started = Date.now();
     try {
       const { weights, inputTokens } = await systemOneWeights(columns, brief, systemOne);
       return { weights, source: "systemone", stats: { model: systemOne.model, durationMs: Date.now() - started, inputTokens } };
     } catch (error) {
-      console.error("The self-hosted decision model failed; trying Jev instead.", error);
+      console.error("The self-hosted decision model failed; trying the next decision model.", error);
     }
   }
 
-  if (hasAudienceCredentials()) {
-    const started = Date.now();
-    try {
-      return { weights: await jevWeights(columns, brief), source: "jev", stats: { model: "Jev", durationMs: Date.now() - started } };
-    } catch (error) {
-      console.error("Jev failed; weighting the audience by keywords instead.", error);
-    }
-  } else if (!systemOne) {
+  if (!systemOne && !hasAudienceCredentials()) {
     console.warn("No decision model endpoint or gateway credentials; weighting the audience by keywords instead.");
   }
-
   return { weights: keywordWeights(columns, brief.targetCustomer), source: "keywords" };
 }
 
@@ -222,9 +228,9 @@ export async function* scoreBatches(brief: Brief, signal?: AbortSignal): AsyncGe
   ]);
 
   const markets = new Set<string>(brief.markets);
-  // The self-hosted CPU model is slow enough that batching it buys a map that
-  // fills in; Jev answers all the columns in one fast request, as before.
-  const batchSize = getSystemOneConfig() ? BATCH_SIZE : columns.length;
+  // Only the self-hosted CPU model is slow enough to need batching; Jev
+  // answers all the columns in one fast request, as main does.
+  const batchSize = getAudiencePreference() === "systemone" && getSystemOneConfig() ? BATCH_SIZE : columns.length;
   const batches: TractColumn[][] = [];
   for (let i = 0; i < columns.length; i += batchSize) batches.push(columns.slice(i, i + batchSize));
 

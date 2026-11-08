@@ -79,6 +79,15 @@ export function getAudienceModel() {
 }
 
 /**
+ * Which decision model is tried first. Jev is the default, so a checkout with
+ * both keys set still uses Jev; only an explicit AUDIENCE_MODEL=systemone,
+ * which the Vultr deployment sets, prefers the self-hosted model.
+ */
+export function getAudiencePreference(): "jev" | "systemone" {
+  return process.env.AUDIENCE_MODEL === "systemone" ? "systemone" : "jev";
+}
+
+/**
  * The self-hosted System One endpoint, when SYSTEMONE_BASE_URL names one.
  * It speaks the same /v1/systemone protocol as Jev, so it is called over
  * fetch rather than through the AI SDK. Null means use Jev instead.

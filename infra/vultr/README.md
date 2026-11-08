@@ -47,8 +47,8 @@ it on port 3000 as `app.<ip>.sslip.io`.
 
 Credentials live in `/srv/placewise/.env` on the host, mode 600, and are passed
 with `--env-file` so they never appear in a command line. It holds
-`SYSTEMONE_BASE_URL=http://127.0.0.1:11434`, `SYSTEMONE_MODEL=tev1:4b`,
-`OPENAI_API_KEY` and `GEOAPIFY_API_KEY`.
+`AUDIENCE_MODEL=systemone`, `SYSTEMONE_BASE_URL=http://127.0.0.1:11434`,
+`SYSTEMONE_MODEL=tev1:4b`, `OPENAI_API_KEY` and `GEOAPIFY_API_KEY`.
 
 ```sh
 tar --exclude='web/node_modules' --exclude='web/.next' --exclude='web/.env.local' \
