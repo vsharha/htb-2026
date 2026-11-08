@@ -93,6 +93,13 @@ export function MapPanel({
               </span>
               Placement to buy
             </li>
+            <li className="flex items-center gap-2 text-muted-foreground">
+              <span className="flex w-4 shrink-0 items-center justify-center">
+                <span className="size-2.5 rounded-full border-2 border-foreground bg-background" />
+                <span className="-ml-0.5 size-3.5 rounded-full border-2 border-foreground bg-foreground" />
+              </span>
+              Bigger and darker is cheaper per customer
+            </li>
           </ul>
         )}
       </div>
