@@ -57,7 +57,7 @@ function Section({ title, aside, children }: { title: string; aside?: React.Reac
     <section className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="font-heading text-lg font-semibold tracking-tight">{title}</h2>
-        {aside && <span className="font-mono text-xs text-muted-foreground">{aside}</span>}
+        {aside && <span className="text-xs text-muted-foreground">{aside}</span>}
       </div>
       {children}
     </section>
@@ -78,7 +78,7 @@ function TractRanking({ layers, layer, value }: { layers: TractLayers; layer: La
             {tractName(geoid)}
             <span className="ml-2 text-[11px] text-muted-foreground/70">{tractCode(geoid)}</span>
           </span>
-          <span className="font-mono text-xs tabular-nums text-muted-foreground">{value(layers[geoid][layer])}</span>
+          <span className="w-16 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">{value(layers[geoid][layer])}</span>
         </li>
       ))}
     </ol>
@@ -121,8 +121,8 @@ function PlacementRow({ placement: p, number, focus }: { placement: Placement; n
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="flex items-baseline justify-between gap-3 text-sm">
             <span className="font-medium">{p.kind === "linknyc" ? "LinkNYC kiosk" : "Bus shelter"}</span>
-            <span className="font-mono tabular-nums">
-              ${p.costPerAudienceMember.toFixed(3)}
+            <span className="text-right">
+              <span className="font-mono tabular-nums">${p.costPerAudienceMember.toFixed(3)}</span>
               <span className="text-xs text-muted-foreground"> / customer</span>
             </span>
           </span>
@@ -219,9 +219,9 @@ function CustomersTab({ run, layers, focus, placements }: { run: RunState; layer
                     {w.weight < 0 && <span className="text-muted-foreground">Less likely: </span>}
                     {w.description}
                   </span>
-                  <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
+                  <span className="shrink-0 text-right text-xs text-muted-foreground">
                     <span className="group-hover:hidden">{MEASURE_LABEL[w.measures]}</span>
-                    <span className="hidden group-hover:inline">{w.weight > 0 ? "+" : ""}{w.weight.toFixed(2)}</span>
+                    <span className="hidden font-mono tabular-nums group-hover:inline">{w.weight > 0 ? "+" : ""}{w.weight.toFixed(2)}</span>
                   </span>
                 </div>
                 <div className="h-1.5 rounded-full bg-foreground/10">
@@ -260,7 +260,7 @@ function CampaignRow({ campaign: c, id, focus }: { campaign: Campaign; id: strin
       <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
         {c.competitor}: {c.title}
       </a>
-      <div className="font-mono text-xs text-muted-foreground">
+      <div className="text-xs text-muted-foreground">
         {location ? LOCATION_PRECISION_LABELS[location.precision] : "Location not resolved"} · {c.kind}
       </div>
       <p className="text-xs text-muted-foreground">

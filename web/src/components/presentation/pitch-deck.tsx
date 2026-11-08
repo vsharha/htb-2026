@@ -34,9 +34,9 @@ const SLIDE_COUNT = 5;
  */
 function SlideFooter({ number }: { number: number }) {
   return (
-    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-24 pb-10 font-mono text-sm text-muted-foreground">
+    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-24 pb-10 text-sm text-muted-foreground">
       <Wordmark className="text-lg text-foreground" />
-      <span>
+      <span className="font-mono tabular-nums">
         {number} / {SLIDE_COUNT}
       </span>
     </div>
@@ -109,9 +109,9 @@ function ExportControls({ exporting }: { exporting: boolean }) {
   );
 }
 
-/** Small mono label above a slide's headline, naming the slide's topic. */
+/** Small label above a slide's headline, naming the slide's topic. */
 function Eyebrow({ children }: { children: ReactNode }) {
-  return <p className="font-mono text-base tracking-wide text-muted-foreground uppercase">{children}</p>;
+  return <p className="text-base tracking-wide text-muted-foreground uppercase">{children}</p>;
 }
 
 function SlideBody({ number, children }: { number: number; children: ReactNode }) {
@@ -249,7 +249,7 @@ function DemoSlide() {
       <div className="relative flex h-full flex-col px-16 pt-12 pb-24 text-foreground">
         <div className="flex items-baseline justify-between">
           <h2 className="font-heading text-[2.6rem] font-bold tracking-tight">Live demo</h2>
-          <p className="font-mono text-base text-muted-foreground">A budgeting app for people who share a flat</p>
+          <p className="text-base text-muted-foreground">A budgeting app for people who share a flat</p>
         </div>
         {/*
           The app is laid out at 1.4 times the frame's size and scaled back down,
