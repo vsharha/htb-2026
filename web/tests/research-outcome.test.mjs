@@ -65,7 +65,9 @@ function adapter({ fail, timeout, unfinished, rejectSource = false, empty = fals
       input = {};
     }
     const toolCallId = `${name}-${step}`;
-    const parts = [{ type: "stream-start", warnings: [] }, { type: "tool-call", toolCallId, toolName, input: JSON.stringify(input), ...(result ? { providerExecuted: true } : {}) }];
+    const parts = [{ type: "stream-start", warnings: [] }];
+    if (discovery && step === 0) parts.push({ type: "reasoning-start", id: "r1" }, { type: "reasoning-delta", id: "r1", delta: "Shoppers say roommate budgeting app." }, { type: "reasoning-end", id: "r1" });
+    parts.push({ type: "tool-call", toolCallId, toolName, input: JSON.stringify(input), ...(result ? { providerExecuted: true } : {}) });
     if (result) parts.push({ type: "tool-result", toolCallId, toolName, result });
     parts.push({ type: "finish", finishReason: { unified: "tool-calls" }, usage: { inputTokens: { total: 1 }, outputTokens: { total: 1 } } });
     return { stream: new ReadableStream({ start(controller) { for (const part of parts) controller.enqueue(part); controller.close(); } }) };
@@ -180,4 +182,19 @@ test("recommendations use audience fit unless current or recent, precisely locat
   assert.equal(recommendationLayer([{ ...campaign, coverage: "historical", mapLocation: { ...campaign.mapLocation, precision: "address" } }]), "fit");
   assert.equal(recommendationLayer([{ ...campaign, coverage: "current", mapLocation: { ...campaign.mapLocation, precision: "address" } }]), "gap");
   assert.equal(recommendationLayer([{ ...campaign, coverage: "recent", mapLocation: { ...campaign.mapLocation, precision: "address" } }]), "gap");
+});
+
+test("the trace lists the reasoning and every tool the agent used, by stage", async () => {
+  const { events } = await research();
+  const trace = events.flatMap((event) => (event.type === "trace" ? [event.entry] : []));
+  const tools = trace.filter((entry) => entry.kind === "tool");
+  const count = (name) => tools.filter((entry) => entry.tool === name).length;
+  assert.equal(count("web_search"), 8);
+  assert.equal(count("reportCompetitor"), 3);
+  assert.equal(count("finishDiscovery"), 1);
+  assert.equal(count("reportCampaign"), 3);
+  assert.equal(count("finishResearch"), 3);
+  assert.deepEqual(tools.filter((entry) => entry.tool === "reportCompetitor").map((entry) => entry.detail), competitors);
+  assert.deepEqual(trace.filter((entry) => entry.kind === "thought"), [{ kind: "thought", stage: "Finding competitors", text: "Shoppers say roommate budgeting app." }]);
+  assert.ok(tools.filter((entry) => entry.tool === "reportCampaign").every((entry) => competitors.includes(entry.stage)));
 });

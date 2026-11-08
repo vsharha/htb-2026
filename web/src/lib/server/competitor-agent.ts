@@ -164,6 +164,7 @@ export async function runCompetitorResearch(
       const stationLocation = getCampaignLocation({ station });
       if (stationLocation || !place) return { place, mapLocation: stationLocation };
       emit({ type: "step", message: `Locating ${competitor.name}'s campaign: ${place}` });
+      emit({ type: "trace", entry: { kind: "tool", stage: competitor.name, tool: "geocode", detail: place } });
       try {
         const { location, note, reach } = await geocodeCampaignLocation(place, campaignSignal);
         return { place, mapLocation: location, locationNote: note, reach };
@@ -200,12 +201,35 @@ export async function runCompetitorResearch(
     return { accepted: true, added, duplicates, mapped: resolved.filter((entry) => entry.mapLocation).length, coverage };
   }
 
+  /** The tools the agent defines itself; web search and page reads are reported from their results instead. */
+  const TOOL_DETAIL: Record<string, (input: Record<string, unknown>) => string> = {
+    reportCompetitor: (input) => String(input.name ?? ""),
+    reportCampaign: (input) => String(input.title ?? input.location ?? ""),
+    finishDiscovery: () => "Moving on to each competitor's placements",
+    finishResearch: () => "Done searching this competitor",
+  };
+
   async function streamStage<TOOLS extends ToolSet>(agent: ToolLoopAgent<never, TOOLS>, prompt: string, stageSignal: AbortSignal, state: { steps: number; finished: boolean }, maxSteps: number, competitor?: string) {
     const messages: ModelMessage[] = [{ role: "user", content: prompt }];
+    const stage = competitor ?? "Finding competitors";
+    // Reasoning summaries and written notes arrive in pieces; each is sent whole once it ends.
+    const thoughts = new Map<string, string>();
     while (state.steps < maxSteps && !state.finished) {
       const result = await agent.stream({ messages, abortSignal: stageSignal });
       for await (const part of result.fullStream) {
         if (part.type === "error") throw part.error;
+        if (part.type === "reasoning-start" || part.type === "text-start") thoughts.set(part.id, "");
+        if (part.type === "reasoning-delta") thoughts.set(part.id, (thoughts.get(part.id) ?? "") + part.text);
+        if (part.type === "text-delta") thoughts.set(part.id, (thoughts.get(part.id) ?? "") + part.text);
+        if (part.type === "reasoning-end" || part.type === "text-end") {
+          const text = thoughts.get(part.id)?.trim();
+          thoughts.delete(part.id);
+          if (text) emit({ type: "trace", entry: { kind: "thought", stage, text } });
+        }
+        if (part.type === "tool-call" && TOOL_DETAIL[part.toolName]) {
+          const input = typeof part.input === "object" && part.input !== null ? (part.input as Record<string, unknown>) : {};
+          emit({ type: "trace", entry: { kind: "tool", stage, tool: part.toolName, detail: TOOL_DETAIL[part.toolName](input) } });
+        }
         const observation = research.readEvent(part);
         for (const value of observation.urls) {
           const url = sourceUrl(value);
@@ -216,7 +240,10 @@ export async function runCompetitorResearch(
           if (competitor && !summary.competitorsSearched.includes(competitor)) summary.competitorsSearched.push(competitor);
           if (competitor) campaignSearches.set(competitor, (campaignSearches.get(competitor) ?? 0) + 1);
         }
-        if (observation.message) emit({ type: "step", message: competitor ? `${competitor}: ${observation.message}` : observation.message });
+        if (observation.message) {
+          emit({ type: "step", message: competitor ? `${competitor}: ${observation.message}` : observation.message });
+          if (observation.tool) emit({ type: "trace", entry: { kind: "tool", stage, tool: observation.tool, detail: observation.message.replace(/^(Searching: |Reading )/, "") } });
+        }
       }
       stageSignal.throwIfAborted();
       messages.push(...(await result.response).messages);

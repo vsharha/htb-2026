@@ -121,9 +121,18 @@ export type ResearchSummary = {
   competitorsCompleted: string[];
 };
 
+/**
+ * One entry in the agent's trace: what the model said it was thinking, or a
+ * tool it called. `stage` names the phase or the competitor being researched.
+ */
+export type TraceEntry =
+  | { kind: "thought"; stage: string; text: string }
+  | { kind: "tool"; stage: string; tool: string; detail: string };
+
 /** One message streamed by the competitor-campaign agent's Route Handler. */
 export type AgentEvent =
   | { type: "step"; message: string }
+  | { type: "trace"; entry: TraceEntry }
   | { type: "competitor"; competitor: Competitor }
   | { type: "campaign"; campaign: Campaign }
   | { type: "recording"; recordedAt: string }

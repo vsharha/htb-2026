@@ -19,7 +19,7 @@ type ResearchEvent = {
   output?: unknown;
 };
 
-type ResearchObservation = { urls: string[]; message?: string; searched?: boolean };
+type ResearchObservation = { urls: string[]; message?: string; searched?: boolean; tool?: "web_search" | "open_page" };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -37,12 +37,12 @@ function readOpenAIResearchEvent(event: ResearchEvent): ResearchObservation {
   if (action.type === "search") {
     const queries = Array.isArray(action.queries) ? action.queries.filter((query): query is string => typeof query === "string") : [];
     const query = queries.join("; ") || (typeof action.query === "string" ? action.query : "New York outdoor campaigns");
-    return { urls, message: `Searching: ${query}`, searched: true };
+    return { urls, message: `Searching: ${query}`, searched: true, tool: "web_search" };
   }
   if (action.type === "openPage" && typeof action.url === "string") {
     try {
       const url = new URL(action.url);
-      if (url.protocol === "https:" || url.protocol === "http:") return { urls: [...urls, action.url], message: `Reading ${url.hostname}` };
+      if (url.protocol === "https:" || url.protocol === "http:") return { urls: [...urls, action.url], message: `Reading ${url.hostname}`, tool: "open_page" };
     } catch {
       return { urls };
     }
@@ -65,7 +65,7 @@ export function getCompetitorAI(modelId: ModelId = AI_MODELS.competitor) {
   return {
     model: providers.languageModel(modelId),
     tools: { web_search: openai.tools.webSearch({ searchContextSize: "high" }) },
-    providerOptions: { openai: { reasoningEffort: "low", store: false, parallelToolCalls: true, maxToolCalls: 8 } },
+    providerOptions: { openai: { reasoningEffort: "low", reasoningSummary: "auto", store: false, parallelToolCalls: true, maxToolCalls: 8 } },
     configured: Boolean(process.env.OPENAI_API_KEY),
     missingCredentialsMessage: "Competitor search needs OPENAI_API_KEY in web/.env.local. Competition coverage is unknown.",
     readEvent: readOpenAIResearchEvent,

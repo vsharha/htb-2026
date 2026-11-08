@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CompetitorLogo } from "@/components/competitor-logo";
 import { campaignId, campaignsOf, competitorsOf, type RunState } from "@/components/use-audience-run";
 import { useMapFocus, type MapFocus } from "@/components/use-map-focus";
-import type { Campaign, Competitor, Placement } from "@/lib/contract";
+import type { Campaign, Competitor, Placement, TraceEntry } from "@/lib/contract";
 import { getCampaignLocation, LOCATION_PRECISION_LABELS } from "@/lib/campaign-location";
 import { computeLayers, recommendationLayer, type LayerId, type TractLayers } from "@/lib/gap";
 import { researchOutcome } from "@/lib/research-outcome";
@@ -343,6 +343,83 @@ function CampaignRow({ campaign: c, id, website, focus }: { campaign: Campaign; 
   );
 }
 
+/** What each tool the agent can call is shown as. */
+const TOOL_LABEL: Record<string, string> = {
+  web_search: "Web search",
+  open_page: "Open page",
+  reportCompetitor: "Report competitor",
+  reportCampaign: "Report campaign",
+  finishDiscovery: "Finish discovery",
+  finishResearch: "Finish research",
+  geocode: "Locate on map",
+};
+
+/** Reasoning summaries mark their headings with **double asterisks**; show those as bold instead of raw markers. */
+function Emphasised({ text }: { text: string }) {
+  return text.split(/\*\*(.+?)\*\*/).map((part, i) => (i % 2 ? <strong key={i} className="font-semibold not-italic text-foreground">{part}</strong> : part));
+}
+
+/**
+ * What the agent did: the tools it called, with counts, then its reasoning and
+ * each call in order, grouped by the phase or competitor it was working on.
+ */
+function AgentTrace({ trace, researching, recorded }: { trace: TraceEntry[]; researching: boolean; recorded: boolean }) {
+  const toolCounts = new Map<string, number>();
+  const stages = new Map<string, TraceEntry[]>();
+  for (const entry of trace) {
+    if (entry.kind === "tool") toolCounts.set(entry.tool, (toolCounts.get(entry.tool) ?? 0) + 1);
+    stages.set(entry.stage, [...(stages.get(entry.stage) ?? []), entry]);
+  }
+  return (
+    <Section title="How the agent worked" aside={trace.length > 0 ? `${trace.length} steps` : undefined} busy={researching}>
+      {trace.length === 0 ? (
+        researching ? (
+          <Pending>Waiting for the agent&rsquo;s first step…</Pending>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {recorded ? "Recorded research keeps the findings but not the agent\u2019s steps." : "The agent recorded no steps for this run."}
+          </p>
+        )
+      ) : (
+        <>
+          <div className="flex flex-col gap-2">
+            <p className="text-xs text-muted-foreground">Tools used</p>
+            <ul className="flex flex-wrap gap-1.5">
+              {[...toolCounts].map(([tool, count]) => (
+                <li key={tool} className="rounded-lg border border-border bg-muted px-2 py-0.5 text-xs text-foreground">
+                  {TOOL_LABEL[tool] ?? tool} <span className="text-muted-foreground">×</span>{" "}
+                  <span className="font-mono tabular-nums text-muted-foreground">{count}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex flex-col gap-5">
+            {[...stages].map(([stage, entries]) => (
+              <div key={stage} className="flex flex-col gap-2">
+                <h3 className="text-sm font-semibold text-foreground">{stage}</h3>
+                <ol className="flex flex-col gap-2 border-l border-border pl-3">
+                  {entries.map((entry, i) =>
+                    entry.kind === "thought" ? (
+                      <li key={i} className="text-sm whitespace-pre-line text-muted-foreground italic">
+                        <Emphasised text={entry.text} />
+                      </li>
+                    ) : (
+                      <li key={i} className="flex items-baseline gap-2 text-xs">
+                        <span className="shrink-0 rounded-lg border border-border bg-muted px-1.5 py-0.5 text-foreground">{TOOL_LABEL[entry.tool] ?? entry.tool}</span>
+                        <span className="min-w-0 break-words text-muted-foreground">{entry.detail}</span>
+                      </li>
+                    ),
+                  )}
+                </ol>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </Section>
+  );
+}
+
 function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState; competitors: Competitor[]; campaigns: Campaign[]; focus: MapFocus }) {
   const steps = run.events.flatMap((e) => (e.type === "step" ? [e.message] : []));
   const errors = run.events.flatMap((e) => (e.type === "error" ? [e.message] : []));
@@ -399,6 +476,12 @@ function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState;
           <p key={m} className="text-sm text-destructive">{m}</p>
         ))}
       </Section>
+
+      <AgentTrace
+        trace={run.events.flatMap((e) => (e.type === "trace" ? [e.entry] : []))}
+        researching={researching}
+        recorded={run.events.some((e) => e.type === "recording")}
+      />
     </>
   );
 }

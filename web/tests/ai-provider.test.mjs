@@ -60,9 +60,9 @@ test("research events expose only URL sources and readable search progress", () 
   assert.deepEqual(research.readEvent({ type: "tool-result", toolName: "web_search", output: {
     sources: [{ type: "url", url: "https://agency.example" }, { type: "api", name: "other" }, null],
     action: { type: "search", queries: ["NYC subway ads", "brand billboards", 42] },
-  } }), { urls: ["https://agency.example"], message: "Searching: NYC subway ads; brand billboards", searched: true });
+  } }), { urls: ["https://agency.example"], message: "Searching: NYC subway ads; brand billboards", searched: true, tool: "web_search" });
   assert.deepEqual(research.readEvent({ type: "tool-result", toolName: "web_search", output: { action: { type: "openPage", url: "https://agency.example/campaign" } } }), {
-    urls: ["https://agency.example/campaign"], message: "Reading agency.example",
+    urls: ["https://agency.example/campaign"], message: "Reading agency.example", tool: "open_page",
   });
 });
 
