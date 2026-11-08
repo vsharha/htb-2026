@@ -18,7 +18,9 @@ const STORAGE_KEY = "placewise-settings";
 /** The heatmap's colours, which the map needs as plain values rather than CSS variables. */
 export type Heat = { mid: string; hot: string };
 
-export const PALETTES: Record<PaletteId, { label: string; swatches: string[]; heat: Heat; vars: Record<string, string> }> = {
+export type Palette = { label: string; note?: string; swatches: string[]; heat: Heat; vars: Record<string, string> };
+
+export const PALETTES: Record<PaletteId, Palette> = {
   default: {
     label: "Default",
     swatches: ["#eceff3", "#c9cfd8", "#2b59c3", "#f2b134", "#e0334f"],
@@ -115,6 +117,7 @@ export const PALETTES: Record<PaletteId, { label: string; swatches: string[]; he
   // leaves heat-cool and heat-hot equally bright.
   navy: {
     label: "Navy, amber",
+    note: "Colour-blind friendly",
     // #F7FBFF #C7E9B4 #41B6C4 #1D91C0 #08306B, accent #FEB24C
     swatches: ["#F7FBFF", "#C7E9B4", "#41B6C4", "#1D91C0", "#08306B", "#FEB24C"],
     heat: { mid: "#41B6C4", hot: "#08306B" },

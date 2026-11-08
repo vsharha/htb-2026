@@ -87,7 +87,10 @@ export function SettingsMenu() {
                       onChange={() => updateSettings({ palette: id })}
                       className="size-4 accent-foreground"
                     />
-                    {PALETTES[id].label}
+                    <span>
+                      {PALETTES[id].label}
+                      {PALETTES[id].note && <span className="block text-xs text-muted-foreground">{PALETTES[id].note}</span>}
+                    </span>
                   </span>
                   <span aria-hidden className="flex">
                     {PALETTES[id].swatches.map((c) => (
