@@ -139,6 +139,7 @@ function SlideGlow() {
         <div className="heat-glow-drift absolute -bottom-[25%] -left-[15%] size-[820px] rounded-full bg-heat-hot blur-[140px]" style={drift("620px", "-260px", 10)} />
         <div className="heat-glow-drift absolute -right-[20%] -bottom-[30%] size-[820px] rounded-full bg-heat-mid blur-[140px]" style={drift("-480px", "-360px", 7)} />
       </div>
+      <div className="heat-glow-drift absolute -bottom-[100px] left-[15%] size-[320px] rounded-full bg-heat-highlight blur-[70px]" style={drift("560px", "-30px", 11)} />
     </div>
   );
 }

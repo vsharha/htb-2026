@@ -15,6 +15,7 @@
   --color-tab: var(--tab-active);
   --color-heat-cool: var(--heat-cool);
   --color-heat-glow: var(--heat-glow);
+  --color-heat-highlight: var(--heat-highlight);
   --color-heat-mid: var(--heat-mid);
   --color-heat-hot: var(--heat-hot);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -90,6 +91,7 @@
   --sidebar-ring: oklch(0.708 0 0);
   --heat-cool: #ec7a3f;
   --heat-glow: #f7d58e;
+  --heat-highlight: #ffffff;
   --heat-mid: #f2b134;
   --heat-hot: #e0334f;
 }

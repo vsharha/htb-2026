@@ -41,6 +41,8 @@ export type PaletteTheme = {
   heat: Heat;
   /** The background glow's lightest blob; the other blobs use the heat variables. */
   glow: string;
+  /** A small extra blob in the background glow; palettes without one leave it transparent. */
+  highlight?: string;
   /** The four filled map classes, from the 50th to 75th percentile up to the top 3%. */
   ramp: [string, string, string, string];
   /** Placement markers, and the colour of the selected one. */
@@ -84,7 +86,8 @@ const CLASSIC_NIGHT_VARS: Record<string, string> = {
 };
 
 export const PALETTES: Record<PaletteId, Palette> = {
-  // The background glow is built from exactly the map's four class colours.
+  // The background glow is built from exactly the map's four class colours,
+  // plus a small white highlight.
   // Light mode's heat variables are the :root defaults in globals.css, so the
   // page paints this palette before the saved settings load.
   warm: {
@@ -93,6 +96,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       swatches: ["#eceff3", "#c9cfd8", "#f7d58e", "#f2b134", "#ec7a3f", "#e0334f"],
       heat: { mid: "#f2b134", hot: "#e0334f" },
       glow: "#F7D58E",
+      highlight: "#FFFFFF",
       ramp: ["#F7D58E", "#F2B134", "#EC7A3F", "#E0334F"],
       accent: "#E0334F",
       accentDark: "#C9CFD8",
@@ -104,6 +108,7 @@ export const PALETTES: Record<PaletteId, Palette> = {
       swatches: ["#14161b", "#343b48", "#f7d58e", "#f2b134", "#ec7a3f", "#e0334f"],
       heat: { mid: "#f2b134", hot: "#e0334f" },
       glow: "#F7D58E",
+      highlight: "#FFFFFF",
       ramp: ["#F7D58E", "#F2B134", "#EC7A3F", "#E0334F"],
       accent: "#F4F6FA",
       accentDark: "#C9CFD8",
@@ -461,6 +466,7 @@ function apply(settings: Settings) {
     root.style.setProperty("--ink-3", theme.ink3);
     root.style.setProperty("--tab-active", theme.tab);
     root.style.setProperty("--heat-glow", theme.glow);
+    root.style.setProperty("--heat-highlight", theme.highlight ?? "transparent");
   });
 }
 
