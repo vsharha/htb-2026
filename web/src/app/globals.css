@@ -157,7 +157,7 @@
     transform: translate(0, 0) scale(1);
   }
   to {
-    transform: translate(var(--drift-x), var(--drift-y)) scale(1.15);
+    transform: translate(var(--drift-x), var(--drift-y)) scale(1.25);
   }
 }
 
