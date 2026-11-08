@@ -20,17 +20,34 @@ import { tractLabel } from "@/lib/tracts";
 setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
 
 // MapLibre paints with plain colour values, not CSS variables, so these
-// repeat --heat-mid and --heat-hot from globals.css, with the alpha rising
-// from 0.1 to 0.75 so weak tracts let the basemap show through. The low end is
-// a faint wash of --heat-mid rather than --heat-cool, because a pale blue tract
-// is hard to tell apart from the basemap's water. The legend in map-panel.tsx
-// draws the same ramp.
-function heatRamp(id: LayerId): ExpressionSpecification {
+// repeat --heat-mid and --heat-hot from globals.css. The stops are quantiles of
+// the layer's own values, not fixed scores: the bottom 65% of tracts stay
+// almost transparent and only the top third glows, amber at the 80th
+// percentile and red at the top. A layer whose values bunch up, such as
+// competition with few ads, would otherwise colour the whole city. The legend
+// in map-panel.tsx draws the same ramp.
+const FADE_BELOW = 0.65;
+const GLOW_AT = 0.8;
+
+function quantile(sorted: number[], q: number) {
+  return sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))];
+}
+
+function heatRamp(id: LayerId, layers: TractLayers | null): ExpressionSpecification {
+  const values = Object.values(layers ?? {}).map((t) => t[id]);
+  // Before any scores arrive there is nothing to rank, so the map stays faded.
+  const sorted = (values.length ? values : [0, 1]).sort((a, b) => a - b);
+  // Interpolation stops must strictly rise, and a bunched layer repeats values.
+  const stops: number[] = [];
+  for (const q of [FADE_BELOW, GLOW_AT, 1]) {
+    const v = quantile(sorted, q === 1 ? 0.999999 : q);
+    stops.push(stops.length && v <= stops[stops.length - 1] ? stops[stops.length - 1] + 1e-6 : v);
+  }
   return [
     "interpolate", ["linear"], ["get", id],
-    0, "rgba(242, 177, 52, 0.1)",
-    0.5, "rgba(242, 177, 52, 0.45)",
-    1, "rgba(224, 51, 79, 0.75)",
+    stops[0], "rgba(242, 177, 52, 0.03)",
+    stops[1], "rgba(242, 177, 52, 0.5)",
+    stops[2], "rgba(224, 51, 79, 0.85)",
   ];
 }
 
@@ -125,7 +142,7 @@ export function TractMap({
     >
       <NavigationControl position="top-right" showCompass={false} />
       <Source id="tracts" type="geojson" data={tracts}>
-        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer), "fill-opacity": showTracts ? 1 : 0 }} />
+        <Layer id="tract-fill" type="fill" paint={{ "fill-color": heatRamp(layer, layers), "fill-opacity": showTracts ? 1 : 0 }} />
         <Layer id="tract-line" type="line" paint={{ "line-color": "#ffffff", "line-width": 0.3, "line-opacity": showTracts ? 0.6 : 0 }} />
       </Source>
       {layer !== "fit" &&
