@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import { findPlacements, runCompetitorAgent, scoreAudience } from "@/lib/api";
+import { findPlacements, runCompetitorAgent } from "@/lib/api";
 import type { AgentEvent, AudienceFit, Brief, Campaign, Competitor, Placement } from "@/lib/contract";
 import { useSettings } from "@/lib/settings";
 import { registerNeighborhoods } from "@/lib/tracts";
@@ -11,6 +11,8 @@ import { computeLayers, recommendationLayer, strongest, type TractShapes } from 
 export type RunState = {
   shapes: TractShapes | null;
   fit: AudienceFit | null;
+  /** How much of the audience scoring has arrived, so the page can show progress. */
+  scoring: { answered: number; total: number } | null;
   events: AgentEvent[];
   agentDone: boolean;
   placements: Placement[] | null;
@@ -20,6 +22,7 @@ export type RunState = {
 const EMPTY: RunState = {
   shapes: null,
   fit: null,
+  scoring: null,
   events: [],
   agentDone: false,
   placements: null,
@@ -27,6 +30,55 @@ const EMPTY: RunState = {
 };
 
 let shapesRequest: Promise<TractShapes> | null = null;
+
+/**
+ * Scores the brief through the streaming Route Handler, calling `onFit` after
+ * each batch so the map can fill in, and resolves with the complete fit.
+ */
+async function streamAudience(
+  brief: Brief,
+  signal: AbortSignal,
+  onFit: (fit: AudienceFit & { answered: number; total: number }) => void,
+) {
+  const response = await fetch("/api/audience", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(brief),
+    signal,
+  });
+  if (!response.ok || !response.body) throw new Error(`Scoring failed (HTTP ${response.status})`);
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let complete: AudienceFit | null = null;
+
+  const read = (line: string) => {
+    if (!line.trim()) return;
+    const event = JSON.parse(line) as {
+      type: string;
+      fit?: AudienceFit & { answered: number; total: number };
+      message?: string;
+    };
+    if (event.type === "error") throw new Error(event.message ?? "Scoring failed");
+    if (event.type === "fit" && event.fit) {
+      complete = event.fit;
+      onFit(event.fit);
+    }
+  };
+
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() ?? "";
+    for (const line of lines) read(line);
+  }
+  if (buffer) read(buffer);
+  if (!complete) throw new Error("Scoring returned no result");
+  return complete;
+}
 
 /** The tract shapes, fetched once per page load. */
 function loadShapes() {
@@ -79,8 +131,10 @@ export function useAudienceRun() {
           update(() => ({ shapes }));
           return shapes;
         }),
-        scoreAudience(brief).then((fit) => {
-          update(() => ({ fit }));
+        streamAudience(brief, ctrl.signal, (batch) => {
+          update(() => ({ fit: batch, scoring: { answered: batch.answered, total: batch.total } }));
+        }).then((fit) => {
+          update(() => ({ fit, scoring: null }));
           return fit;
         }),
       ]);
