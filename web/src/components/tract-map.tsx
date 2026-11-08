@@ -111,10 +111,8 @@ export function TractMap({
           ? (map.current?.queryRenderedFeatures(event.point, { layers: ["tract-fill"] })[0]?.properties?.geoid as string | undefined)
           : undefined;
         const value = geoid ? layers?.[geoid]?.[layer] : undefined;
-        // A tract that scores zero on the current layer reads as empty space:
-        // the map shows nothing there, so it offers no value to hover.
         setHoveredTract(
-          geoid && value !== undefined && value > 0
+          geoid && value !== undefined
             ? { geoid, value, longitude: event.lngLat.lng, latitude: event.lngLat.lat }
             : null,
         );
