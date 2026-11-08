@@ -309,7 +309,7 @@ function NextStepsSlide() {
         </h2>
         <ul className="mt-auto grid grid-cols-3 gap-8">
           {nextSteps.map((step) => (
-            <li key={step.name} className={`${sheet} rounded-2xl px-8 py-7`}>
+            <li key={step.name} className="rounded-2xl border border-border bg-card px-8 py-7 text-card-foreground">
               <p className="font-heading text-[1.8rem] font-bold tracking-tight">{step.name}</p>
               <p className="mt-3 text-[1.3rem] leading-snug text-muted-foreground">{step.detail}</p>
             </li>
