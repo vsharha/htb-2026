@@ -41,7 +41,7 @@ export type PaletteTheme = {
   heat: Heat;
   /** The background glow's lightest blob; the other blobs use the heat variables. */
   glow: string;
-  /** A small extra blob in the background glow; palettes without one leave it transparent. */
+  /** An extra blob in the background glow; palettes without one leave it transparent. */
   highlight?: string;
   /** The four filled map classes, from the 50th to 75th percentile up to the top 3%. */
   ramp: [string, string, string, string];
@@ -87,7 +87,7 @@ const CLASSIC_NIGHT_VARS: Record<string, string> = {
 
 export const PALETTES: Record<PaletteId, Palette> = {
   // The background glow is built from exactly the map's four class colours,
-  // plus a small white highlight.
+  // plus a white highlight.
   // Light mode's heat variables are the :root defaults in globals.css, so the
   // page paints this palette before the saved settings load.
   warm: {
