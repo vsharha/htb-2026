@@ -204,6 +204,8 @@ export function TractMap({
       minZoom={9}
       maxBounds={[-74.6, 40.35, -73.4, 41.1]}
       mapStyle={dark ? DARK_BASEMAP : LIGHT_BASEMAP}
+      // Diffing the two basemaps would fade their colours over MapLibre's default 300ms.
+      styleDiffing={false}
       style={{ width: "100%", height: "100%" }}
       attributionControl={{ compact: true }}
       onMove={(event) => setZoom(Math.round(event.viewState.zoom * 20) / 20)}

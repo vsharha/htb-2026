@@ -386,21 +386,33 @@ function resolveDark(mode: Mode) {
   return mode === "system" ? systemDark() : mode === "dark";
 }
 
+function withoutTransitions(change: () => void) {
+  const style = document.createElement("style");
+  style.textContent = "*,*::before,*::after{transition:none!important}";
+  document.head.appendChild(style);
+  change();
+  // Forces a style recalculation, so the new colours settle before transitions return.
+  void document.documentElement.offsetHeight;
+  style.remove();
+}
+
 function apply(settings: Settings) {
-  const root = document.documentElement;
-  root.dataset.corners = settings.corners;
-  root.classList.toggle("dark", settings.dark);
-  root.style.colorScheme = settings.dark ? "dark" : "light";
-  for (const palette of Object.values(PALETTES)) {
-    for (const { vars } of [palette.light, palette.night]) {
-      for (const name of Object.keys(vars)) root.style.removeProperty(name);
+  withoutTransitions(() => {
+    const root = document.documentElement;
+    root.dataset.corners = settings.corners;
+    root.classList.toggle("dark", settings.dark);
+    root.style.colorScheme = settings.dark ? "dark" : "light";
+    for (const palette of Object.values(PALETTES)) {
+      for (const { vars } of [palette.light, palette.night]) {
+        for (const name of Object.keys(vars)) root.style.removeProperty(name);
+      }
     }
-  }
-  const theme = paletteTheme(settings.palette, settings.dark);
-  for (const [name, value] of Object.entries(theme.vars)) root.style.setProperty(name, value);
-  root.style.setProperty("--accent-dark", theme.accentDark);
-  root.style.setProperty("--ink-3", theme.ink3);
-  root.style.setProperty("--tab-active", theme.tab);
+    const theme = paletteTheme(settings.palette, settings.dark);
+    for (const [name, value] of Object.entries(theme.vars)) root.style.setProperty(name, value);
+    root.style.setProperty("--accent-dark", theme.accentDark);
+    root.style.setProperty("--ink-3", theme.ink3);
+    root.style.setProperty("--tab-active", theme.tab);
+  });
 }
 
 function load() {
