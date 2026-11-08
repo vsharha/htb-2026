@@ -112,17 +112,40 @@ function Pending({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * The wait while the self-hosted decision model scores every tract. The count
- * shows the page is working, because CPU inference takes about a minute and a
- * half and a still spinner reads as a hang.
+ * The wait while the self-hosted decision model scores every tract. The bar
+ * fills against the usual 90 seconds and stops short of the end, because the
+ * request reports nothing until it finishes; the seconds count is the real
+ * signal and CPU inference under load can run past 90.
  */
+const EXPECTED_SECONDS = 90;
+
 function Scoring() {
   const [seconds, setSeconds] = useState(0);
   useEffect(() => {
     const id = window.setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => window.clearInterval(id);
   }, []);
-  return <Pending>Scoring 2,324 census tracts with the self-hosted model… {seconds}s</Pending>;
+  const progress = Math.min(seconds / EXPECTED_SECONDS, 0.97);
+  return (
+    <div className="flex max-w-sm flex-col gap-2">
+      <p className="animate-pulse text-sm text-muted-foreground">
+        Scoring 2,324 census tracts with the self-hosted model… {seconds}s of about {EXPECTED_SECONDS}
+      </p>
+      <div
+        className="h-1.5 w-full overflow-hidden rounded-full bg-foreground/10"
+        role="progressbar"
+        aria-label="Scoring progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(progress * 100)}
+      >
+        <div
+          className="h-full rounded-full bg-accent transition-[width] duration-1000 ease-linear"
+          style={{ width: `${(progress * 100).toFixed(1)}%` }}
+        />
+      </div>
+    </div>
+  );
 }
 
 /**
