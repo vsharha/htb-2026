@@ -159,23 +159,37 @@ export function TractMap({
     map.current.fitBounds(boundsOf(placements), { padding: 60, maxZoom: 15, duration: 800 });
   }, [placements]);
 
-  // A click on a placement or campaign row brings its marker into view.
+  // A click on a placement or campaign row brings its marker into view, once.
+  // Placements and campaigns get a new array on every run update, so the
+  // effects below must remember which click they acted on: otherwise each
+  // event of a still-running run pulls the map back to the same item.
+  const handledPlacement = useRef<string | null>(null);
+  const handledCampaign = useRef<string | null>(null);
+
   const selected = focus.selected;
   useEffect(() => {
     if (selected?.from !== "list") return;
+    const click = `${selected.id}:${selected.at}`;
+    if (handledPlacement.current === click) return;
     const p = placements?.find((x) => x.id === selected.id);
     if (!p) return;
+    handledPlacement.current = click;
     map.current?.flyTo({ center: [p.longitude, p.latitude], zoom: Math.max(map.current.getZoom(), 14) });
     // On phones the map sits above the scrolling column, so selecting a
     // placement from the list scrolls back up to it.
     map.current?.getContainer().scrollIntoView({ behavior: "smooth", block: "start" });
   }, [selected, placements]);
+
   const selectedCampaign = campaignFocus.selected;
   useEffect(() => {
     if (selectedCampaign?.from !== "list") return;
+    const click = `${selectedCampaign.id}:${selectedCampaign.at}`;
+    if (handledCampaign.current === click) return;
     const c = campaigns.find((x, i) => campaignId(x, i) === selectedCampaign.id);
     const location = c && getCampaignLocation(c);
-    if (location) map.current?.flyTo({ center: [location.longitude, location.latitude], zoom: Math.max(map.current.getZoom(), 14) });
+    if (!location) return;
+    handledCampaign.current = click;
+    map.current?.flyTo({ center: [location.longitude, location.latitude], zoom: Math.max(map.current.getZoom(), 14) });
   }, [selectedCampaign, campaigns]);
 
   const tracts = useMemo(
