@@ -3,7 +3,7 @@
   "checkpoint_id": "01M6XBP6WYCYSD0Y20T1QZJN4N",
   "strategy": "manual-commit",
   "branch": "vultr2",
-  "checkpoints_count": 5,
+  "checkpoints_count": 6,
   "files_touched": [
     "web/src/components/tract-map.tsx"
   ],
@@ -35,6 +35,13 @@
       "compact_transcript": "/3/transcript.jsonl",
       "content_hash": "/3/content_hash.txt",
       "prompt": "/3/prompt.txt"
+    },
+    {
+      "metadata": "/4/metadata.json",
+      "transcript": "/4/full.jsonl",
+      "compact_transcript": "/4/transcript.jsonl",
+      "content_hash": "/4/content_hash.txt",
+      "prompt": "/4/prompt.txt"
     }
   ],
   "token_usage": {
