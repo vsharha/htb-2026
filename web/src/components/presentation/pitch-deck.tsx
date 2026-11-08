@@ -312,20 +312,7 @@ function DemoSlide() {
   );
 }
 
-const nextSteps = [
-  {
-    name: "Real prices",
-    detail: "Verified placement prices and minimum spends. Costs per audience member are estimates today.",
-  },
-  {
-    name: "Stores and offices",
-    detail: "Competitors’ stores and offices as presence evidence, alongside their campaigns.",
-  },
-  {
-    name: "More cities",
-    detail: "The method works in any city that publishes data on residents, jobs, trips and ad sites.",
-  },
-];
+const nextSteps = ["More cities", "Real prices", "Consider competitor stores"];
 
 function NextStepsSlide() {
   return (
@@ -335,12 +322,9 @@ function NextStepsSlide() {
         <h2 className="mt-6 max-w-[1050px] font-heading text-[4.75rem] leading-[1] font-bold tracking-[-0.03em] text-balance">
           From a map of the gap to a plan you can buy.
         </h2>
-        <ul className="mt-auto grid grid-cols-3 gap-8">
+        <ul className="mt-14 list-disc space-y-5 pl-10 text-[2.4rem] leading-snug marker:text-muted-foreground">
           {nextSteps.map((step) => (
-            <li key={step.name} className="rounded-2xl border border-border bg-card px-8 py-7 text-card-foreground">
-              <p className="font-heading text-[1.8rem] font-bold tracking-tight">{step.name}</p>
-              <p className="mt-3 text-[1.3rem] leading-snug text-muted-foreground">{step.detail}</p>
-            </li>
+            <li key={step}>{step}</li>
           ))}
         </ul>
       </SlideBody>
