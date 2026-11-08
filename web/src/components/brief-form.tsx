@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CITIES, INDUSTRIES, type Brief, type Industry } from "@/lib/contract";
+import { SAMPLE_BRIEF } from "@/lib/example-briefs";
 import { cn } from "@/lib/utils";
 
 // The select popups render in a portal, outside the sentence, so they repeat
@@ -70,21 +71,15 @@ const CITY_OPTIONS: Option[] = [
 // no spinner arrows. `pattern` keeps the browser's validation.
 const money = { type: "text", inputMode: "decimal", required: true, autoComplete: "off" } as const;
 
-const SAMPLE_BRIEF: Brief = {
-  industry: "Consumer app",
-  description: "a dating app for people looking for a serious relationship",
-  targetCustomer: "single professionals in their late twenties and thirties living in Manhattan and Brooklyn",
-  customerPays: { amount: 30, per: "month" },
-  monthlyBudget: 8000,
-  city: CITIES[0].id,
-  markets: [...CITIES[0].areas],
-};
-
 export function BriefForm({
   onSubmit,
+  preset,
 }: {
   onSubmit: (brief: Brief) => void;
+  /** A picked example brief; a new `id` remounts the form with its values. */
+  preset?: { brief: Brief; id: number } | null;
 }) {
+  const filled = preset?.brief;
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -115,35 +110,35 @@ export function BriefForm({
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="group/form flex flex-col gap-16">
+    <form key={preset?.id ?? "blank"} noValidate onSubmit={handleSubmit} className="group/form flex flex-col gap-16">
       <p className={cn(sentenceType, "leading-[1.55] text-balance")}>
         Our company is{" "}
         <label className="sr-only" htmlFor="description">What the company is, in a few words</label>
-        <input id="description" name="description" required placeholder="a budgeting app" className={cn(blank, "min-w-[12ch]")} />{" "}
+        <input id="description" name="description" required defaultValue={filled?.description ?? ""} placeholder="a budgeting app" className={cn(blank, "min-w-[12ch]")} />{" "}
         in{" "}
         <span className="whitespace-nowrap">
-          <BlankSelect name="industry" label="Industry" options={INDUSTRY_OPTIONS} placeholder="fintech" required />.
+          <BlankSelect name="industry" label="Industry" options={INDUSTRY_OPTIONS} defaultValue={filled?.industry ?? null} placeholder="fintech" required />.
         </span>{" "}
         We want to reach{" "}
         <label className="sr-only" htmlFor="targetCustomer">The customers the company wants to reach</label>
-        <input id="targetCustomer" name="targetCustomer" required placeholder="young renters in tech" className={cn(blank, "min-w-[12ch]")} />{" "}
+        <input id="targetCustomer" name="targetCustomer" required defaultValue={filled?.targetCustomer ?? ""} placeholder="young renters in tech" className={cn(blank, "min-w-[12ch]")} />{" "}
         who would pay{" "}
         <label className="sr-only" htmlFor="pays">What a customer pays, in US dollars</label>
         <span className="whitespace-nowrap">
-          $<input id="pays" name="pays" {...money} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="12" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
+          $<input id="pays" name="pays" {...money} defaultValue={filled?.customerPays.amount ?? ""} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="12" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
         </span>{" "}
         per{" "}
         <span className="whitespace-nowrap">
-          <BlankSelect name="per" label="Paid per" options={PER_OPTIONS} defaultValue="month" />,
+          <BlankSelect name="per" label="Paid per" options={PER_OPTIONS} defaultValue={filled?.customerPays.per ?? "month"} />,
         </span>{" "}
         and we can spend{" "}
         <label className="sr-only" htmlFor="budget">Monthly advertising budget, in US dollars</label>
         <span className="whitespace-nowrap">
-          $<input id="budget" name="budget" {...money} pattern="[0-9]+" placeholder="3000" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
+          $<input id="budget" name="budget" {...money} defaultValue={filled?.monthlyBudget ?? ""} pattern="[0-9]+" placeholder="3000" className={cn(blank, "ml-1 min-w-[1ch] tabular-nums")} />
         </span>{" "}
         a month on ads in{" "}
         <span className="whitespace-nowrap">
-          <BlankSelect name="city" label="City" options={CITY_OPTIONS} defaultValue={CITIES[0].id} />.
+          <BlankSelect name="city" label="City" options={CITY_OPTIONS} defaultValue={filled?.city ?? CITIES[0].id} />.
         </span>
       </p>
 

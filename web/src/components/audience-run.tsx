@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { BriefForm } from "@/components/brief-form";
+import { ExampleBriefs } from "@/components/example-briefs";
 import { HeatGlow } from "@/components/heat-glow";
 import { ResultsSplit } from "@/components/results-split";
 import { SettingsMenu } from "@/components/settings-menu";
@@ -21,6 +22,7 @@ const sheet = "bg-card text-card-foreground shadow-[0_24px_60px_-20px_rgb(21_23_
 export function AudienceRun() {
   const { run, start } = useAudienceRun();
   const [brief, setBrief] = useState<Brief | null>(null);
+  const [preset, setPreset] = useState<{ brief: Brief; id: number } | null>(null);
   const [editing, setEditing] = useState(true);
   const [revealing, setRevealing] = useState(false);
   const [collapsing, setCollapsing] = useState(false);
@@ -47,7 +49,7 @@ export function AudienceRun() {
         <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-3 sm:px-8">
           <section className={`${sheet} flex flex-col gap-12 rounded-b-lg px-6 pt-8 pb-12 sm:px-14 sm:pt-12 sm:pb-16`}>
             <SiteHeader className="text-[clamp(1.35rem,3vw,2.35rem)]" />
-            <BriefForm onSubmit={submit} />
+            <BriefForm onSubmit={submit} preset={preset} />
           </section>
         </main>
       </div>
@@ -80,6 +82,7 @@ export function AudienceRun() {
           />
         </main>
       )}
+      {!showResults && <ExampleBriefs onPick={(example) => setPreset({ brief: example, id: Date.now() })} />}
       <SettingsMenu />
     </div>
   );
