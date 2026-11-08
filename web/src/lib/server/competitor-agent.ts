@@ -37,7 +37,7 @@ Keep historical campaigns with their known dates; do not describe them as runnin
 Campaign startsOn and endsOn are YYYY-MM-DD dates explicitly supported by the source, not publication dates. Use null when unknown.
 Use stationName only for subway advertising explicitly placed at that station in the evidence. Do not infer a station from a neighbourhood or nearby billboard.
 Use the exact station name from the supplied list; line names in parentheses can be omitted. Include that name in your factual evidence summary.
-For other campaign types, put the specific landmark, neighbourhood or street address stated by the source in location. The server geocodes it. Never invent an address or coordinates. Report one location per finding.
+For other campaign types, put the specific landmark, neighbourhood, street address or street corner stated by the source in location, followed by the neighbourhood or borough when the source gives one, such as "41st Street and 7th Avenue, Manhattan". The server geocodes it. Never invent an address or coordinates. Report one location per finding.
 Keep source-supported campaigns even when their dates or exact location are unknown.`;
 
 type Finding = {

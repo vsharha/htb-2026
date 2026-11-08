@@ -86,7 +86,7 @@ export type CampaignLocation = {
   longitude: number;
   label: string;
   precision: "station" | "address" | "area";
-  source: "station" | "geoapify";
+  source: "station" | "geoapify" | "street-centerline";
   attribution: string;
 };
 

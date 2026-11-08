@@ -13,6 +13,9 @@ Run from tools/ with `uv run python -m tools.analyze`. Writes to data/analysis/:
   Jev questions from the descriptions.
 - nyc_placements.csv: every LinkNYC kiosk and bus shelter with its tract geoid.
 
+It also makes sure data/streets/intersections.csv exists: the street
+intersections the web app uses to place campaigns described by a street corner.
+
 Startup-specific scoring and competitor campaigns are added by the web app.
 """
 
@@ -21,7 +24,7 @@ import json
 import geopandas as gpd
 import pandas as pd
 
-from tools.sources import census, lodes, placements, subway, tracts
+from tools.sources import census, lodes, placements, streets, subway, tracts
 from tools.sources._common import DATA, ROOT
 
 OUTPUT = DATA / "analysis" / "nyc_tracts.geojson"
@@ -205,6 +208,7 @@ def main() -> None:
     pd.DataFrame(shapes.drop(columns="geometry")).to_csv(TABLE_OUTPUT, index=False)
     COLUMNS_OUTPUT.write_text(json.dumps(_column_list(), indent=2) + "\n")
     sites.to_csv(PLACEMENTS_OUTPUT, index=False)
+    intersections = streets.load()
 
     outside = sites["geoid"].isna().sum()
     print(
@@ -212,6 +216,9 @@ def main() -> None:
         f"and {TABLE_OUTPUT.relative_to(ROOT)}"
     )
     print(f"Wrote {len(FEATURES)} columns to {COLUMNS_OUTPUT.relative_to(ROOT)}")
+    print(
+        f"{len(intersections)} street intersections in {streets.INTERSECTIONS.relative_to(ROOT)}"
+    )
     print(
         f"Wrote {len(sites)} placements to {PLACEMENTS_OUTPUT.relative_to(ROOT)}, "
         f"{outside} outside every tract"

@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/*": ["../data/analysis/*.csv", "../data/analysis/columns.json"],
     "/api/tracts": ["../data/analysis/nyc_tracts.geojson"],
-    "/api/competitors": ["../data/subway/stations.csv", "../data/competitors/*.json"],
+    "/api/competitors": ["../data/subway/stations.csv", "../data/streets/intersections.csv", "../data/competitors/*.json"],
   },
   turbopack: {
     rules: {
