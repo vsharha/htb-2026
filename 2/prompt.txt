@@ -1,0 +1,5 @@
+can we add a night mode
+
+---
+
+yeah we dont need to test it with playwright ill do that. can you add a button to toggle it
