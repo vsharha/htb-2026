@@ -53,11 +53,33 @@ export function useRunView(run: RunState) {
   return { layer, setLayer, hasGap, campaigns, competitors, layers, focus, campaignFocus };
 }
 
-function Section({ title, aside, children }: { title: string; aside?: React.ReactNode; children: React.ReactNode }) {
+function Throbber() {
+  return (
+    <span
+      aria-hidden
+      className="mb-px inline-block size-3 shrink-0 animate-spin rounded-full border-[1.5px] border-muted-foreground/30 border-t-muted-foreground motion-reduce:animate-none"
+    />
+  );
+}
+
+function Section({
+  title,
+  aside,
+  busy,
+  children,
+}: {
+  title: string;
+  aside?: React.ReactNode;
+  busy?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-heading text-lg font-semibold tracking-tight">{title}</h2>
+        <div className="flex items-baseline gap-2">
+          <h2 className="font-heading text-lg font-semibold tracking-tight">{title}</h2>
+          {busy && <Throbber />}
+        </div>
         {aside && <span className="text-xs text-muted-foreground">{aside}</span>}
       </div>
       {children}
@@ -305,10 +327,11 @@ function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState;
   const steps = run.events.flatMap((e) => (e.type === "step" ? [e.message] : []));
   const errors = run.events.flatMap((e) => (e.type === "error" ? [e.message] : []));
   const outcome = researchOutcome(run.events, run.agentDone || !!run.error);
+  const researching = !run.agentDone && !run.error;
 
   return (
     <>
-      <Section title="Competitors" aside={`${competitors.length} found`}>
+      <Section title="Competitors" aside={`${competitors.length} found`} busy={researching}>
         {competitors.length === 0 ? (
           !run.agentDone && !run.error ? <Pending>Finding competitors…</Pending> : <p className="text-sm text-muted-foreground">No source-supported competitor matches are available from this run.</p>
         ) : (
@@ -326,7 +349,7 @@ function CompetitorsTab({ run, competitors, campaigns, focus }: { run: RunState;
         )}
       </Section>
 
-      <Section title="Their ads" aside={`${campaigns.length} found`}>
+      <Section title="Their ads" aside={`${campaigns.length} found`} busy={researching}>
         <div className="flex flex-col gap-1 text-xs text-muted-foreground" role="status">
           <p className="font-medium text-foreground">{outcome.label}</p>
           {outcome.summary && <p>{outcome.summary.competitorsSearched.length} of {competitors.length} competitors searched; {outcome.summary.competitorsCompleted.length} completed. {outcome.summary.searches} searches; {outcome.summary.sources} source URLs found.</p>}
