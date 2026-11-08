@@ -42,7 +42,7 @@ export function AudienceRun() {
         <HeatGlow hurrying={revealing} />
         <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-3 sm:px-8">
           <section className={`${sheet} flex flex-col gap-12 rounded-b-[2.5rem] px-6 pt-8 pb-12 sm:px-14 sm:pt-12 sm:pb-16`}>
-            <SiteHeader className="text-4xl sm:text-5xl" />
+            <SiteHeader className="text-[clamp(1.35rem,3vw,2.35rem)]" />
             <BriefForm onSubmit={submit} busy={busy} />
           </section>
         </main>
