@@ -3,7 +3,7 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { setWorkerUrl, type ExpressionSpecification } from "maplibre-gl";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Map, { Layer, Marker, NavigationControl, Popup, Source, useMap, type MapRef } from "react-map-gl/maplibre";
 
 import { CompetitorLogo } from "@/components/competitor-logo";
@@ -105,6 +105,24 @@ function ClusterMarker({ sites }: { sites: Placement[] }) {
   );
 }
 
+function HoverPopup({ longitude, latitude, offset, children }: { longitude: number; latitude: number; offset: number; children: ReactNode }) {
+  return (
+    <Popup
+      longitude={longitude}
+      latitude={latitude}
+      offset={offset}
+      closeButton={false}
+      closeOnClick={false}
+      maxWidth="220px"
+      className="pointer-events-none"
+      // Markers carry z-index 1 to 4, and the popup shares their container.
+      style={{ zIndex: 5 }}
+    >
+      {children}
+    </Popup>
+  );
+}
+
 export function TractMap({
   shapes,
   layers,
@@ -195,6 +213,13 @@ export function TractMap({
   const audienceOnly = recommendationLayer(campaigns) === "fit";
   const showTracts = layer !== "competition" || !audienceOnly;
   const [hoveredTract, setHoveredTract] = useState<{ geoid: string; value: number; longitude: number; latitude: number } | null>(null);
+  // Separate from campaignFocus.hovered, which a sidebar row also sets: the row already names its app.
+  const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
+  const hoveredMarker = layer !== "fit" ? campaignMarkers.find((m) => m.id === hoveredMarkerId) : undefined;
+  const hoverMarker = (id: string | null) => {
+    setHoveredMarkerId(id);
+    campaignFocus.hover(id);
+  };
 
   return (
     <Map
@@ -236,10 +261,10 @@ export function TractMap({
               <button
                 type="button"
                 aria-label={`Campaign: ${campaign.competitor}, ${campaign.title}. ${LOCATION_PRECISION_LABELS[location.precision]}`}
-                onMouseEnter={() => campaignFocus.hover(id)}
-                onMouseLeave={() => campaignFocus.hover(null)}
-                onFocus={() => campaignFocus.hover(id)}
-                onBlur={() => campaignFocus.hover(null)}
+                onMouseEnter={() => hoverMarker(id)}
+                onMouseLeave={() => hoverMarker(null)}
+                onFocus={() => hoverMarker(id)}
+                onBlur={() => hoverMarker(null)}
                 onClick={() => campaignFocus.select(id, "map")}
                 className={
                   "flex size-7 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-foreground shadow-sm transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 " +
@@ -287,18 +312,13 @@ export function TractMap({
             </Marker>
           );
         })}
-      {showTracts && hoveredTract && (
-        <Popup
-          longitude={hoveredTract.longitude}
-          latitude={hoveredTract.latitude}
-          offset={12}
-          closeButton={false}
-          closeOnClick={false}
-          maxWidth="220px"
-          className="pointer-events-none"
-          // Markers carry z-index 1 to 4, and the popup shares their container.
-          style={{ zIndex: 5 }}
-        >
+      {hoveredMarker && (
+        <HoverPopup longitude={hoveredMarker.location.longitude} latitude={hoveredMarker.location.latitude} offset={20}>
+          <p className="font-sans text-xs leading-tight font-medium text-foreground">{hoveredMarker.campaign.competitor}</p>
+        </HoverPopup>
+      )}
+      {showTracts && hoveredTract && !hoveredMarker && (
+        <HoverPopup longitude={hoveredTract.longitude} latitude={hoveredTract.latitude} offset={12}>
           <div className="font-sans text-xs leading-tight text-foreground">
             <p className="font-medium">{tractName(hoveredTract.geoid)}</p>
             <p className="text-[10px] text-ink-3">{tractCode(hoveredTract.geoid)}</p>
@@ -307,7 +327,7 @@ export function TractMap({
               <span className="font-mono tabular-nums text-foreground">{TRACT_VALUE[layer].format(hoveredTract.value)}</span>
             </p>
           </div>
-        </Popup>
+        </HoverPopup>
       )}
     </Map>
   );

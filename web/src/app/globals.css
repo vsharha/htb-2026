@@ -194,6 +194,27 @@ html[data-corners="sharp"] *::after {
   }
 }
 
+/* MapLibre's own popup is white in every theme. */
+.maplibregl-popup .maplibregl-popup-content {
+  background: var(--popover);
+}
+
+.maplibregl-popup[class*="-anchor-top"] .maplibregl-popup-tip {
+  border-bottom-color: var(--popover);
+}
+
+.maplibregl-popup[class*="-anchor-bottom"] .maplibregl-popup-tip {
+  border-top-color: var(--popover);
+}
+
+.maplibregl-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--popover);
+}
+
+.maplibregl-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--popover);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
