@@ -150,7 +150,7 @@ export function BriefForm({
       </p>
 
       <div className="flex flex-wrap items-center gap-4">
-        <Button type="submit" disabled={busy} className="h-12 gap-2.5 rounded-full pr-5 pl-6 text-base">
+        <Button type="submit" disabled={busy} className="h-14 gap-3 rounded-full pr-6 pl-7 text-lg [&_svg:not([class*='size-'])]:size-5">
           {busy ? "Mapping your audience…" : "Map my audience"}
           <ArrowRight />
         </Button>
