@@ -13,14 +13,16 @@ const sheet = "bg-card text-card-foreground shadow-[0_24px_60px_-20px_rgb(21_23_
 
 /**
  * The form on the heat glow until it is submitted, then the results expand
- * over it from the bottom. The form stays mounted while hidden, so editing
- * the brief brings it back with the answers still in it.
+ * over it from the bottom. Editing the brief plays that animation in reverse.
+ * The form stays mounted while hidden, so it comes back with the answers
+ * still in it.
  */
 export function AudienceRun() {
   const { run, start, busy } = useAudienceRun();
   const [brief, setBrief] = useState<Brief | null>(null);
   const [editing, setEditing] = useState(true);
   const [revealing, setRevealing] = useState(false);
+  const [collapsing, setCollapsing] = useState(false);
 
   function submit(next: Brief) {
     setBrief(next);
@@ -31,11 +33,12 @@ export function AudienceRun() {
   }
 
   const showResults = !editing && run && brief;
+  const animating = revealing || collapsing;
 
   return (
-    <div className={`relative isolate flex-1${revealing ? " overflow-clip" : ""}`}>
+    <div className={`relative isolate flex-1${animating ? " overflow-clip" : ""}`}>
       <div
-        hidden={!!showResults && !revealing}
+        hidden={!!showResults && !animating}
         inert={!!showResults}
         className={showResults ? "absolute inset-0" : "relative"}
       >
@@ -51,9 +54,14 @@ export function AudienceRun() {
         <main
           aria-label="Audience results"
           tabIndex={-1}
-          className={`relative z-10 min-h-dvh bg-card outline-none${revealing ? " results-reveal" : ""}`}
+          className={`relative z-10 min-h-dvh bg-card outline-none${revealing ? " results-reveal" : ""}${collapsing ? " results-collapse" : ""}`}
           onAnimationEnd={(event) => {
             if (event.target !== event.currentTarget) return;
+            if (collapsing) {
+              setCollapsing(false);
+              setEditing(true);
+              return;
+            }
             setRevealing(false);
             if (!event.currentTarget.contains(document.activeElement)) {
               event.currentTarget.focus({ preventScroll: true });
@@ -64,8 +72,9 @@ export function AudienceRun() {
             run={run}
             brief={brief}
             onEditBrief={() => {
+              window.scrollTo({ top: 0, behavior: "instant" });
               setRevealing(false);
-              setEditing(true);
+              setCollapsing(true);
             }}
           />
         </main>
