@@ -87,7 +87,6 @@ export function MapPanel({
             </li>
           </ul>
         )}
-        <a href="https://www.geoapify.com/" target="_blank" rel="noreferrer" className="pointer-events-auto mt-2 block text-[10px] text-muted-foreground underline underline-offset-2">Location lookup powered by Geoapify</a>
       </div>
     </section>
   );
