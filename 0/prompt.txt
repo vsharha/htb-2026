@@ -1,0 +1,96 @@
+╭╴pixel@nixos …/htb-2026 on  main (  ) 
+╰─ entire repo remote add origin --override /et/htb/second-test
+resolve repo: refresh login token: load core token: read access token: The name is not activatable
+
+╭╴pixel@nixos …/htb-2026 on  main (  ) 
+╰─ gs
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+
+╭╴pixel@nixos …/htb-2026 on  main (  ) 
+╰─
+
+---
+
+[Enter] Open browser  [c] Copy URL
+Waiting for sign-in… 
+✓ Copied to clipboard.
+✓ Opened browser.
+save login: store refresh token in credential store: The name is not activatable
+
+If this machine has no usable OS keyring (headless server, container, CI), store tokens in a file instead:
+
+  ENTIRE_TOKEN_STORE=file entire login
+
+or, to make it stick, put {"token_store": "file"} in /home/pixel/.config/entire/config.json.
+
+Tokens are then written with 0600 permissions to /home/pixel/.config/entire/tokens.json (override the location with ENTIRE_TOKEN_STORE_PATH)
+
+╭╴pixel@nixos …/htb-2026 on  main (  ) 
+╰─
+
+---
+
+ok how can i tes tit
+
+---
+
+╭╴pixel@nixos …/htb-2026 on  enti… ( ) 
+╰─ git remote -v
+origin	entire://aws-eu-central-1.entire.io/et/htb/second-test (fetch)
+origin	entire://aws-eu-central-1.entire.io/et/htb/second-test (push)
+
+╭╴pixel@nixos …/htb-2026 on  enti… ( ) 
+╰─ git ls-remote --heads origin
+
+---
+
+how do i use the platform
+
+---
+
+how do i use a trail
+
+---
+
+╭╴pixel@nixos …/htb-2026 on  enti… ( ) 
+╰─ entire trail list --mine
+PROJECT  NUMBER  STATUS  PHASE     ACTIVITY              TITLE
+et/htb   1       open    planning  2026-11-07T23:54:43Z  evaluate what tracks havent been complete that could be, what prizes are being missed out on
+
+╭╴pixel@nixos …/htb-2026 on  enti… ( ) 
+╰─  what do i do with it
+
+---
+
+so what is the point of a trail
+
+---
+
+so i use a open code instance to work on the trail?
+
+---
+
+i dont understand what do i do with teh trail now
+
+---
+
+we can do multiple tracks, but i feel we're missing out on easy ones in mlh
+
+---
+
+so what do we do with the taril then
+
+---
+
+can you do this
+
+---
+
+as man as we can, but obviously some dont apply e.g. lloyds
+
+---
+
+ok edit it go for it
