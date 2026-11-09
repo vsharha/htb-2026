@@ -6,6 +6,8 @@ Built at HackTheBurgh 2026.
 
 ![The Placewise form, a fill-in-the-blank brief describing the startup and its target customer](screenshots/form-empty.png)
 
+![The Placewise gap map of New York, with census tracts coloured by uncovered target customers, numbered placements to buy, and a ranked placement list beside it](screenshots/map-gap-view.png)
+
 ## Run the web app
 
 You need Node.js and pnpm. From `web/`:
